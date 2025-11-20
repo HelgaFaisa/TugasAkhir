@@ -75,6 +75,5 @@ Aplikasi mobile yang dirancang untuk memberikan transparansi perkembangan santri
 | Database | MySQL                           |
 | Grafik   | Chart.js                        |
 | RFID     | USB Reader (Keyboard Emulation) |
-| Caching  | Laravel Cache (Redis / Array)   |
 
 ---
