@@ -1,0 +1,335 @@
+<?php
+// routes/web.php (Complete Routes - FIXED VERSION)
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Admin\SantriController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\KesehatanSantriController;
+use App\Http\Controllers\Admin\KepulanganController;
+use App\Http\Controllers\Admin\BeritaController;
+use App\Http\Controllers\Admin\KategoriPelanggaranController;
+use App\Http\Controllers\Admin\RiwayatPelanggaranController;
+use App\Http\Controllers\Admin\PembayaranSppController;
+use App\Http\Controllers\Admin\UangSakuController;
+use App\Http\Controllers\Admin\KategoriKegiatanController;
+use App\Http\Controllers\Admin\KegiatanController;
+use App\Http\Controllers\Admin\AbsensiKegiatanController;
+use App\Http\Controllers\Admin\KartuRfidController;
+use App\Http\Controllers\Admin\RiwayatKegiatanController;
+use App\Http\Controllers\Admin\MateriController;
+use App\Http\Controllers\Admin\SemesterController;
+use App\Http\Controllers\Admin\CapaianController;
+use App\Http\Controllers\Auth\AdminAuthController;
+use App\Http\Controllers\Auth\SantriAuthController;
+use App\Http\Controllers\Santri\SantriProfileController; // BARU
+use App\Http\Controllers\Santri\SantriUangSakuController;
+use App\Http\Controllers\Santri\SantriPelanggaranController;
+use App\Http\Controllers\Santri\SantriBeritaController; // ✅ TAMBAHKAN INI
+use App\Http\Controllers\Santri\SantriKesehatanController;
+use App\Http\Controllers\Santri\SantriCapaianController;
+use App\Http\Controllers\Santri\SantriKepulanganController;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
+
+// Route fallback 'login' untuk middleware authenticate
+Route::get('/login', function () {
+    return redirect()->route('admin.login');
+})->name('login');
+
+// Halaman utama (root /) akan dialihkan ke halaman login admin
+Route::get('/', function () {
+    return redirect()->route('admin.login');
+})->name('home');
+
+// --- RUTE OTENTIKASI ADMIN ---
+Route::prefix('admin')->middleware('guest')->group(function () {
+    // Login
+    Route::get('login', [AdminAuthController::class, 'login'])->name('admin.login');
+    Route::post('login', [AdminAuthController::class, 'authenticate']);
+    
+    // Register (Hanya untuk Admin)
+    Route::get('register', [AdminAuthController::class, 'register'])->name('admin.register');
+    Route::post('register', [AdminAuthController::class, 'storeRegister']); 
+});
+
+// --- RUTE OTENTIKASI SANTRI/WALI ---
+Route::prefix('santri')->middleware('guest')->group(function () {
+    // Login
+    Route::get('login', [SantriAuthController::class, 'login'])->name('santri.login');
+    Route::post('login', [SantriAuthController::class, 'authenticate']);
+});
+
+// --- RUTE ADMINISTRATOR (Prefix: admin) ---
+Route::prefix('admin')
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.')->group(function () {
+    
+    // Logout Admin
+    Route::post('logout', [AdminAuthController::class, 'logout'])->name('logout');
+    
+    // 1. Dashboard Admin
+    Route::get('/dashboard', [DashboardController::class, 'admin'])->name('dashboard');
+
+    // 2. Data Santri (CRUD)
+    Route::resource('santri', SantriController::class);
+
+    // 3. Manajemen Pengguna (Akun Santri & Wali)
+    Route::prefix('users')->name('users.')->group(function () {
+        Route::get('santri', [UserController::class, 'santriAccounts'])->name('santri_accounts');
+        Route::get('santri/create', [UserController::class, 'createAccount'])->defaults('role', 'santri')->name('santri_create');
+        Route::post('santri/store', [UserController::class, 'storeAccount'])->defaults('role', 'santri')->name('santri_store');
+
+        Route::get('wali', [UserController::class, 'waliAccounts'])->name('wali_accounts');
+        Route::get('wali/create', [UserController::class, 'createAccount'])->defaults('role', 'wali')->name('wali_create');
+        Route::post('wali/store', [UserController::class, 'storeAccount'])->defaults('role', 'wali')->name('wali_store');
+    });
+    
+    // 4. Kesehatan Santri
+    Route::resource('kesehatan-santri', KesehatanSantriController::class);
+    
+    // Route tambahan untuk keluar UKP
+    Route::patch('kesehatan-santri/{kesehatanSantri}/keluar-ukp', [
+        KesehatanSantriController::class, 
+        'keluarUkp'
+    ])->name('kesehatan-santri.keluar-ukp');
+    
+    // Route untuk riwayat kesehatan per santri
+    Route::get('kesehatan-santri/riwayat/{id_santri}', [
+        KesehatanSantriController::class, 
+        'riwayat'
+    ])->name('kesehatan-santri.riwayat');
+    
+    // Route untuk cetak surat
+    Route::get('kesehatan-santri/{kesehatanSantri}/cetak-surat', [
+        KesehatanSantriController::class, 
+        'cetakSurat'
+    ])->name('kesehatan-santri.cetak-surat');
+    
+    // 5. KEPULANGAN SANTRI
+    Route::resource('kepulangan', KepulanganController::class);
+    
+    // Route tambahan untuk approve/reject
+    Route::post('kepulangan/{kepulangan}/approve', [
+        KepulanganController::class, 
+        'approve'
+    ])->name('kepulangan.approve');
+    
+    Route::post('kepulangan/{kepulangan}/reject', [
+        KepulanganController::class, 
+        'reject'
+    ])->name('kepulangan.reject');
+    
+    Route::post('kepulangan/{kepulangan}/complete', [
+        KepulanganController::class, 
+        'complete'
+    ])->name('kepulangan.complete');
+    
+    Route::get('kepulangan/{kepulangan}/print', [
+        KepulanganController::class, 
+        'print'
+    ])->name('kepulangan.print');
+    
+    // API route untuk get santri data
+    Route::get('api/kepulangan/santri/{id_santri}', [
+        KepulanganController::class, 
+        'getSantriData'
+    ])->name('api.kepulangan.santri');
+
+    // 6. BERITA
+    Route::prefix('berita')->name('berita.')->group(function () {
+        Route::get('/', [BeritaController::class, 'index'])->name('index');
+        Route::get('/create', [BeritaController::class, 'create'])->name('create');
+        Route::post('/', [BeritaController::class, 'store'])->name('store');
+        Route::get('/statistik', [BeritaController::class, 'statistik'])->name('statistik');
+        Route::get('/{berita:id_berita}', [BeritaController::class, 'show'])->name('show');
+        Route::get('/{berita:id_berita}/edit', [BeritaController::class, 'edit'])->name('edit');
+        Route::put('/{berita:id_berita}', [BeritaController::class, 'update'])->name('update');
+        Route::delete('/{berita:id_berita}', [BeritaController::class, 'destroy'])->name('destroy');
+    });
+
+    // 7. KATEGORI PELANGGARAN
+    Route::resource('kategori-pelanggaran', KategoriPelanggaranController::class);
+
+    // 8. RIWAYAT PELANGGARAN
+    Route::resource('riwayat-pelanggaran', RiwayatPelanggaranController::class);
+    
+    // Route tambahan untuk riwayat per santri
+    Route::get('riwayat-pelanggaran/santri/{id_santri}', [
+        RiwayatPelanggaranController::class, 
+        'riwayatSantri'
+    ])->name('riwayat-pelanggaran.riwayat-santri');
+
+    // 9. PEMBAYARAN SPP
+    Route::prefix('pembayaran-spp')->name('pembayaran-spp.')->group(function () {
+        Route::get('/', [PembayaranSppController::class, 'index'])->name('index');
+        Route::get('/create', [PembayaranSppController::class, 'create'])->name('create');
+        Route::post('/', [PembayaranSppController::class, 'store'])->name('store');
+        
+        // Generate
+        Route::get('/generate', [PembayaranSppController::class, 'generate'])->name('generate');
+        Route::post('/generate', [PembayaranSppController::class, 'generate']);
+        
+        // Laporan
+        Route::get('/laporan', [PembayaranSppController::class, 'laporan'])->name('laporan');
+        Route::get('/cetak-laporan', [PembayaranSppController::class, 'cetakLaporan'])->name('cetak-laporan');
+        Route::get('/cetak-laporan-santri/{id_santri}', [PembayaranSppController::class, 'cetakLaporanSantri'])->name('cetak-laporan-santri');
+        Route::get('/{pembayaranSpp}/cetak-bukti', [PembayaranSppController::class, 'cetakBukti'])->name('cetak-bukti');
+        
+        // Riwayat
+        Route::get('/riwayat/{id_santri}', [PembayaranSppController::class, 'riwayat'])->name('riwayat');
+        
+        // Show, Edit, Update, Delete
+        Route::get('/{pembayaranSpp}', [PembayaranSppController::class, 'show'])->name('show');
+        Route::get('/{pembayaranSpp}/edit', [PembayaranSppController::class, 'edit'])->name('edit');
+        Route::put('/{pembayaranSpp}', [PembayaranSppController::class, 'update'])->name('update');
+        Route::delete('/{pembayaranSpp}', [PembayaranSppController::class, 'destroy'])->name('destroy');
+    });
+
+    // 10. UANG SAKU SANTRI
+    Route::prefix('uang-saku')->name('uang-saku.')->group(function () {
+        Route::get('/', [UangSakuController::class, 'index'])->name('index');
+        Route::get('/create', [UangSakuController::class, 'create'])->name('create');
+        Route::post('/', [UangSakuController::class, 'store'])->name('store');
+        Route::get('/riwayat/{id_santri}', [UangSakuController::class, 'riwayat'])->name('riwayat');
+        Route::get('/{uangSaku}', [UangSakuController::class, 'show'])->name('show');
+        Route::get('/{uangSaku}/edit', [UangSakuController::class, 'edit'])->name('edit');
+        Route::put('/{uangSaku}', [UangSakuController::class, 'update'])->name('update');
+        Route::delete('/{uangSaku}', [UangSakuController::class, 'destroy'])->name('destroy');
+    });
+
+    // 11. KATEGORI KEGIATAN
+    Route::resource('kategori-kegiatan', KategoriKegiatanController::class);
+
+    // 12. KEGIATAN
+    Route::resource('kegiatan', KegiatanController::class);
+
+    // 13. ABSENSI KEGIATAN
+    Route::prefix('absensi-kegiatan')->name('absensi-kegiatan.')->group(function () {
+        Route::get('/', [AbsensiKegiatanController::class, 'index'])->name('index');
+        Route::get('/input/{kegiatan_id}', [AbsensiKegiatanController::class, 'inputAbsensi'])->name('input');
+        Route::post('/simpan', [AbsensiKegiatanController::class, 'simpanAbsensi'])->name('simpan');
+        Route::get('/rekap/{kegiatan_id}', [AbsensiKegiatanController::class, 'rekapAbsensi'])->name('rekap');
+        Route::post('/scan-rfid', [AbsensiKegiatanController::class, 'scanRfid'])->name('scan-rfid');
+    });
+
+    // 14. KARTU RFID
+    Route::prefix('kartu-rfid')->name('kartu-rfid.')->group(function () {
+        Route::get('/', [KartuRfidController::class, 'index'])->name('index');
+        Route::get('/daftar/{id_santri}', [KartuRfidController::class, 'daftarRfid'])->name('daftar');
+        Route::post('/simpan/{id_santri}', [KartuRfidController::class, 'simpanRfid'])->name('simpan');
+        Route::delete('/hapus/{id_santri}', [KartuRfidController::class, 'hapusRfid'])->name('hapus');
+        Route::get('/cetak/{id_santri}', [KartuRfidController::class, 'cetakKartu'])->name('cetak');
+    });
+
+    // 15. RIWAYAT KEGIATAN & ABSENSI
+    Route::prefix('riwayat-kegiatan')->name('riwayat-kegiatan.')->group(function () {
+        Route::get('/', [RiwayatKegiatanController::class, 'index'])->name('index');
+        Route::get('/detail-santri/{id_santri}', [RiwayatKegiatanController::class, 'detailSantri'])->name('detail-santri');
+        Route::get('/{riwayat}', [RiwayatKegiatanController::class, 'show'])->name('show');
+        Route::get('/{riwayat}/edit', [RiwayatKegiatanController::class, 'edit'])->name('edit');
+        Route::put('/{riwayat}', [RiwayatKegiatanController::class, 'update'])->name('update');
+        Route::delete('/{riwayat}', [RiwayatKegiatanController::class, 'destroy'])->name('destroy');
+        Route::get('/export/pdf', [RiwayatKegiatanController::class, 'exportPdf'])->name('export-pdf');
+    });
+
+    // 16. MASTER MATERI (Capaian Al-Qur'an & Hadist)
+    Route::resource('materi', MateriController::class);
+
+    // 17. SEMESTER (Capaian Al-Qur'an & Hadist)
+    Route::resource('semester', SemesterController::class);
+    Route::post('semester/{semester}/toggle-aktif', [SemesterController::class, 'toggleAktif'])->name('semester.toggle-aktif');
+
+    // 18. CAPAIAN SANTRI (Al-Qur'an & Hadist)
+    Route::prefix('capaian')->name('capaian.')->group(function () {
+        // Dashboard & Rekap
+        Route::get('/dashboard', [CapaianController::class, 'dashboard'])->name('dashboard');
+        Route::get('/rekap-kelas', [CapaianController::class, 'rekapKelas'])->name('rekap-kelas');
+        Route::get('/detail-materi/{id_materi}', [CapaianController::class, 'detailMateri'])->name('detail-materi');
+        
+        // CRUD Capaian
+        Route::get('/', [CapaianController::class, 'index'])->name('index');
+        Route::get('/create', [CapaianController::class, 'create'])->name('create');
+        Route::post('/', [CapaianController::class, 'store'])->name('store');
+        Route::get('/riwayat/{id_santri}', [CapaianController::class, 'riwayatSantri'])->name('riwayat-santri');
+        Route::get('/{capaian}', [CapaianController::class, 'show'])->name('show');
+        Route::get('/{capaian}/edit', [CapaianController::class, 'edit'])->name('edit');
+        Route::put('/{capaian}', [CapaianController::class, 'update'])->name('update');
+        Route::delete('/{capaian}', [CapaianController::class, 'destroy'])->name('destroy');
+        
+        // AJAX Routes
+        Route::post('/ajax/get-materi', [CapaianController::class, 'getMateriByKelas'])->name('ajax.get-materi');
+        Route::post('/ajax/get-detail-materi', [CapaianController::class, 'getDetailMateri'])->name('ajax.get-detail-materi');
+        Route::post('/ajax/calculate-persentase', [CapaianController::class, 'calculatePersentase'])->name('ajax.calculate-persentase');
+        
+        // API untuk Grafik
+        Route::get('/api/grafik-data', [CapaianController::class, 'apiGrafikData'])->name('api.grafik-data');
+    });
+});
+
+/*
+|--------------------------------------------------------------------------
+| BAGIAN SANTRI/WALI ROUTES
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('santri')
+    ->middleware(['auth', 'role:santri,wali'])
+    ->name('santri.')
+    ->group(function () {
+    
+    // Logout Santri
+    Route::post('logout', [SantriAuthController::class, 'logout'])->name('logout');
+    
+    // Dashboard Santri
+    Route::get('/dashboard', [DashboardController::class, 'santri'])->name('dashboard');
+    
+    // 1. PROFIL SANTRI
+    Route::prefix('profil')->name('profil.')->group(function () {
+        Route::get('/', [SantriProfileController::class, 'index'])->name('index');
+        Route::get('/edit', [SantriProfileController::class, 'edit'])->name('edit');
+        Route::put('/update', [SantriProfileController::class, 'update'])->name('update');
+    });
+    
+    // 2. RIWAYAT UANG SAKU
+    Route::prefix('uang-saku')->name('uang-saku.')->group(function () {
+        Route::get('/', [SantriUangSakuController::class, 'index'])->name('index');
+        Route::get('/{id}', [SantriUangSakuController::class, 'show'])->name('show');
+    });
+    
+    // 3. RIWAYAT PELANGGARAN
+    Route::prefix('pelanggaran')->name('pelanggaran.')->group(function () {
+        Route::get('/', [SantriPelanggaranController::class, 'index'])->name('index');
+        Route::get('/kategori/daftar', [SantriPelanggaranController::class, 'kategoriList'])->name('kategori');
+        Route::get('/{riwayatPelanggaran}', [SantriPelanggaranController::class, 'show'])->name('show');
+    });
+
+    // 4. BERITA SANTRI
+    Route::prefix('berita')->name('berita.')->group(function () {
+        Route::get('/', [SantriBeritaController::class, 'index'])->name('index');
+        Route::get('/{berita:id_berita}', [SantriBeritaController::class, 'show'])->name('show');
+    });
+    
+    // 5. RIWAYAT KESEHATAN
+    Route::prefix('kesehatan')->name('kesehatan.')->group(function () {
+        Route::get('/', [SantriKesehatanController::class, 'index'])->name('index');
+        Route::get('/{kesehatanSantri}', [SantriKesehatanController::class, 'show'])->name('show');
+    });
+    
+    // 6. CAPAIAN AL-QUR'AN & HADIST
+    Route::prefix('capaian')->name('capaian.')->group(function () {
+        Route::get('/', [SantriCapaianController::class, 'index'])->name('index');
+        Route::get('/{id}', [SantriCapaianController::class, 'show'])->name('show');
+        Route::get('/api/grafik-data', [SantriCapaianController::class, 'apiGrafikData'])->name('api.grafik-data');
+    });
+
+    // 7. RIWAYAT KEPULANGAN
+    Route::prefix('kepulangan')->name('kepulangan.')->group(function () {
+        Route::get('/', [SantriKepulanganController::class, 'index'])->name('index');
+        Route::get('/{kepulangan:id_kepulangan}', [SantriKepulanganController::class, 'show'])->name('show');
+    });
+});

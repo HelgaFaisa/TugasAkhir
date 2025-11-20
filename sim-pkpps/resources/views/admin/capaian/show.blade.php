@@ -1,0 +1,251 @@
+@extends('layouts.app')
+
+@section('content')
+<div class="page-header">
+    <h2><i class="fas fa-chart-line"></i> Detail Capaian Santri</h2>
+</div>
+
+<div class="content-box">
+    {{-- Header Section --}}
+    <div class="detail-header">
+        <div>
+            <h3>{{ $capaian->santri->nama_lengkap }}</h3>
+            <p class="text-muted">{{ $capaian->id_capaian }} | {{ $capaian->materi->nama_kitab }}</p>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <a href="{{ route('admin.capaian.edit', $capaian) }}" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            <a href="{{ route('admin.capaian.index') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Kembali
+            </a>
+        </div>
+    </div>
+
+    {{-- Progress Card --}}
+    <div style="background: linear-gradient(135deg, #E8F7F2 0%, #D4F1E3 100%); padding: 30px; border-radius: 12px; margin: 30px 0;">
+        <h4 style="margin: 0 0 20px 0; color: var(--primary-dark);">
+            <i class="fas fa-chart-pie"></i> Progress Capaian
+        </h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+            <div style="text-align: center; padding: 20px; background: white; border-radius: 8px;">
+                <p style="margin: 0; color: var(--text-light); font-size: 0.9rem;">Halaman Selesai</p>
+                <h2 style="margin: 10px 0; color: var(--primary-color);">{{ $capaian->jumlah_halaman_selesai }}</h2>
+                <small class="text-muted">dari {{ $capaian->materi->total_halaman }} halaman</small>
+            </div>
+            <div style="text-align: center; padding: 20px; background: white; border-radius: 8px;">
+                <p style="margin: 0; color: var(--text-light); font-size: 0.9rem;">Persentase</p>
+                <h2 style="margin: 10px 0; color: var(--success-color);">{{ number_format($capaian->persentase, 2) }}%</h2>
+                <small class="text-muted">progress keseluruhan</small>
+            </div>
+            <div style="text-align: center; padding: 20px; background: white; border-radius: 8px;">
+                <p style="margin: 0; color: var(--text-light); font-size: 0.9rem;">Status</p>
+                <div style="margin: 10px 0;">
+                    {!! $capaian->persentase_badge !!}
+                </div>
+                <small class="text-muted">
+                    @if($capaian->persentase >= 100)
+                        Selesai 100%
+                    @elseif($capaian->persentase >= 75)
+                        Hampir Selesai
+                    @elseif($capaian->persentase >= 50)
+                        Sedang Berlangsung
+                    @else
+                        Baru Dimulai
+                    @endif
+                </small>
+            </div>
+        </div>
+        <div style="margin-top: 20px;">
+            <div class="progress-bar" style="height: 20px;">
+                <div class="progress-fill" style="width: {{ $capaian->persentase }}%; background: linear-gradient(90deg, var(--primary-color), var(--success-color)); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.85rem;">
+                    {{ number_format($capaian->persentase, 1) }}%
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Detail Santri & Materi --}}
+    <div class="detail-section">
+        <h4><i class="fas fa-user"></i> Informasi Santri</h4>
+        <table class="detail-table">
+            <tr>
+                <th><i class="fas fa-user"></i> Nama Santri</th>
+                <td><strong>{{ $capaian->santri->nama_lengkap }}</strong></td>
+            </tr>
+            <tr>
+                <th><i class="fas fa-id-card"></i> NIS</th>
+                <td>{{ $capaian->santri->nis }}</td>
+            </tr>
+            <tr>
+                <th><i class="fas fa-users"></i> Kelas</th>
+                <td><span class="badge badge-secondary">{{ $capaian->santri->kelas }}</span></td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="detail-section">
+        <h4><i class="fas fa-book"></i> Informasi Materi</h4>
+        <table class="detail-table">
+            <tr>
+                <th><i class="fas fa-book"></i> Nama Kitab</th>
+                <td><strong>{{ $capaian->materi->nama_kitab }}</strong></td>
+            </tr>
+            <tr>
+                <th><i class="fas fa-layer-group"></i> Kategori</th>
+                <td>{!! $capaian->materi->kategori_badge !!}</td>
+            </tr>
+            <tr>
+                <th><i class="fas fa-file-alt"></i> Total Halaman</th>
+                <td><strong>{{ $capaian->materi->total_halaman }}</strong> halaman</td>
+            </tr>
+            <tr>
+                <th><i class="fas fa-book-open"></i> Range Halaman</th>
+                <td>Halaman {{ $capaian->materi->halaman_mulai }} - {{ $capaian->materi->halaman_akhir }}</td>
+            </tr>
+            <tr>
+                <th><i class="fas fa-calendar-alt"></i> Semester</th>
+                <td>
+                    <strong>{{ $capaian->semester->nama_semester }}</strong>
+                    {!! $capaian->semester->status_badge !!}
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    {{-- Detail Capaian --}}
+    <div class="detail-section">
+        <h4><i class="fas fa-clipboard-check"></i> Detail Halaman yang Selesai</h4>
+        <table class="detail-table">
+            <tr>
+                <th><i class="fas fa-list-ol"></i> Halaman Selesai (Range)</th>
+                <td>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 1.1rem;">
+                        {{ $capaian->halaman_selesai }}
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th><i class="fas fa-calculator"></i> Jumlah Halaman</th>
+                <td>
+                    <strong>{{ $capaian->jumlah_halaman_selesai }}</strong> dari {{ $capaian->materi->total_halaman }} halaman
+                    ({{ $capaian->materi->total_halaman - $capaian->jumlah_halaman_selesai }} halaman tersisa)
+                </td>
+            </tr>
+            <tr>
+                <th><i class="fas fa-percentage"></i> Persentase</th>
+                <td>{!! $capaian->persentase_badge !!} ({{ number_format($capaian->persentase, 2) }}%)</td>
+            </tr>
+            <tr>
+                <th><i class="fas fa-sticky-note"></i> Catatan</th>
+                <td>{{ $capaian->catatan ?: '-' }}</td>
+            </tr>
+            <tr>
+                <th><i class="fas fa-calendar-day"></i> Tanggal Input</th>
+                <td>{{ $capaian->tanggal_input->format('d F Y') }}</td>
+            </tr>
+            <tr>
+                <th><i class="fas fa-calendar-plus"></i> Dibuat Pada</th>
+                <td>{{ $capaian->created_at->format('d F Y, H:i') }} WIB</td>
+            </tr>
+            <tr>
+                <th><i class="fas fa-calendar-edit"></i> Terakhir Diupdate</th>
+                <td>{{ $capaian->updated_at->format('d F Y, H:i') }} WIB</td>
+            </tr>
+        </table>
+    </div>
+
+    {{-- Visual Halaman (Grid Preview) --}}
+    <div class="detail-section">
+        <h4><i class="fas fa-th"></i> Visual Halaman yang Selesai</h4>
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+            <div id="visualGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(45px, 1fr)); gap: 8px;">
+                <!-- Will be generated by JavaScript -->
+            </div>
+            <p style="margin-top: 15px; color: var(--text-light); text-align: center;">
+                <i class="fas fa-check-circle" style ="color: var(--success-color);"></i> = Selesai &nbsp;&nbsp;
+                <i class="fas fa-square" style="color: #ddd;"></i> = Belum
+            </p>
+        </div>
+    </div>
+
+    {{-- Action Buttons --}}
+    <div style="margin-top: 30px; display: flex; gap: 10px; justify-content: flex-end;">
+        <a href="{{ route('admin.capaian.edit', $capaian) }}" class="btn btn-warning">
+            <i class="fas fa-edit"></i> Edit Capaian
+        </a>
+        <a href="{{ route('admin.capaian.riwayat-santri', $capaian->id_santri) }}" class="btn btn-info">
+            <i class="fas fa-history"></i> Lihat Riwayat Santri
+        </a>
+        <form action="{{ route('admin.capaian.destroy', $capaian) }}" method="POST" style="display: inline-block;"
+              onsubmit="return confirm('Yakin ingin menghapus capaian ini?')">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn btn-danger">
+                <i class="fas fa-trash"></i> Hapus Capaian
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+// Generate visual grid
+document.addEventListener('DOMContentLoaded', function() {
+    const halamanSelesai = "{{ $capaian->halaman_selesai }}";
+    const halamanMulai = {{ $capaian->materi->halaman_mulai }};
+    const halamanAkhir = {{ $capaian->materi->halaman_akhir }};
+    
+    const selectedPages = parseRangeString(halamanSelesai, halamanMulai, halamanAkhir);
+    const gridContainer = document.getElementById('visualGrid');
+    
+    for (let i = halamanMulai; i <= halamanAkhir; i++) {
+        const pageBox = document.createElement('div');
+        pageBox.textContent = i;
+        pageBox.style.cssText = `
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.85rem;
+        `;
+        
+        if (selectedPages.has(i)) {
+            pageBox.style.background = 'linear-gradient(135deg, var(--primary-color), var(--success-color))';
+            pageBox.style.borderColor = 'var(--primary-color)';
+            pageBox.style.color = 'white';
+        } else {
+            pageBox.style.background = 'white';
+            pageBox.style.borderColor = '#ddd';
+            pageBox.style.color = '#999';
+        }
+        
+        gridContainer.appendChild(pageBox);
+    }
+});
+
+function parseRangeString(rangeString, mulai, akhir) {
+    const pages = new Set();
+    const ranges = rangeString.split(',');
+    
+    ranges.forEach(range => {
+        range = range.trim();
+        if (range.includes('-')) {
+            const [start, end] = range.split('-').map(num => parseInt(num.trim()));
+            for (let i = start; i <= end; i++) {
+                if (i >= mulai && i <= akhir) {
+                    pages.add(i);
+                }
+            }
+        } else {
+            const pageNum = parseInt(range);
+            if (pageNum >= mulai && pageNum <= akhir) {
+                pages.add(pageNum);
+            }
+        }
+    });
+    
+    return pages;
+}
+</script>
+@endsection
