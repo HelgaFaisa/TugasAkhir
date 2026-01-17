@@ -1,3 +1,4 @@
+<!-- resources/views/santri/profil/index.blade.php -->
 @extends('layouts.app')
 
 @section('title', 'Edit Profil Santri')

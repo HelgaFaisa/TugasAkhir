@@ -9,14 +9,28 @@
 
 <div class="content-box">
     <div class="detail-header">
-        <div>
-            <h3>{{ $santri->nama_lengkap }}</h3>
-            <p style="color: #7F8C8D; margin: 5px 0 0 0;">
-                <i class="fas fa-id-badge"></i> {{ $santri->id_santri }}
-                @if($santri->nis)
-                    | <i class="fas fa-barcode"></i> NIS: {{ $santri->nis }}
-                @endif
-            </p>
+        <div style="display: flex; align-items: center; gap: 20px;">
+            {{-- Foto Santri --}}
+            @if($santri->foto)
+                <img src="{{ asset('storage/' . $santri->foto) }}" 
+                     alt="Foto {{ $santri->nama_lengkap }}" 
+                     style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary-color); flex-shrink: 0;"
+                     loading="lazy">
+            @else
+                <div style="width: 80px; height: 80px; border-radius: 50%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; font-weight: bold; flex-shrink: 0;">
+                    {{ strtoupper(substr($santri->nama_lengkap, 0, 1)) }}
+                </div>
+            @endif
+            
+            <div>
+                <h3>{{ $santri->nama_lengkap }}</h3>
+                <p style="color: #7F8C8D; margin: 5px 0 0 0;">
+                    <i class="fas fa-id-badge"></i> {{ $santri->id_santri }}
+                    @if($santri->nis)
+                        | <i class="fas fa-barcode"></i> NIS: {{ $santri->nis }}
+                    @endif
+                </p>
+            </div>
         </div>
         <div style="display: flex; gap: 10px;">
             <a href="{{ route('admin.santri.edit', $santri) }}" class="btn btn-warning">

@@ -1,9 +1,10 @@
 <?php
-
+// app/Models/AbsensiKegiatan.php
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class AbsensiKegiatan extends Model
 {
@@ -75,7 +76,7 @@ class AbsensiKegiatan extends Model
     }
 
     /**
-     * Accessor: Status Badge
+     * Accessor: Status Badge (HTML - untuk admin)
      */
     public function getStatusBadgeAttribute()
     {
@@ -87,5 +88,56 @@ class AbsensiKegiatan extends Model
         ];
 
         return $badges[$this->status] ?? $this->status;
+    }
+
+    // ============================================
+    // ✅ TAMBAHKAN METHOD-METHOD BARU DI BAWAH INI
+    // ============================================
+
+    /**
+     * Accessor: Tanggal Formatted (untuk view santri)
+     */
+    public function getTanggalFormattedAttribute()
+    {
+        return Carbon::parse($this->tanggal)->locale('id')->isoFormat('dddd, D MMMM YYYY');
+    }
+
+    /**
+     * Accessor: Waktu Absen Formatted (untuk view santri)
+     */
+    public function getWaktuAbsenFormattedAttribute()
+    {
+        return $this->waktu_absen ? Carbon::parse($this->waktu_absen)->format('H:i') : '-';
+    }
+
+    /**
+     * Accessor: Status Badge Class (CSS class only - untuk view santri)
+     */
+    public function getStatusBadgeClassAttribute()
+    {
+        return match($this->status) {
+            'Hadir' => 'badge-success',
+            'Izin' => 'badge-info',
+            'Sakit' => 'badge-warning',
+            'Alpa' => 'badge-danger',
+            default => 'badge-secondary',
+        };
+    }
+
+    /**
+     * Scope: Filter by date range
+     */
+    public function scopeDateRange($query, $start, $end)
+    {
+        return $query->whereBetween('tanggal', [$start, $end]);
+    }
+
+    /**
+     * Scope: Filter by month
+     */
+    public function scopeByMonth($query, $month, $year)
+    {
+        return $query->whereMonth('tanggal', $month)
+                     ->whereYear('tanggal', $year);
     }
 }

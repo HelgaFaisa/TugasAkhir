@@ -55,6 +55,7 @@
         <thead>
             <tr>
                 <th>No</th>
+                <th>Foto</th>
                 <th>ID Santri</th>
                 <th>NIS</th>
                 <th>Nama Lengkap</th>
@@ -67,7 +68,20 @@
         <tbody>
             @forelse ($santris as $index => $santri)
             <tr>
-                <td>{{ $index + 1 }}</td>
+                <td>{{ $santris->firstItem() + $index }}</td>
+                <td>
+                    {{-- Foto Santri --}}
+                    @if($santri->foto)
+                        <img src="{{ asset('storage/' . $santri->foto) }}" 
+                             alt="Foto {{ $santri->nama_lengkap }}" 
+                             style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-color);"
+                             loading="lazy">
+                    @else
+                        <div class="santri-avatar-initial" style="width: 40px; height: 40px; border-radius: 50%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.9rem;">
+                            {{ strtoupper(substr($santri->nama_lengkap, 0, 1)) }}
+                        </div>
+                    @endif
+                </td>
                 <td><strong>{{ $santri->id_santri }}</strong></td>
                 <td>{{ $santri->nis ?? '-' }}</td>
                 <td>{{ $santri->nama_lengkap }}</td>
@@ -104,7 +118,7 @@
             </tr>
             @empty
             <tr>
-                <td colspan="8" class="text-center" style="padding: 40px;">
+                <td colspan="9" class="text-center" style="padding: 40px;">
                     <i class="fas fa-inbox" style="font-size: 3rem; color: #ccc; margin-bottom: 15px; display: block;"></i>
                     @if(request('search') || request('status') || request('kelas'))
                         <strong>Data tidak ditemukan.</strong><br>
@@ -123,15 +137,15 @@
         <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #E8F7F2;">
             <p style="color: #7F8C8D; font-size: 0.9rem;">
                 <i class="fas fa-info-circle"></i> 
-                Menampilkan <strong>{{ $santris->count() }}</strong> data santri
+                Menampilkan <strong>{{ $santris->count() }}</strong> dari <strong>{{ $santris->total() }}</strong> data santri
                 @if(request('search') || request('status') || request('kelas'))
-                    dari hasil pencarian/filter
+                    (hasil pencarian/filter)
                 @endif
             </p>
         </div>
     @endif
 
-    <!-- Pagination (jika menggunakan paginate) -->
+    <!-- Pagination -->
     @if(method_exists($santris, 'links'))
         <div style="margin-top: 20px;">
             {{ $santris->links() }}

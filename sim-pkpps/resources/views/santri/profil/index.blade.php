@@ -18,10 +18,21 @@
     {{-- Header Profil --}}
     <div class="detail-header">
         <div style="display: flex; align-items: center; gap: 20px;">
-            {{-- Avatar Santri --}}
-            <div class="santri-avatar-initial santri-avatar-initial-lg">
-                {{ strtoupper(substr($santri->nama_lengkap, 0, 1)) }}
-            </div>
+            {{-- Foto Santri --}}
+            @if($santri->foto && file_exists(public_path('storage/' . $santri->foto)))
+                <img src="{{ asset('storage/' . $santri->foto) }}" 
+                     alt="Foto {{ $santri->nama_lengkap }}" 
+                     style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary-color); flex-shrink: 0;"
+                     loading="lazy"
+                     onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="santri-avatar-initial santri-avatar-initial-lg" style="display: none;">
+                    {{ strtoupper(substr($santri->nama_lengkap, 0, 1)) }}
+                </div>
+            @else
+                <div class="santri-avatar-initial santri-avatar-initial-lg">
+                    {{ strtoupper(substr($santri->nama_lengkap, 0, 1)) }}
+                </div>
+            @endif
             
             <div>
                 <h3 style="margin: 0; font-size: 1.8rem; color: var(--text-color);">
@@ -146,7 +157,7 @@
     <div style="margin-top: 30px; padding: 20px; background: var(--primary-light); border-radius: var(--border-radius-sm); border-left: 4px solid var(--primary-color);">
         <p style="margin: 0; color: var(--text-color); line-height: 1.6;">
             <i class="fas fa-info-circle" style="color: var(--primary-color);"></i>
-            <strong>Catatan:</strong> Jika ada data yang perlu diperbarui selain alamat dan nomor HP orang tua, silakan hubungi admin atau pengurus pesantren.
+            <strong>Catatan:</strong> Jika ada data yang perlu diperbarui termasuk foto profil, silakan hubungi admin atau pengurus pesantren.
         </p>
     </div>
 </div>

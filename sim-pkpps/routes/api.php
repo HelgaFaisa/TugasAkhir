@@ -1,19 +1,32 @@
 <?php
+// routes/api.php
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\ApiAuthController;
 
 /*
 |--------------------------------------------------------------------------
-| API Routes
+| API Routes untuk Mobile App
 |--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+// Public routes (tanpa auth)
+Route::prefix('v1')->group(function () {
+    // Login
+    Route::post('/login', [ApiAuthController::class, 'login']);
+});
+
+// Protected routes (butuh token)
+Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
+    // Logout
+    Route::post('/logout', [ApiAuthController::class, 'logout']);
+    
+    // Profile
+    Route::get('/profile', [ApiAuthController::class, 'profile']);
+    
+    // TODO: Tambahkan endpoint lain di sini
+    // Route::get('/uang-saku', [ApiUangSakuController::class, 'index']);
+    // Route::get('/pelanggaran', [ApiPelanggaranController::class, 'index']);
+    // dst...
 });

@@ -56,6 +56,7 @@
         <thead>
             <tr>
                 <th>No</th>
+                <th>Foto</th>
                 <th>ID Santri</th>
                 <th>NIS</th>
                 <th>Nama Lengkap</th>
@@ -68,7 +69,21 @@
         <tbody>
             <?php $__empty_1 = true; $__currentLoopData = $santris; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $santri): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
             <tr>
-                <td><?php echo e($index + 1); ?></td>
+                <td><?php echo e($santris->firstItem() + $index); ?></td>
+                <td>
+                    
+                    <?php if($santri->foto): ?>
+                        <img src="<?php echo e(asset('storage/' . $santri->foto)); ?>" 
+                             alt="Foto <?php echo e($santri->nama_lengkap); ?>" 
+                             style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-color);"
+                             loading="lazy">
+                    <?php else: ?>
+                        <div class="santri-avatar-initial" style="width: 40px; height: 40px; border-radius: 50%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.9rem;">
+                            <?php echo e(strtoupper(substr($santri->nama_lengkap, 0, 1))); ?>
+
+                        </div>
+                    <?php endif; ?>
+                </td>
                 <td><strong><?php echo e($santri->id_santri); ?></strong></td>
                 <td><?php echo e($santri->nis ?? '-'); ?></td>
                 <td><?php echo e($santri->nama_lengkap); ?></td>
@@ -108,7 +123,7 @@
             </tr>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
             <tr>
-                <td colspan="8" class="text-center" style="padding: 40px;">
+                <td colspan="9" class="text-center" style="padding: 40px;">
                     <i class="fas fa-inbox" style="font-size: 3rem; color: #ccc; margin-bottom: 15px; display: block;"></i>
                     <?php if(request('search') || request('status') || request('kelas')): ?>
                         <strong>Data tidak ditemukan.</strong><br>
@@ -127,15 +142,15 @@
         <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #E8F7F2;">
             <p style="color: #7F8C8D; font-size: 0.9rem;">
                 <i class="fas fa-info-circle"></i> 
-                Menampilkan <strong><?php echo e($santris->count()); ?></strong> data santri
+                Menampilkan <strong><?php echo e($santris->count()); ?></strong> dari <strong><?php echo e($santris->total()); ?></strong> data santri
                 <?php if(request('search') || request('status') || request('kelas')): ?>
-                    dari hasil pencarian/filter
+                    (hasil pencarian/filter)
                 <?php endif; ?>
             </p>
         </div>
     <?php endif; ?>
 
-    <!-- Pagination (jika menggunakan paginate) -->
+    <!-- Pagination -->
     <?php if(method_exists($santris, 'links')): ?>
         <div style="margin-top: 20px;">
             <?php echo e($santris->links()); ?>

@@ -27,7 +27,7 @@
     <div class="content-box">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
             <h3 style="margin: 0;">Informasi Kepulangan</h3>
-            <span style="display: inline-block; padding: 6px 14px; border-radius: 6px; font-size: 1rem; font-weight: 600;
+            <span style="display: inline-block; padding: 8px 16px; border-radius: 6px; font-size: 1rem; font-weight: 600;
                 @if($kepulangan->status == 'Menunggu') background: #ffc107; color: #000;
                 @elseif($kepulangan->status == 'Disetujui') background: #28a745; color: white;
                 @elseif($kepulangan->status == 'Ditolak') background: #dc3545; color: white;
@@ -40,7 +40,7 @@
         <table class="detail-table">
             <tr>
                 <th>ID Kepulangan:</th>
-                <td>{{ $kepulangan->id_kepulangan }}</td>
+                <td><strong>{{ $kepulangan->id_kepulangan }}</strong></td>
             </tr>
             <tr>
                 <th>Tanggal Pengajuan:</th>
@@ -57,8 +57,8 @@
             <tr>
                 <th>Durasi Izin:</th>
                 <td>
-                    <span style="display: inline-block; background: {{ $kepulangan->durasi_izin_calculated > 7 ? '#ffc107' : '#007bff' }}; color: {{ $kepulangan->durasi_izin_calculated > 7 ? '#000' : 'white' }}; padding: 4px 10px; border-radius: 4px; font-size: 0.9rem;">
-                        {{ $kepulangan->durasi_izin_calculated }} hari
+                    <span style="display: inline-block; background: {{ $kepulangan->durasi_izin > 7 ? '#ffc107' : '#007bff' }}; color: {{ $kepulangan->durasi_izin > 7 ? '#000' : 'white' }}; padding: 6px 12px; border-radius: 6px; font-size: 1rem; font-weight: 600;">
+                        {{ $kepulangan->durasi_izin }} hari
                     </span>
                 </td>
             </tr>
@@ -66,13 +66,21 @@
                 <th>Status Kepulangan:</th>
                 <td>
                     @if($kepulangan->is_aktif)
-                        <span style="display: inline-block; background: #28a745; color: white; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;">Sedang Izin</span>
+                        <span style="display: inline-block; background: #28a745; color: white; padding: 4px 10px; border-radius: 4px; font-size: 0.9rem;">
+                            🏠 Sedang Izin
+                        </span>
                     @elseif($kepulangan->is_terlambat)
-                        <span style="display: inline-block; background: #dc3545; color: white; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;">Terlambat Kembali</span>
+                        <span style="display: inline-block; background: #dc3545; color: white; padding: 4px 10px; border-radius: 4px; font-size: 0.9rem;">
+                            ⏰ Terlambat Kembali
+                        </span>
                     @elseif($kepulangan->status == 'Selesai')
-                        <span style="display: inline-block; background: #6c757d; color: white; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;">Sudah Selesai</span>
+                        <span style="display: inline-block; background: #6c757d; color: white; padding: 4px 10px; border-radius: 4px; font-size: 0.9rem;">
+                            ✅ Sudah Selesai
+                        </span>
                     @else
-                        <span style="display: inline-block; background: #81C6E8; color: white; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;">Belum Dimulai</span>
+                        <span style="display: inline-block; background: #81C6E8; color: white; padding: 4px 10px; border-radius: 4px; font-size: 0.9rem;">
+                            📅 Belum Dimulai
+                        </span>
                     @endif
                 </td>
             </tr>
@@ -82,11 +90,11 @@
             </tr>
             @if($kepulangan->approved_by)
             <tr>
-                <th>Disetujui Oleh:</th>
+                <th>Diproses Oleh:</th>
                 <td>{{ $kepulangan->approved_by }}</td>
             </tr>
             <tr>
-                <th>Tanggal Persetujuan:</th>
+                <th>Tanggal Diproses:</th>
                 <td>{{ $kepulangan->approved_at_formatted }}</td>
             </tr>
             @endif
@@ -163,56 +171,83 @@
             </table>
         </div>
 
-        {{-- Statistik Penggunaan Izin --}}
+        {{-- Statistik Kuota Santri --}}
         <div class="content-box" style="margin-bottom: 20px;">
             <h4 style="margin-top: 0; color: #2C3E50; border-bottom: 2px solid #6FBA9D; padding-bottom: 10px;">
-                <i class="fas fa-chart-bar"></i> Statistik Izin {{ $kepulangan->tanggal_pulang->year }}
+                <i class="fas fa-chart-pie"></i> Kuota Izin Periode Ini
             </h4>
-            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center;">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
-                    <div>
-                        <h3 style="margin: 0; color: #007bff;">{{ $detailIzin['total_hari'] }}</h3>
-                        <small style="color: #7F8C8D;">Total Hari</small>
+            
+            <div style="background: linear-gradient(135deg, {{ $kuotaSantri['badge_color'] == 'danger' ? '#ff5252 0%, #f48fb1 100%' : ($kuotaSantri['badge_color'] == 'warning' ? '#ffd54f 0%, #ffb74d 100%' : '#81c784 0%, #66bb6a 100%') }}); padding: 20px; border-radius: 12px; text-align: center; color: white; margin-bottom: 15px;">
+                <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 5px;">Total Terpakai</div>
+                <div style="font-size: 3rem; font-weight: 700; line-height: 1;">{{ $kuotaSantri['total_terpakai'] }}</div>
+                <div style="font-size: 1rem; opacity: 0.9;">dari {{ $kuotaSantri['kuota_maksimal'] }} hari</div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <div style="font-size: 0.85rem; color: #7F8C8D; margin-bottom: 5px;">Sisa Kuota</div>
+                    <div style="font-size: 1.8rem; font-weight: 700; color: {{ $kuotaSantri['badge_color'] == 'danger' ? '#dc3545' : ($kuotaSantri['badge_color'] == 'warning' ? '#ff9800' : '#28a745') }};">
+                        {{ $kuotaSantri['sisa_kuota'] }}
                     </div>
-                    <div>
-                        <h3 style="margin: 0; color: #81C6E8;">{{ $detailIzin['total_izin'] }}</h3>
-                        <small style="color: #7F8C8D;">Total Izin</small>
-                    </div>
+                    <div style="font-size: 0.8rem; color: #7F8C8D;">hari</div>
                 </div>
-                <hr style="margin: 15px 0; border: none; border-top: 1px solid #dee2e6;">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <div>
-                        <h4 style="margin: 0; color: {{ $detailIzin['sisa_kuota'] <= 3 ? '#dc3545' : '#28a745' }};">
-                            {{ $detailIzin['sisa_kuota'] }}
-                        </h4>
-                        <small style="color: #7F8C8D;">Sisa Kuota</small>
+                <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <div style="font-size: 0.85rem; color: #7F8C8D; margin-bottom: 5px;">Persentase</div>
+                    <div style="font-size: 1.8rem; font-weight: 700; color: {{ $kuotaSantri['badge_color'] == 'danger' ? '#dc3545' : ($kuotaSantri['badge_color'] == 'warning' ? '#ff9800' : '#28a745') }};">
+                        {{ $kuotaSantri['persentase'] }}%
                     </div>
-                    <div>
-                        @if($detailIzin['over_limit'])
-                            <span style="display: inline-block; background: #dc3545; color: white; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;">Over Limit</span>
-                        @else
-                            <span style="display: inline-block; background: #28a745; color: white; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;">Normal</span>
-                        @endif
-                    </div>
+                    <div style="font-size: 0.8rem; color: #7F8C8D;">terpakai</div>
                 </div>
             </div>
 
             {{-- Progress Bar --}}
-            <div style="margin-top: 15px;">
+            <div style="margin-bottom: 15px;">
                 <label style="font-size: 0.85rem; color: #7F8C8D; margin-bottom: 5px; display: block;">
-                    Penggunaan Kuota ({{ $detailIzin['total_hari'] }}/12 hari)
+                    Penggunaan Kuota ({{ $kuotaSantri['total_terpakai'] }}/{{ $kuotaSantri['kuota_maksimal'] }} hari)
                 </label>
-                <div style="width: 100%; height: 10px; background: #E0F0EC; border-radius: 5px; overflow: hidden;">
-                    <div style="width: {{ min(100, ($detailIzin['total_hari'] / 12) * 100) }}%; height: 100%; background: {{ $detailIzin['over_limit'] ? '#dc3545' : ($detailIzin['total_hari'] > 8 ? '#ffc107' : '#28a745') }}; transition: width 0.3s ease;"></div>
+                <div style="width: 100%; height: 15px; background: #E0F0EC; border-radius: 8px; overflow: hidden;">
+                    <div style="width: {{ min(100, $kuotaSantri['persentase']) }}%; height: 100%; background: {{ $kuotaSantri['badge_color'] == 'danger' ? '#dc3545' : ($kuotaSantri['badge_color'] == 'warning' ? '#ffc107' : '#28a745') }}; transition: width 0.3s ease;"></div>
                 </div>
             </div>
+
+            @if($kuotaSantri['status'] == 'melebihi')
+                <div style="padding: 12px; background: #ffebee; border: 1px solid #ffcdd2; border-radius: 6px; color: #c62828; font-size: 0.9rem;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>OVER LIMIT!</strong> Santri ini telah melebihi kuota maksimal.
+                </div>
+            @elseif($kuotaSantri['status'] == 'hampir_habis')
+                <div style="padding: 12px; background: #fff3e0; border: 1px solid #ffe0b2; border-radius: 6px; color: #e65100; font-size: 0.9rem;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <strong>Hampir Habis!</strong> Kuota hampir mencapai batas maksimal.
+                </div>
+            @else
+                <div style="padding: 12px; background: #e8f5e9; border: 1px solid #c8e6c9; border-radius: 6px; color: #2e7d32; font-size: 0.9rem;">
+                    <i class="fas fa-check-circle"></i>
+                    <strong>Aman!</strong> Kuota masih dalam batas normal.
+                </div>
+            @endif
+
+            <div style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 6px; font-size: 0.85rem; color: #7F8C8D;">
+                <strong>Periode:</strong><br>
+                {{ $kuotaSantri['periode_mulai'] }} - {{ $kuotaSantri['periode_akhir'] }}
+            </div>
+
+            {{-- Reset Individual Button --}}
+            @if($kuotaSantri['total_terpakai'] > 0)
+                <button type="button" 
+                        class="btn btn-warning" 
+                        style="width: 100%; margin-top: 15px;"
+                        onclick="resetKuotaSantri('{{ $kepulangan->id_santri }}', '{{ $kepulangan->santri->nama_lengkap }}')">
+                    <i class="fas fa-sync-alt"></i> Reset Kuota Santri Ini
+                </button>
+            @endif
         </div>
 
-        {{-- Riwayat Izin --}}
+        {{-- Riwayat Izin Periode Ini --}}
         @if(count($detailIzin['details']) > 0)
         <div class="content-box">
             <h4 style="margin-top: 0; color: #2C3E50; border-bottom: 2px solid #6FBA9D; padding-bottom: 10px;">
-                <i class="fas fa-history"></i> Riwayat Izin {{ $kepulangan->tanggal_pulang->year }}
+                <i class="fas fa-history"></i> Riwayat Izin Periode Ini
             </h4>
             <div style="position: relative; padding-left: 20px;">
                 @foreach($detailIzin['details'] as $detail)
@@ -222,14 +257,19 @@
                             <i class="fas fa-star" style="color: #ffc107;"></i>
                         </div>
                     @endif
-                    <strong style="color: #2C3E50;">{{ $detail['id'] }}</strong>
-                    <div style="font-size: 0.85rem; color: #7F8C8D; margin-top: 3px;">{{ $detail['tanggal'] }}</div>
-                    <div style="font-size: 0.9rem; margin-top: 5px;">
-                        <span style="display: inline-block; background: #6c757d; color: white; padding: 2px 6px; border-radius: 3px; font-size: 0.8rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 5px;">
+                        <strong style="color: #2C3E50;">{{ $detail['id'] }}</strong>
+                        <span style="display: inline-block; background: {{ $detail['status'] == 'Disetujui' ? '#28a745' : '#6c757d' }}; color: white; padding: 2px 6px; border-radius: 3px; font-size: 0.75rem;">
+                            {{ $detail['status'] }}
+                        </span>
+                    </div>
+                    <div style="font-size: 0.85rem; color: #7F8C8D; margin-bottom: 5px;">{{ $detail['tanggal'] }}</div>
+                    <div style="font-size: 0.9rem; margin-bottom: 5px;">
+                        <span style="display: inline-block; background: #007bff; color: white; padding: 2px 8px; border-radius: 3px; font-size: 0.8rem; font-weight: 600;">
                             {{ $detail['durasi'] }} hari
                         </span>
                     </div>
-                    <div style="font-size: 0.85rem; color: #7F8C8D; margin-top: 5px;">
+                    <div style="font-size: 0.85rem; color: #7F8C8D;">
                         {{ \Illuminate\Support\Str::limit($detail['alasan'], 50) }}
                     </div>
                 </div>
@@ -244,31 +284,28 @@
 @if($history->count() > 0)
 <div class="content-box" style="margin-top: 20px;">
     <h4 style="margin-top: 0; color: #2C3E50; border-bottom: 2px solid #6FBA9D; padding-bottom: 10px;">
-        <i class="fas fa-list"></i> Riwayat Kepulangan Lainnya
+        <i class="fas fa-list"></i> Riwayat Kepulangan Lainnya (5 Terakhir)
     </h4>
     <div style="overflow-x: auto;">
         <table class="data-table">
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Tanggal</th>
+                    <th>Tanggal Pulang</th>
                     <th>Durasi</th>
                     <th>Status</th>
                     <th>Alasan</th>
+                    <th>Aksi</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($history as $item)
                 <tr>
-                    <td>
-                        <a href="{{ route('admin.kepulangan.show', $item->id_kepulangan) }}" style="color: #6FBA9D; text-decoration: none; font-weight: 600;">
-                            {{ $item->id_kepulangan }}
-                        </a>
-                    </td>
+                    <td><strong>{{ $item->id_kepulangan }}</strong></td>
                     <td>{{ $item->tanggal_pulang_formatted }}</td>
                     <td>
                         <span style="display: inline-block; background: #6c757d; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem;">
-                            {{ $item->durasi_izin_calculated }} hari
+                            {{ $item->durasi_izin }} hari
                         </span>
                     </td>
                     <td>
@@ -282,6 +319,12 @@
                         </span>
                     </td>
                     <td>{{ \Illuminate\Support\Str::limit($item->alasan, 30) }}</td>
+                    <td>
+                        <a href="{{ route('admin.kepulangan.show', $item->id_kepulangan) }}" 
+                           class="btn btn-sm btn-primary">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                    </td>
                 </tr>
                 @endforeach
             </tbody>
@@ -290,7 +333,7 @@
 </div>
 @endif
 
-{{-- Modals (sama seperti di index) --}}
+{{-- Modals --}}
 <div class="modal fade" id="approveModal" tabindex="-1" style="display: none;">
     <div class="modal-dialog">
         <div class="modal-content" style="background: white; border-radius: 12px; padding: 20px;">
@@ -333,6 +376,33 @@
     </div>
 </div>
 
+<div class="modal fade" id="resetKuotaModal" tabindex="-1" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content" style="background: white; border-radius: 12px; padding: 20px;">
+            <form id="resetKuotaForm">
+                @csrf
+                <div style="margin-bottom: 20px;">
+                    <h3 style="margin: 0; color: #2C3E50;">Reset Kuota Santri</h3>
+                </div>
+                <div style="padding: 15px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 6px; margin-bottom: 15px;">
+                    <p style="margin: 0; color: #856404;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Anda akan mereset kuota untuk santri: <strong id="resetSantriName"></strong>
+                    </p>
+                </div>
+                <div class="form-group">
+                    <label>Catatan Reset (Opsional):</label>
+                    <textarea name="catatan" class="form-control" rows="2" placeholder="Alasan reset kuota..."></textarea>
+                </div>
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('resetKuotaModal')">Batal</button>
+                    <button type="submit" class="btn btn-warning"><i class="fas fa-sync-alt"></i> Reset Kuota</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <style>
 .modal.fade { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
 .modal-dialog { max-width: 500px; width: 90%; margin: auto; }
@@ -343,6 +413,8 @@
 </style>
 
 <script>
+let currentResetSantriId = null;
+
 function approveKepulangan() {
     document.getElementById('approveModal').style.display = 'flex';
 }
@@ -432,6 +504,43 @@ function completeKepulangan() {
     }
 }
 
+function resetKuotaSantri(idSantri, namaSantri) {
+    currentResetSantriId = idSantri;
+    document.getElementById('resetSantriName').textContent = namaSantri;
+    document.getElementById('resetKuotaModal').style.display = 'flex';
+}
+
+document.getElementById('resetKuotaForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mereset...';
+    
+    fetch(`/admin/kepulangan/reset/santri/${currentResetSantriId}`, {
+        method: 'POST',
+        body: formData,
+        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            closeModal('resetKuotaModal');
+            showAlert('success', data.message);
+            setTimeout(() => window.location.reload(), 1500);
+        } else {
+            showAlert('danger', data.message);
+        }
+    })
+    .catch(error => showAlert('danger', 'Error: ' + error.message))
+    .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+    });
+});
+
 function closeModal(modalId) {
     document.getElementById(modalId).style.display = 'none';
 }
@@ -449,6 +558,14 @@ document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         document.querySelectorAll('.modal.fade').forEach(modal => modal.style.display = 'none');
     }
+});
+
+document.querySelectorAll('.modal.fade').forEach(modal => {
+    modal.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeModal(this.id);
+        }
+    });
 });
 </script>
 @endsection

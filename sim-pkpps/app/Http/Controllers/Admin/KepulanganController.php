@@ -48,7 +48,7 @@ class KepulanganController extends Controller
             'total_data' => Kepulangan::count(),
             'menunggu_approval' => Kepulangan::where('status', 'Menunggu')->count(),
             'sedang_izin' => Kepulangan::aktif()->count(),
-            'over_limit_santri' => $this->getOverLimitSantri()->count(),
+            'over_limit_santri' => count(Kepulangan::getSantriOverLimit()),
         ];
 
         // Get unique years for filter
@@ -58,13 +58,17 @@ class KepulanganController extends Controller
             ->pluck('tahun');
 
         // Get santri yang over limit untuk highlight
-        $santriOverLimit = $this->getOverLimitSantri()->pluck('total_hari', 'id_santri');
+        $santriOverLimit = Kepulangan::getSantriOverLimit();
+
+        // Get settings untuk info periode
+        $settings = Kepulangan::getSettings();
 
         return view('admin.kepulangan.index', compact(
             'kepulangan',
             'stats',
             'tahunList',
-            'santriOverLimit'
+            'santriOverLimit',
+            'settings'
         ));
     }
 
@@ -77,7 +81,9 @@ class KepulanganController extends Controller
             ->orderBy('nama_lengkap')
             ->get();
 
-        return view('admin.kepulangan.create', compact('santriList'));
+        $settings = Kepulangan::getSettings();
+
+        return view('admin.kepulangan.create', compact('santriList', 'settings'));
     }
 
     /**
@@ -102,11 +108,21 @@ class KepulanganController extends Controller
             'alasan.max' => 'Alasan maksimal 500 karakter.',
         ]);
 
-        // Create kepulangan
-        Kepulangan::create($validated);
+        // Create kepulangan (durasi_izin akan otomatis dihitung di model)
+        $kepulangan = Kepulangan::create($validated);
+
+        // Check apakah over limit
+        $kuota = Kepulangan::getSisaKuotaSantri($validated['id_santri']);
+        $message = 'Izin kepulangan berhasil diajukan.';
+        
+        if ($kuota['status'] === 'melebihi') {
+            $message .= ' ⚠️ PERHATIAN: Santri ini sudah melebihi kuota ' . $kuota['kuota_maksimal'] . ' hari per tahun (Total: ' . $kuota['total_terpakai'] . ' hari).';
+        } elseif ($kuota['status'] === 'hampir_habis') {
+            $message .= ' ⚠️ Kuota hampir habis. Sisa: ' . $kuota['sisa_kuota'] . ' hari.';
+        }
 
         return redirect()->route('admin.kepulangan.index')
-            ->with('success', 'Izin kepulangan berhasil diajukan.');
+            ->with('success', $message);
     }
 
     /**
@@ -114,14 +130,22 @@ class KepulanganController extends Controller
      */
     public function show($id_kepulangan)
     {
-        // Cari data berdasarkan id_kepulangan (KP001, KP002, dst)
         $kepulangan = Kepulangan::where('id_kepulangan', $id_kepulangan)
             ->with('santri')
             ->firstOrFail();
 
+        // Get detail kuota santri
+        $kuotaSantri = Kepulangan::getSisaKuotaSantri($kepulangan->id_santri);
+
+        // Get settings
+        $settings = Kepulangan::getSettings();
+
         // Get detail izin tahun ini
-        $tahunSekarang = Carbon::now()->year;
-        $detailIzin = $this->getDetailIzinSantri($kepulangan->id_santri, $tahunSekarang);
+        $detailIzin = $this->getDetailIzinSantri(
+            $kepulangan->id_santri,
+            $settings->periode_mulai,
+            $settings->periode_akhir
+        );
 
         // Get history kepulangan santri (exclude current)
         $history = Kepulangan::where('id_santri', $kepulangan->id_santri)
@@ -132,8 +156,10 @@ class KepulanganController extends Controller
 
         return view('admin.kepulangan.show', compact(
             'kepulangan',
+            'kuotaSantri',
             'detailIzin',
-            'history'
+            'history',
+            'settings'
         ));
     }
 
@@ -142,10 +168,8 @@ class KepulanganController extends Controller
      */
     public function edit($id_kepulangan)
     {
-        // Cari data berdasarkan id_kepulangan
         $kepulangan = Kepulangan::where('id_kepulangan', $id_kepulangan)->firstOrFail();
         
-        // Hanya bisa edit jika status Menunggu
         if ($kepulangan->status !== 'Menunggu') {
             return redirect()->route('admin.kepulangan.index')
                 ->with('error', 'Hanya izin dengan status "Menunggu" yang bisa diedit.');
@@ -155,7 +179,15 @@ class KepulanganController extends Controller
             ->orderBy('nama_lengkap')
             ->get();
 
-        return view('admin.kepulangan.edit', compact('kepulangan', 'santriList'));
+        $settings = Kepulangan::getSettings();
+        $kuotaSantri = Kepulangan::getSisaKuotaSantri($kepulangan->id_santri);
+
+        return view('admin.kepulangan.edit', compact(
+            'kepulangan', 
+            'santriList', 
+            'settings',
+            'kuotaSantri'
+        ));
     }
 
     /**
@@ -163,10 +195,8 @@ class KepulanganController extends Controller
      */
     public function update(Request $request, $id_kepulangan)
     {
-        // Cari data berdasarkan id_kepulangan
         $kepulangan = Kepulangan::where('id_kepulangan', $id_kepulangan)->firstOrFail();
         
-        // Hanya bisa update jika status Menunggu
         if ($kepulangan->status !== 'Menunggu') {
             return redirect()->route('admin.kepulangan.index')
                 ->with('error', 'Hanya izin dengan status "Menunggu" yang bisa diubah.');
@@ -184,10 +214,19 @@ class KepulanganController extends Controller
             'alasan.min' => 'Alasan minimal 10 karakter.',
         ]);
 
+        // Update (durasi_izin akan otomatis dihitung ulang di model)
         $kepulangan->update($validated);
 
-        return redirect()->route('admin.kepulangan.index')
-            ->with('success', 'Data kepulangan berhasil diperbarui.');
+        // Check apakah over limit setelah update
+        $kuota = Kepulangan::getSisaKuotaSantri($kepulangan->id_santri);
+        $message = 'Data kepulangan berhasil diperbarui.';
+        
+        if ($kuota['status'] === 'melebihi') {
+            $message .= ' ⚠️ PERHATIAN: Santri ini sudah melebihi kuota ' . $kuota['kuota_maksimal'] . ' hari.';
+        }
+
+        return redirect()->route('admin.kepulangan.show', $id_kepulangan)
+            ->with('success', $message);
     }
 
     /**
@@ -195,10 +234,8 @@ class KepulanganController extends Controller
      */
     public function destroy($id_kepulangan)
     {
-        // Cari data berdasarkan id_kepulangan
         $kepulangan = Kepulangan::where('id_kepulangan', $id_kepulangan)->firstOrFail();
         
-        // Hanya bisa hapus jika status Menunggu atau Ditolak
         if (!in_array($kepulangan->status, ['Menunggu', 'Ditolak'])) {
             return response()->json([
                 'success' => false,
@@ -219,7 +256,6 @@ class KepulanganController extends Controller
      */
     public function approve(Request $request, $id_kepulangan)
     {
-        // Cari data berdasarkan id_kepulangan
         $kepulangan = Kepulangan::where('id_kepulangan', $id_kepulangan)->firstOrFail();
         
         if ($kepulangan->status !== 'Menunggu') {
@@ -229,7 +265,6 @@ class KepulanganController extends Controller
             ], 400);
         }
 
-        // Update status - catatan opsional (tidak perlu validasi)
         $kepulangan->update([
             'status' => 'Disetujui',
             'approved_by' => Auth::user()->name,
@@ -248,10 +283,8 @@ class KepulanganController extends Controller
      */
     public function reject(Request $request, $id_kepulangan)
     {
-        // Cari data berdasarkan id_kepulangan
         $kepulangan = Kepulangan::where('id_kepulangan', $id_kepulangan)->firstOrFail();
         
-        // Validasi alasan penolakan (wajib diisi minimal 10 karakter)
         $validated = $request->validate([
             'alasan_penolakan' => 'required|string|min:10',
         ], [
@@ -280,11 +313,10 @@ class KepulanganController extends Controller
     }
 
     /**
-     * Complete kepulangan (mark as selesai)
+     * Complete kepulangan
      */
     public function complete($id_kepulangan)
     {
-        // Cari data berdasarkan id_kepulangan
         $kepulangan = Kepulangan::where('id_kepulangan', $id_kepulangan)->firstOrFail();
         
         if ($kepulangan->status !== 'Disetujui') {
@@ -294,9 +326,7 @@ class KepulanganController extends Controller
             ], 400);
         }
 
-        $kepulangan->update([
-            'status' => 'Selesai',
-        ]);
+        $kepulangan->update(['status' => 'Selesai']);
 
         return response()->json([
             'success' => true,
@@ -309,7 +339,6 @@ class KepulanganController extends Controller
      */
     public function print($id_kepulangan)
     {
-        // Cari data berdasarkan id_kepulangan
         $kepulangan = Kepulangan::where('id_kepulangan', $id_kepulangan)
             ->with('santri')
             ->firstOrFail();
@@ -332,7 +361,7 @@ class KepulanganController extends Controller
     }
 
     /**
-     * API: Get santri data with penggunaan izin
+     * API: Get santri data with penggunaan kuota
      */
     public function getSantriData($idSantri)
     {
@@ -345,36 +374,164 @@ class KepulanganController extends Controller
             ], 404);
         }
 
-        $tahunSekarang = Carbon::now()->year;
-        $penggunaanIzin = $this->getDetailIzinSantri($idSantri, $tahunSekarang);
+        $kuotaSantri = Kepulangan::getSisaKuotaSantri($idSantri);
 
         return response()->json([
             'success' => true,
             'santri' => $santri,
-            'penggunaan_izin' => [
-                'total_hari' => $penggunaanIzin['total_hari'],
-                'total_izin' => $penggunaanIzin['total_izin'],
-                'sisa_kuota' => $penggunaanIzin['sisa_kuota'],
-                'over_limit' => $penggunaanIzin['over_limit'],
-            ]
+            'penggunaan_izin' => $kuotaSantri
         ]);
     }
 
     /**
-     * Helper: Get detail izin santri per tahun
+     * ========================================
+     * FITUR PENGATURAN KUOTA
+     * ========================================
      */
-    private function getDetailIzinSantri($idSantri, $tahun)
+
+    /**
+     * Show settings page
+     */
+    public function settings()
+    {
+        $settings = Kepulangan::getSettings();
+        $resetLogs = Kepulangan::getResetLogs(20);
+        
+        // Statistik periode saat ini
+        $totalSantri = Santri::where('status', 'Aktif')->count();
+        $santriOverLimit = Kepulangan::getSantriOverLimit();
+        $totalIzinPeriodeIni = Kepulangan::whereBetween('tanggal_pulang', [
+            $settings->periode_mulai,
+            $settings->periode_akhir
+        ])->whereIn('status', ['Disetujui', 'Selesai'])->count();
+
+        return view('admin.kepulangan.settings', compact(
+            'settings',
+            'resetLogs',
+            'totalSantri',
+            'santriOverLimit',
+            'totalIzinPeriodeIni'
+        ));
+    }
+
+    /**
+     * Update settings
+     */
+    public function updateSettings(Request $request)
+    {
+        $validated = $request->validate([
+            'kuota_maksimal' => 'required|integer|min:1|max:365',
+            'periode_mulai' => 'required|date',
+            'periode_akhir' => 'required|date|after:periode_mulai',
+        ], [
+            'kuota_maksimal.required' => 'Kuota maksimal wajib diisi.',
+            'kuota_maksimal.min' => 'Kuota minimal 1 hari.',
+            'kuota_maksimal.max' => 'Kuota maksimal 365 hari.',
+            'periode_mulai.required' => 'Periode mulai wajib diisi.',
+            'periode_akhir.required' => 'Periode akhir wajib diisi.',
+            'periode_akhir.after' => 'Periode akhir harus setelah periode mulai.',
+        ]);
+
+        Kepulangan::updateSettings(
+            $validated['kuota_maksimal'],
+            $validated['periode_mulai'],
+            $validated['periode_akhir']
+        );
+
+        return redirect()->route('admin.kepulangan.settings')
+            ->with('success', 'Pengaturan kuota berhasil diperbarui.');
+    }
+
+    /**
+     * Reset kuota satu santri
+     */
+    public function resetKuotaSantri(Request $request, $idSantri)
+    {
+        $validated = $request->validate([
+            'catatan' => 'nullable|string|max:500',
+        ]);
+
+        $santri = Santri::where('id_santri', $idSantri)->firstOrFail();
+
+        $result = Kepulangan::resetKuotaSantri(
+            $idSantri,
+            Auth::user()->name,
+            $validated['catatan'] ?? 'Reset kuota individual untuk ' . $santri->nama_lengkap
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Kuota santri ' . $santri->nama_lengkap . ' berhasil direset. Total ' . $result['total_hari_direset'] . ' hari telah direset.'
+        ]);
+    }
+
+    /**
+     * Reset kuota semua santri
+     */
+    public function resetKuotaSemuaSantri(Request $request)
+    {
+        $validated = $request->validate([
+            'catatan' => 'nullable|string|max:500',
+            'konfirmasi' => 'required|accepted',
+        ], [
+            'konfirmasi.accepted' => 'Anda harus mencentang konfirmasi untuk melanjutkan reset massal.',
+        ]);
+
+        $result = Kepulangan::resetKuotaSemuaSantri(
+            Auth::user()->name,
+            $validated['catatan'] ?? 'Reset kuota tahunan massal'
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Kuota berhasil direset untuk ' . $result['total_santri'] . ' santri. Total ' . $result['total_hari_direset'] . ' hari telah direset.',
+            'data' => $result
+        ]);
+    }
+
+    /**
+     * Show list santri over limit
+     */
+    public function santriOverLimit()
+    {
+        $settings = Kepulangan::getSettings();
+        $santriOverLimitIds = Kepulangan::getSantriOverLimit();
+        
+        $santriList = Santri::whereIn('id_santri', array_keys($santriOverLimitIds))
+            ->with(['kepulangan' => function($query) use ($settings) {
+                $query->whereBetween('tanggal_pulang', [
+                    $settings->periode_mulai,
+                    $settings->periode_akhir
+                ])->whereIn('status', ['Disetujui', 'Selesai']);
+            }])
+            ->get()
+            ->map(function($santri) use ($santriOverLimitIds) {
+                $kuota = Kepulangan::getSisaKuotaSantri($santri->id_santri);
+                $santri->total_hari_izin = $santriOverLimitIds[$santri->id_santri];
+                $santri->kuota_info = $kuota;
+                return $santri;
+            })
+            ->sortByDesc('total_hari_izin');
+
+        return view('admin.kepulangan.over-limit', compact('santriList', 'settings'));
+    }
+
+    /**
+     * Helper: Get detail izin santri
+     */
+    private function getDetailIzinSantri($idSantri, $periodeMulai, $periodeAkhir)
     {
         $kepulanganList = Kepulangan::where('id_santri', $idSantri)
-            ->where('status', 'Disetujui')
-            ->whereYear('tanggal_pulang', $tahun)
+            ->whereIn('status', ['Disetujui', 'Selesai'])
+            ->whereBetween('tanggal_pulang', [$periodeMulai, $periodeAkhir])
             ->orderBy('tanggal_pulang', 'desc')
             ->get();
 
+        $settings = Kepulangan::getSettings();
         $totalHari = $kepulanganList->sum('durasi_izin');
         $totalIzin = $kepulanganList->count();
-        $sisaKuota = max(0, 12 - $totalHari);
-        $overLimit = $totalHari > 12;
+        $sisaKuota = max(0, $settings->kuota_maksimal - $totalHari);
+        $overLimit = $totalHari > $settings->kuota_maksimal;
 
         $details = $kepulanganList->map(function($item) {
             return [
@@ -382,6 +539,7 @@ class KepulanganController extends Controller
                 'tanggal' => $item->tanggal_pulang_formatted . ' - ' . $item->tanggal_kembali_formatted,
                 'durasi' => $item->durasi_izin,
                 'alasan' => $item->alasan,
+                'status' => $item->status,
             ];
         });
 
@@ -392,20 +550,5 @@ class KepulanganController extends Controller
             'over_limit' => $overLimit,
             'details' => $details,
         ];
-    }
-
-    /**
-     * Helper: Get santri yang over limit
-     */
-    private function getOverLimitSantri()
-    {
-        $tahunSekarang = Carbon::now()->year;
-
-        return Kepulangan::selectRaw('id_santri, SUM(durasi_izin) as total_hari')
-            ->where('status', 'Disetujui')
-            ->whereYear('tanggal_pulang', $tahunSekarang)
-            ->groupBy('id_santri')
-            ->having('total_hari', '>', 12)
-            ->get();
     }
 }

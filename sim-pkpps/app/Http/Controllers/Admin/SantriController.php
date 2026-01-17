@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Santri;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 
 class SantriController extends Controller
 {
@@ -46,6 +47,7 @@ class SantriController extends Controller
                 'jenis_kelamin', 
                 'kelas', 
                 'status',
+                'foto', // TAMBAHAN
                 'created_at'
             )
             ->orderBy('created_at', 'desc')
@@ -87,15 +89,33 @@ class SantriController extends Controller
             'daerah_asal' => 'nullable|string|max:255',
             'nama_orang_tua' => 'nullable|string|max:255',
             'nomor_hp_ortu' => 'nullable|string|max:20',
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // TAMBAHAN: max 2MB
         ], [
             'nis.unique' => 'NIS sudah digunakan oleh santri lain.',
             'nama_lengkap.required' => 'Nama lengkap wajib diisi.',
             'jenis_kelamin.required' => 'Jenis kelamin wajib dipilih.',
             'kelas.required' => 'Kelas wajib dipilih.',
             'status.required' => 'Status wajib dipilih.',
+            'foto.image' => 'File harus berupa gambar.',
+            'foto.mimes' => 'Foto harus berformat JPG, JPEG, atau PNG.',
+            'foto.max' => 'Ukuran foto maksimal 2 MB.',
         ]);
 
-        Santri::create($validated);
+        // Buat santri terlebih dahulu untuk mendapatkan id_santri
+        $santri = Santri::create($validated);
+
+        // Handle upload foto
+        if ($request->hasFile('foto')) {
+            $file = $request->file('foto');
+            $extension = $file->getClientOriginalExtension();
+            $filename = $santri->id_santri . '.' . $extension;
+            
+            // Simpan file ke storage/app/public/santri
+            $path = $file->storeAs('santri', $filename, 'public');
+            
+            // Update path foto di database
+            $santri->update(['foto' => $path]);
+        }
 
         // Clear cache
         Cache::forget('next_santri_id');
@@ -137,13 +157,33 @@ class SantriController extends Controller
             'daerah_asal' => 'nullable|string|max:255',
             'nama_orang_tua' => 'nullable|string|max:255',
             'nomor_hp_ortu' => 'nullable|string|max:20',
+            'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // TAMBAHAN: max 2MB
         ], [
             'nis.unique' => 'NIS sudah digunakan oleh santri lain.',
             'nama_lengkap.required' => 'Nama lengkap wajib diisi.',
             'jenis_kelamin.required' => 'Jenis kelamin wajib dipilih.',
             'kelas.required' => 'Kelas wajib dipilih.',
             'status.required' => 'Status wajib dipilih.',
+            'foto.image' => 'File harus berupa gambar.',
+            'foto.mimes' => 'Foto harus berformat JPG, JPEG, atau PNG.',
+            'foto.max' => 'Ukuran foto maksimal 2 MB.',
         ]);
+
+        // Handle upload foto baru
+        if ($request->hasFile('foto')) {
+            // Hapus foto lama jika ada
+            if ($santri->foto && Storage::disk('public')->exists($santri->foto)) {
+                Storage::disk('public')->delete($santri->foto);
+            }
+            
+            $file = $request->file('foto');
+            $extension = $file->getClientOriginalExtension();
+            $filename = $santri->id_santri . '.' . $extension;
+            
+            // Simpan file ke storage/app/public/santri
+            $path = $file->storeAs('santri', $filename, 'public');
+            $validated['foto'] = $path;
+        }
 
         $santri->update($validated);
 
@@ -161,6 +201,11 @@ class SantriController extends Controller
     public function destroy(Santri $santri)
     {
         $namaSantri = $santri->nama_lengkap;
+        
+        // Hapus foto jika ada
+        if ($santri->foto && Storage::disk('public')->exists($santri->foto)) {
+            Storage::disk('public')->delete($santri->foto);
+        }
         
         $santri->delete();
         

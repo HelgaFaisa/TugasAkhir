@@ -2,7 +2,7 @@
     $isEdit = isset($santri);
 @endphp
 
-<form action="{{ $isEdit ? route('admin.santri.update', $santri) : route('admin.santri.store') }}" method="POST" class="data-form">
+<form action="{{ $isEdit ? route('admin.santri.update', $santri) : route('admin.santri.store') }}" method="POST" class="data-form" enctype="multipart/form-data">
     @csrf
     @if ($isEdit)
         @method('PUT')
@@ -12,6 +12,50 @@
         <label for="id_santri">ID Santri</label>
         <input type="text" id="id_santri" name="id_santri" value="{{ $isEdit ? $santri->id_santri : $nextIdSantri ?? 'Otomatis Dibuat' }}" class="form-control" disabled>
         <small class="form-text text-muted">{{ $isEdit ? 'ID Santri tidak dapat diubah.' : 'ID akan otomatis di-generate (Contoh: ' . ($nextIdSantri ?? 'S001') . ')' }}</small>
+    </div>
+
+    {{-- FOTO SANTRI (BARU) --}}
+    <div class="form-group">
+        <label for="foto">
+            <i class="fas fa-image form-icon"></i>
+            Foto Santri
+        </label>
+        
+        @if($isEdit && $santri->foto)
+            <div style="margin-bottom: 10px;">
+                <img src="{{ asset('storage/' . $santri->foto) }}" 
+                     alt="Foto {{ $santri->nama_lengkap }}" 
+                     style="max-width: 150px; max-height: 150px; border-radius: 8px; border: 2px solid var(--primary-light); object-fit: cover;"
+                     loading="lazy">
+                <p style="margin-top: 5px; font-size: 0.85rem; color: var(--text-light);">
+                    <i class="fas fa-info-circle"></i> Foto saat ini
+                </p>
+            </div>
+        @endif
+        
+        <input type="file" 
+               id="foto" 
+               name="foto" 
+               class="form-control @error('foto') is-invalid @enderror" 
+               accept="image/jpeg,image/jpg,image/png"
+               onchange="previewImage(event)">
+        
+        @error('foto')
+            <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
+        
+        <small class="form-text text-muted">
+            <i class="fas fa-info-circle"></i> 
+            Format: JPG, JPEG, atau PNG. Maksimal 2 MB.
+            @if($isEdit)
+                Upload foto baru akan mengganti foto lama.
+            @endif
+        </small>
+        
+        {{-- Preview Image --}}
+        <img id="preview" 
+             style="display: none; margin-top: 10px; max-width: 150px; max-height: 150px; border-radius: 8px; border: 2px solid var(--primary-color); object-fit: cover;" 
+             loading="lazy">
     </div>
 
     <div class="form-group">
@@ -94,3 +138,39 @@
         </a>
     </div>
 </form>
+
+{{-- JavaScript untuk Preview Image --}}
+<script>
+function previewImage(event) {
+    const preview = document.getElementById('preview');
+    const file = event.target.files[0];
+    
+    if (file) {
+        // Validasi ukuran file (2 MB = 2097152 bytes)
+        if (file.size > 2097152) {
+            alert('Ukuran file terlalu besar! Maksimal 2 MB.');
+            event.target.value = '';
+            preview.style.display = 'none';
+            return;
+        }
+        
+        // Validasi tipe file
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+        if (!allowedTypes.includes(file.type)) {
+            alert('Format file tidak valid! Hanya JPG, JPEG, dan PNG yang diperbolehkan.');
+            event.target.value = '';
+            preview.style.display = 'none';
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    } else {
+        preview.style.display = 'none';
+    }
+}
+</script>

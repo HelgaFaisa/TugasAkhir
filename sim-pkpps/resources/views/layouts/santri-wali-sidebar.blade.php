@@ -16,11 +16,11 @@
         </a>
     </li>
 
-    {{-- Riwayat Absensi --}}
+    {{-- ✅ Kegiatan & Absensi --}}
     <li>
-        <a href="#" class="{{ Request::routeIs('santri.absensi.*') ? 'active' : '' }}">
+        <a href="{{ route('santri.kegiatan.index') }}" class="{{ Request::routeIs('santri.kegiatan.*') ? 'active' : '' }}">
             <i class="fas fa-calendar-check"></i>
-            <span>Riwayat Absensi</span>
+            <span>Kegiatan & Absensi</span>
         </a>
     </li>
 

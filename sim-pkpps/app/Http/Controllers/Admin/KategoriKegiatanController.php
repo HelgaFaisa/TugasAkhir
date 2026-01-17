@@ -1,5 +1,5 @@
 <?php
-
+// app/Http/Controllers/admin/KategoriKegiatanController.php
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;

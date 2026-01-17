@@ -1,5 +1,5 @@
 <?php
-// app/Models/Santri.php - Model untuk Data Santri (LENGKAP)
+// app/Models/Santri.php - Model untuk Data Santri (DENGAN FOTO)
 
 namespace App\Models;
 
@@ -24,7 +24,8 @@ class Santri extends Model
         'daerah_asal',
         'nama_orang_tua',
         'nomor_hp_ortu',
-        'rfid_uid', // TAMBAHAN BARU
+        'rfid_uid',
+        'foto', // TAMBAHAN BARU
     ];
 
     /**
@@ -244,6 +245,23 @@ class Santri extends Model
     public function getTotalKehadiranAttribute()
     {
         return $this->absensiKegiatans()->where('status', 'Hadir')->count();
+    }
+
+    /**
+     * Accessor: URL Foto Santri (BARU)
+     */
+    public function getFotoUrlAttribute()
+    {
+        if ($this->foto && file_exists(storage_path('app/public/' . $this->foto))) {
+            return asset('storage/' . $this->foto);
+        }
+        
+        // Fallback ke gambar default berdasarkan jenis kelamin
+        if ($this->jenis_kelamin === 'Perempuan') {
+            return asset('images/default-female.png');
+        }
+        
+        return asset('images/default-male.png');
     }
 
     /**

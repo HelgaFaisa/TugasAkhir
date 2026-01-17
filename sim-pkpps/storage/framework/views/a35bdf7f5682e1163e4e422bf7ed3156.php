@@ -18,9 +18,9 @@
 
     
     <li>
-        <a href="#" class="<?php echo e(Request::routeIs('santri.absensi.*') ? 'active' : ''); ?>">
+        <a href="<?php echo e(route('santri.kegiatan.index')); ?>" class="<?php echo e(Request::routeIs('santri.kegiatan.*') ? 'active' : ''); ?>">
             <i class="fas fa-calendar-check"></i>
-            <span>Riwayat Absensi</span>
+            <span>Kegiatan & Absensi</span>
         </a>
     </li>
 

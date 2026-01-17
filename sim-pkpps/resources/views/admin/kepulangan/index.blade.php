@@ -9,6 +9,33 @@
     <h2><i class="fas fa-home"></i> Data Kepulangan Santri</h2>
 </div>
 
+{{-- Info Periode Kuota --}}
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; align-items: center;">
+        <div>
+            <h4 style="margin: 0 0 5px 0; opacity: 0.9;">📅 Periode Kuota</h4>
+            <p style="margin: 0; font-size: 1.1rem; font-weight: 600;">
+                {{ $settings->periode_mulai->format('d M Y') }} - {{ $settings->periode_akhir->format('d M Y') }}
+            </p>
+        </div>
+        <div>
+            <h4 style="margin: 0 0 5px 0; opacity: 0.9;">📊 Kuota Maksimal</h4>
+            <p style="margin: 0; font-size: 1.1rem; font-weight: 600;">{{ $settings->kuota_maksimal }} Hari / Tahun</p>
+        </div>
+        <div>
+            <h4 style="margin: 0 0 5px 0; opacity: 0.9;">🔄 Terakhir Reset</h4>
+            <p style="margin: 0; font-size: 1.1rem; font-weight: 600;">
+                {{ $settings->terakhir_reset ? $settings->terakhir_reset->format('d M Y') : 'Belum Pernah' }}
+            </p>
+        </div>
+        <div style="text-align: right;">
+            <a href="{{ route('admin.kepulangan.settings') }}" class="btn btn-light" style="background: white; color: #667eea; font-weight: 600;">
+                <i class="fas fa-cog"></i> Kelola Pengaturan
+            </a>
+        </div>
+    </div>
+</div>
+
 {{-- Dashboard Cards --}}
 <div class="row-cards">
     <div class="card card-info">
@@ -27,9 +54,14 @@
         <i class="fas fa-home card-icon"></i>
     </div>
     <div class="card card-danger">
-        <h3>Over Limit</h3>
+        <h3>Over Limit (>{{ $settings->kuota_maksimal }} Hari)</h3>
         <div class="card-value">{{ $stats['over_limit_santri'] }}</div>
         <i class="fas fa-exclamation-triangle card-icon"></i>
+        @if($stats['over_limit_santri'] > 0)
+            <a href="{{ route('admin.kepulangan.over-limit') }}" style="font-size: 0.85rem; color: #dc3545; text-decoration: underline; margin-top: 5px; display: block;">
+                Lihat Detail
+            </a>
+        @endif
     </div>
 </div>
 
@@ -64,7 +96,7 @@
                 <input type="text" 
                        name="search" 
                        class="form-control" 
-                       placeholder="Nama, ID, atau alasan..." 
+                       placeholder="Cari nama, ID, atau alasan..." 
                        value="{{ request('search') }}"
                        id="searchInput">
             </div>
@@ -122,6 +154,7 @@
                     <th>Tanggal Pulang</th>
                     <th>Tanggal Kembali</th>
                     <th>Durasi</th>
+                    <th>Total Kuota Terpakai</th>
                     <th>Alasan</th>
                     <th>Status</th>
                     <th class="text-center">Aksi</th>
@@ -129,12 +162,16 @@
             </thead>
             <tbody>
                 @forelse($kepulangan as $item)
-                    <tr style="{{ isset($santriOverLimit[$item->id_santri]) ? 'background-color: #fff3cd;' : '' }}">
+                    @php
+                        $isOverLimit = isset($santriOverLimit[$item->id_santri]);
+                        $totalHariTerpakai = $isOverLimit ? $santriOverLimit[$item->id_santri] : 0;
+                    @endphp
+                    <tr style="{{ $isOverLimit ? 'background-color: rgba(220, 53, 69, 0.1); border-left: 4px solid #dc3545;' : '' }}">
                         <td>
                             <strong>{{ $item->id_kepulangan }}</strong>
-                            @if(isset($santriOverLimit[$item->id_santri]))
-                                <span style="display: inline-block; background: #dc3545; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; margin-left: 5px;" 
-                                      title="Over Limit: {{ $santriOverLimit[$item->id_santri] }} hari">
+                            @if($isOverLimit)
+                                <span style="display: inline-block; background: #dc3545; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; margin-left: 5px; animation: pulse 2s infinite;" 
+                                      title="Over Limit: {{ $totalHariTerpakai }} hari">
                                     <i class="fas fa-exclamation-triangle"></i>
                                 </span>
                             @endif
@@ -150,9 +187,30 @@
                         <td>{{ $item->tanggal_pulang_formatted }}</td>
                         <td>{{ $item->tanggal_kembali_formatted }}</td>
                         <td>
-                            <span style="display: inline-block; background: {{ $item->durasi_izin_calculated > 7 ? '#ffc107' : '#6c757d' }}; color: {{ $item->durasi_izin_calculated > 7 ? '#000' : '#fff' }}; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem;">
-                                {{ $item->durasi_izin_calculated }} hari
+                            <span style="display: inline-block; background: {{ $item->durasi_izin > 7 ? '#ffc107' : '#6c757d' }}; color: {{ $item->durasi_izin > 7 ? '#000' : '#fff' }}; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">
+                                {{ $item->durasi_izin }} hari
                             </span>
+                        </td>
+                        <td>
+                            @php
+                                $kuotaSantri = \App\Models\Kepulangan::getSisaKuotaSantri($item->id_santri);
+                                $badgeColor = $kuotaSantri['badge_color'];
+                                $badgeColors = [
+                                    'success' => '#28a745',
+                                    'warning' => '#ffc107',
+                                    'danger' => '#dc3545'
+                                ];
+                                $bgColor = $badgeColors[$badgeColor] ?? '#6c757d';
+                                $textColor = $badgeColor == 'warning' ? '#000' : '#fff';
+                            @endphp
+                            <div style="text-align: center;">
+                                <span style="display: inline-block; background: {{ $bgColor }}; color: {{ $textColor }}; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">
+                                    {{ $kuotaSantri['total_terpakai'] }} / {{ $kuotaSantri['kuota_maksimal'] }} hari
+                                </span>
+                                <div style="margin-top: 5px; font-size: 0.75rem; color: #7F8C8D;">
+                                    Sisa: {{ $kuotaSantri['sisa_kuota'] }} hari ({{ $kuotaSantri['persentase'] }}%)
+                                </div>
+                            </div>
                         </td>
                         <td>
                             <span style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block;" title="{{ $item->alasan }}">
@@ -169,9 +227,9 @@
                                 {{ $item->status }}
                             </span>
                             @if($item->is_aktif)
-                                <br><small style="color: #28a745; font-weight: 600;">Sedang Izin</small>
+                                <br><small style="color: #28a745; font-weight: 600;">🏠 Sedang Izin</small>
                             @elseif($item->is_terlambat)
-                                <br><small style="color: #dc3545; font-weight: 600;">Terlambat</small>
+                                <br><small style="color: #dc3545; font-weight: 600;">⏰ Terlambat</small>
                             @endif
                         </td>
                         <td class="text-center">
@@ -227,7 +285,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" style="text-align: center; padding: 40px;">
+                        <td colspan="9" style="text-align: center; padding: 40px;">
                             <i class="fas fa-inbox" style="font-size: 3rem; color: #ccc; margin-bottom: 15px;"></i>
                             <p style="color: #7F8C8D;">Tidak ada data kepulangan ditemukan</p>
                         </td>
@@ -251,7 +309,7 @@
     @endif
 </div>
 
-{{-- Modal Approve --}}
+{{-- Modals (sama seperti sebelumnya) --}}
 <div class="modal fade" id="approveModal" tabindex="-1" style="display: none;">
     <div class="modal-dialog">
         <div class="modal-content" style="background: white; border-radius: 12px; padding: 20px;">
@@ -276,7 +334,6 @@
     </div>
 </div>
 
-{{-- Modal Reject --}}
 <div class="modal fade" id="rejectModal" tabindex="-1" style="display: none;">
     <div class="modal-dialog">
         <div class="modal-content" style="background: white; border-radius: 12px; padding: 20px;">
@@ -301,7 +358,6 @@
     </div>
 </div>
 
-{{-- Modal Delete --}}
 <div class="modal fade" id="deleteModal" tabindex="-1" style="display: none;">
     <div class="modal-dialog">
         <div class="modal-content" style="background: white; border-radius: 12px; padding: 20px;">
@@ -324,12 +380,17 @@
 .modal.fade { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
 .modal-dialog { max-width: 500px; width: 90%; margin: auto; }
 .modal-content { max-height: 90vh; overflow-y: auto; }
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
 </style>
 
 <script>
 let currentActionId = null;
 
-// Auto submit search with debounce
+// Auto submit search dengan debounce
 let searchTimeout;
 document.getElementById('searchInput')?.addEventListener('input', function() {
     clearTimeout(searchTimeout);

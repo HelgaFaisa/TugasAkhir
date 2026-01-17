@@ -29,6 +29,7 @@ use App\Http\Controllers\Santri\SantriBeritaController; // ✅ TAMBAHKAN INI
 use App\Http\Controllers\Santri\SantriKesehatanController;
 use App\Http\Controllers\Santri\SantriCapaianController;
 use App\Http\Controllers\Santri\SantriKepulanganController;
+use App\Http\Controllers\Santri\RiwayatKegiatanSantriController; // ✅ TAMBAHKAN INI
 
 /*
 |--------------------------------------------------------------------------
@@ -67,7 +68,8 @@ Route::prefix('santri')->middleware('guest')->group(function () {
 // --- RUTE ADMINISTRATOR (Prefix: admin) ---
 Route::prefix('admin')
     ->middleware(['auth', 'role:admin'])
-    ->name('admin.')->group(function () {
+    ->name('admin.')
+    ->group(function () {
     
     // Logout Admin
     Route::post('logout', [AdminAuthController::class, 'logout'])->name('logout');
@@ -110,35 +112,40 @@ Route::prefix('admin')
         'cetakSurat'
     ])->name('kesehatan-santri.cetak-surat');
     
-    // 5. KEPULANGAN SANTRI
-    Route::resource('kepulangan', KepulanganController::class);
-    
-    // Route tambahan untuk approve/reject
-    Route::post('kepulangan/{kepulangan}/approve', [
-        KepulanganController::class, 
-        'approve'
-    ])->name('kepulangan.approve');
-    
-    Route::post('kepulangan/{kepulangan}/reject', [
-        KepulanganController::class, 
-        'reject'
-    ])->name('kepulangan.reject');
-    
-    Route::post('kepulangan/{kepulangan}/complete', [
-        KepulanganController::class, 
-        'complete'
-    ])->name('kepulangan.complete');
-    
-    Route::get('kepulangan/{kepulangan}/print', [
-        KepulanganController::class, 
-        'print'
-    ])->name('kepulangan.print');
-    
-    // API route untuk get santri data
-    Route::get('api/kepulangan/santri/{id_santri}', [
-        KepulanganController::class, 
-        'getSantriData'
-    ])->name('api.kepulangan.santri');
+    // 5. KEPULANGAN SANTRI (UPDATED - LENGKAP) ✅
+    Route::prefix('kepulangan')->name('kepulangan.')->group(function () {
+        
+        // Main CRUD
+        Route::get('/', [KepulanganController::class, 'index'])->name('index');
+        Route::get('/create', [KepulanganController::class, 'create'])->name('create');
+        Route::post('/', [KepulanganController::class, 'store'])->name('store');
+        Route::get('/{id_kepulangan}', [KepulanganController::class, 'show'])->name('show');
+        Route::get('/{id_kepulangan}/edit', [KepulanganController::class, 'edit'])->name('edit');
+        Route::put('/{id_kepulangan}', [KepulanganController::class, 'update'])->name('update');
+        Route::delete('/{id_kepulangan}', [KepulanganController::class, 'destroy'])->name('destroy');
+        
+        // Actions (Approval/Reject/Complete)
+        Route::post('/{id_kepulangan}/approve', [KepulanganController::class, 'approve'])->name('approve');
+        Route::post('/{id_kepulangan}/reject', [KepulanganController::class, 'reject'])->name('reject');
+        Route::post('/{id_kepulangan}/complete', [KepulanganController::class, 'complete'])->name('complete');
+        
+        // Print Surat Izin
+        Route::get('/{id_kepulangan}/print', [KepulanganController::class, 'print'])->name('print');
+        
+        // Settings & Manajemen Kuota
+        Route::get('/settings/manage', [KepulanganController::class, 'settings'])->name('settings');
+        Route::put('/settings/update', [KepulanganController::class, 'updateSettings'])->name('settings.update');
+        
+        // Reset Kuota
+        Route::post('/reset/santri/{id_santri}', [KepulanganController::class, 'resetKuotaSantri'])->name('reset.santri');
+        Route::post('/reset/semua', [KepulanganController::class, 'resetKuotaSemuaSantri'])->name('reset.semua');
+        
+        // List Santri Over Limit
+        Route::get('/over-limit/list', [KepulanganController::class, 'santriOverLimit'])->name('over-limit');
+        
+        // API untuk AJAX (Get Santri Data)
+        Route::get('/api/santri/{id_santri}', [KepulanganController::class, 'getSantriData'])->name('api.santri');
+    });
 
     // 6. BERITA
     Route::prefix('berita')->name('berita.')->group(function () {
@@ -331,5 +338,11 @@ Route::prefix('santri')
     Route::prefix('kepulangan')->name('kepulangan.')->group(function () {
         Route::get('/', [SantriKepulanganController::class, 'index'])->name('index');
         Route::get('/{kepulangan:id_kepulangan}', [SantriKepulanganController::class, 'show'])->name('show');
+    });
+
+    // 8. RIWAYAT KEGIATAN & ABSENSI (BARU ✅)
+    Route::prefix('kegiatan')->name('kegiatan.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Santri\RiwayatKegiatanSantriController::class, 'index'])->name('index');
+        Route::get('/{kegiatan_id}', [\App\Http\Controllers\Santri\RiwayatKegiatanSantriController::class, 'show'])->name('show');
     });
 });

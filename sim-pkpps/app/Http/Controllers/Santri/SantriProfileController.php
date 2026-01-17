@@ -43,6 +43,7 @@ class SantriProfileController extends Controller
                         'nama_orang_tua',
                         'nomor_hp_ortu',
                         'rfid_uid',
+                        'foto', // ✅ TAMBAHAN INI - PENTING!
                         'created_at'
                     ])
                     ->firstOrFail();
@@ -68,8 +69,10 @@ class SantriProfileController extends Controller
                 'id',
                 'id_santri',
                 'nama_lengkap',
+                'jenis_kelamin', // ✅ TAMBAHAN untuk fallback foto default
                 'alamat_santri',
-                'nomor_hp_ortu'
+                'nomor_hp_ortu',
+                'foto' // ✅ TAMBAHAN INI - PENTING!
             ])
             ->firstOrFail();
         

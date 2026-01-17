@@ -9,6 +9,20 @@
     <h2><i class="fas fa-plus-circle"></i> Tambah Izin Kepulangan</h2>
 </div>
 
+{{-- Info Periode Kuota --}}
+<div style="background: #E8F7F2; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #6FBA9D;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+        <div>
+            <strong>📅 Periode Kuota:</strong><br>
+            {{ $settings->periode_mulai->format('d M Y') }} - {{ $settings->periode_akhir->format('d M Y') }}
+        </div>
+        <div>
+            <strong>📊 Kuota Maksimal:</strong><br>
+            {{ $settings->kuota_maksimal }} Hari / Tahun
+        </div>
+    </div>
+</div>
+
 @if($errors->any())
     <div class="alert alert-danger">
         <ul style="margin: 0; padding-left: 20px;">
@@ -38,22 +52,34 @@
             </select>
         </div>
 
-        {{-- Info Santri --}}
+        {{-- Info Santri & Kuota --}}
         <div id="santriInfo" style="display: none; background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #6FBA9D;">
-            <h4 style="margin-top: 0; color: #2C3E50;">Informasi Santri</h4>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+            <h4 style="margin-top: 0; color: #2C3E50;">📋 Informasi Santri & Kuota</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
                 <div>
                     <p style="margin: 5px 0;"><strong>Nama:</strong> <span id="santriNama">-</span></p>
                     <p style="margin: 5px 0;"><strong>Kelas:</strong> <span id="santriKelas">-</span></p>
+                    <p style="margin: 5px 0;"><strong>Periode:</strong> <span id="santriPeriode">-</span></p>
                 </div>
                 <div>
-                    <p style="margin: 5px 0;"><strong>Total Hari Izin Tahun Ini:</strong> <span id="totalHariIzin" style="display: inline-block; background: #81C6E8; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem;">0 hari</span></p>
-                    <p style="margin: 5px 0;"><strong>Sisa Kuota:</strong> <span id="sisaKuota" style="display: inline-block; background: #6FBA9D; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem;">12 hari</span></p>
+                    <p style="margin: 5px 0;"><strong>Kuota Maksimal:</strong> <span id="kuotaMaksimal">-</span></p>
+                    <p style="margin: 5px 0;"><strong>Total Terpakai:</strong> <span id="totalTerpakai" class="badge">-</span></p>
+                    <p style="margin: 5px 0;"><strong>Sisa Kuota:</strong> <span id="sisaKuota" class="badge">-</span></p>
                 </div>
             </div>
+            
+            {{-- Progress Bar Kuota --}}
+            <div style="margin-top: 15px;">
+                <label style="font-size: 0.9rem; color: #7F8C8D; margin-bottom: 5px;">Penggunaan Kuota:</label>
+                <div style="width: 100%; height: 20px; background: #E0F0EC; border-radius: 10px; overflow: hidden; position: relative;">
+                    <div id="progressBar" style="height: 100%; width: 0%; background: #28a745; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.75rem; font-weight: 600;"></div>
+                </div>
+                <small id="progressText" style="color: #7F8C8D; margin-top: 5px; display: block;">0% dari kuota terpakai</small>
+            </div>
+
             <div id="warningOverLimit" style="display: none; margin-top: 15px; padding: 12px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 6px; color: #856404;">
                 <i class="fas fa-exclamation-triangle"></i>
-                <strong>Peringatan:</strong> Santri ini sudah melebihi batas 12 hari per tahun!
+                <strong>⚠️ PERHATIAN:</strong> <span id="warningText"></span>
             </div>
         </div>
 
@@ -86,23 +112,29 @@
             </div>
         </div>
 
-        {{-- Info Durasi --}}
-        <div id="durasiInfo" style="display: none; background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #FF8B94;">
-            <h4 style="margin-top: 0; color: #2C3E50;">Informasi Durasi Izin</h4>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                <div>
-                    <p style="margin: 5px 0;"><strong>Durasi Izin:</strong> <span id="durasiHari" style="display: inline-block; background: #007bff; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem;">0 hari</span></p>
+        {{-- Info Durasi Izin --}}
+        <div id="durasiInfo" style="display: none; background: #fff3e0; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #ff9800;">
+            <h4 style="margin-top: 0; color: #2C3E50;">⏱️ Detail Durasi Izin</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px;">
+                <div style="text-align: center; padding: 15px; background: white; border-radius: 8px;">
+                    <div style="font-size: 0.85rem; color: #7F8C8D; margin-bottom: 5px;">Durasi Izin</div>
+                    <div id="durasiHari" style="font-size: 2rem; font-weight: 700; color: #ff9800;">0</div>
+                    <div style="font-size: 0.8rem; color: #7F8C8D;">hari</div>
                 </div>
-                <div>
-                    <p style="margin: 5px 0;"><strong>Total Setelah Izin:</strong> <span id="totalSetelahIzin" style="display: inline-block; background: #6c757d; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem;">0 hari</span></p>
+                <div style="text-align: center; padding: 15px; background: white; border-radius: 8px;">
+                    <div style="font-size: 0.85rem; color: #7F8C8D; margin-bottom: 5px;">Total Setelah Izin</div>
+                    <div id="totalSetelahIzin" style="font-size: 2rem; font-weight: 700; color: #2196f3;">0</div>
+                    <div style="font-size: 0.8rem; color: #7F8C8D;">hari terpakai</div>
                 </div>
-                <div>
-                    <p style="margin: 5px 0;"><strong>Sisa Kuota Setelah Izin:</strong> <span id="sisaKuotaSetelah" style="display: inline-block; background: #6FBA9D; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem;">12 hari</span></p>
+                <div style="text-align: center; padding: 15px; background: white; border-radius: 8px;">
+                    <div style="font-size: 0.85rem; color: #7F8C8D; margin-bottom: 5px;">Sisa Kuota</div>
+                    <div id="sisaKuotaSetelah" style="font-size: 2rem; font-weight: 700; color: #28a745;">12</div>
+                    <div style="font-size: 0.8rem; color: #7F8C8D;">hari tersisa</div>
                 </div>
             </div>
-            <div id="warningDurasi" style="display: none; margin-top: 15px; padding: 12px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 6px; color: #856404;">
-                <i class="fas fa-exclamation-triangle"></i>
-                <span id="warningMessage"></span>
+            <div id="warningDurasi" style="display: none; margin-top: 15px; padding: 12px; background: #ffebee; border: 1px solid #ffcdd2; border-radius: 6px; color: #c62828;">
+                <i class="fas fa-exclamation-circle"></i>
+                <strong>⚠️ PERHATIAN:</strong> <span id="warningDurasiMessage"></span>
             </div>
         </div>
 
@@ -141,18 +173,19 @@
     <div class="modal-dialog">
         <div class="modal-content" style="background: white; border-radius: 12px; padding: 20px;">
             <div style="margin-bottom: 20px;">
-                <h3 style="margin: 0; color: #2C3E50;">Konfirmasi Izin Melebihi Batas</h3>
+                <h3 style="margin: 0; color: #2C3E50;">⚠️ Konfirmasi Izin Melebihi Batas</h3>
             </div>
             <div style="padding: 15px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 6px; margin-bottom: 15px;">
                 <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: #856404; margin-bottom: 10px;"></i>
                 <h4 style="margin: 10px 0; color: #856404;">Peringatan!</h4>
                 <p id="overLimitMessage" style="margin: 0; color: #856404;"></p>
             </div>
-            <p>Apakah Anda yakin ingin melanjutkan pengajuan izin ini?</p>
+            <p style="margin: 15px 0;">Izin tetap bisa diproses, tetapi santri ini akan <strong>melebihi kuota maksimal</strong>.</p>
+            <p style="margin: 15px 0; color: #7F8C8D; font-size: 0.9rem;">Apakah Anda yakin ingin melanjutkan pengajuan izin ini?</p>
             <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
                 <button type="button" class="btn btn-secondary" onclick="closeModal('overLimitModal')">Batal</button>
-                <button type="button" class="btn btn-warning" id="confirmOverLimit">
-                    <i class="fas fa-check"></i> Lanjutkan Tetap
+                <button type="button" class="btn btn-warning" id="confirmOverLimit" style="background: #ff9800; border-color: #ff9800;">
+                    <i class="fas fa-check"></i> Ya, Lanjutkan Tetap
                 </button>
             </div>
         </div>
@@ -163,6 +196,7 @@
 .modal.fade { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
 .modal-dialog { max-width: 500px; width: 90%; margin: auto; }
 .modal-content { max-height: 90vh; overflow-y: auto; }
+.badge { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 0.9rem; font-weight: 600; }
 </style>
 
 <script>
@@ -182,46 +216,82 @@ document.getElementById('id_santri').addEventListener('change', function() {
 
     const infoDiv = document.getElementById('santriInfo');
     infoDiv.style.display = 'block';
-    infoDiv.innerHTML = '<div style="text-align: center;"><i class="fas fa-spinner fa-spin"></i> Memuat data santri...</div>';
+    infoDiv.innerHTML = '<div style="text-align: center; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Memuat data santri...</div>';
 
     fetch(`/admin/api/kepulangan/santri/${santriId}`)
         .then(response => response.json())
         .then(data => {
-            currentSantriData = data;
-            updateSantriInfo(data);
-            calculateDurasi();
+            if (data.success) {
+                currentSantriData = data;
+                updateSantriInfo(data);
+                calculateDurasi();
+            } else {
+                infoDiv.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+            }
         })
         .catch(error => {
-            infoDiv.innerHTML = `<div style="padding: 15px; background: #ffe8ea; border: 1px solid #ffd5d8; border-radius: 6px; color: #7C2D35;">Error loading santri data: ${error.message}</div>`;
+            infoDiv.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
         });
 });
 
 function updateSantriInfo(data) {
     const santri = data.santri;
-    const penggunaan = data.penggunaan_izin;
+    const kuota = data.penggunaan_izin;
     
-    const totalColor = penggunaan.total_hari > 8 ? '#ffc107' : '#81C6E8';
-    const sisaColor = penggunaan.sisa_kuota <= 3 ? '#dc3545' : '#6FBA9D';
+    // Tentukan warna badge berdasarkan status
+    let badgeColor = '#28a745'; // Hijau (aman)
+    let badgeTextColor = 'white';
+    if (kuota.status === 'hampir_habis') {
+        badgeColor = '#ffc107'; // Kuning
+        badgeTextColor = '#000';
+    } else if (kuota.status === 'melebihi') {
+        badgeColor = '#dc3545'; // Merah
+    }
     
-    document.getElementById('santriInfo').innerHTML = `
-        <h4 style="margin-top: 0; color: #2C3E50;">Informasi Santri</h4>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
-            <div>
-                <p style="margin: 5px 0;"><strong>Nama:</strong> ${santri.nama_lengkap}</p>
-                <p style="margin: 5px 0;"><strong>Kelas:</strong> ${santri.kelas}</p>
-            </div>
-            <div>
-                <p style="margin: 5px 0;"><strong>Total Hari Izin Tahun Ini:</strong> <span style="display: inline-block; background: ${totalColor}; color: ${penggunaan.total_hari > 8 ? '#000' : 'white'}; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem;">${penggunaan.total_hari} hari</span></p>
-                <p style="margin: 5px 0;"><strong>Sisa Kuota:</strong> <span style="display: inline-block; background: ${sisaColor}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem;">${penggunaan.sisa_kuota} hari</span></p>
-            </div>
-        </div>
-        ${penggunaan.over_limit ? `
-        <div style="margin-top: 15px; padding: 12px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 6px; color: #856404;">
-            <i class="fas fa-exclamation-triangle"></i>
-            <strong>Peringatan:</strong> Santri ini sudah melebihi batas 12 hari per tahun!
-        </div>
-        ` : ''}
-    `;
+    // Update info santri
+    document.getElementById('santriNama').textContent = santri.nama_lengkap;
+    document.getElementById('santriKelas').textContent = santri.kelas;
+    document.getElementById('santriPeriode').textContent = kuota.periode_mulai + ' - ' + kuota.periode_akhir;
+    document.getElementById('kuotaMaksimal').textContent = kuota.kuota_maksimal + ' hari';
+    
+    const totalTerpakaiSpan = document.getElementById('totalTerpakai');
+    totalTerpakaiSpan.textContent = kuota.total_terpakai + ' hari';
+    totalTerpakaiSpan.style.background = badgeColor;
+    totalTerpakaiSpan.style.color = badgeTextColor;
+    
+    const sisaKuotaSpan = document.getElementById('sisaKuota');
+    sisaKuotaSpan.textContent = kuota.sisa_kuota + ' hari';
+    sisaKuotaSpan.style.background = badgeColor;
+    sisaKuotaSpan.style.color = badgeTextColor;
+    
+    // Update progress bar
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    progressBar.style.width = Math.min(100, kuota.persentase) + '%';
+    progressBar.textContent = kuota.persentase + '%';
+    progressText.textContent = kuota.persentase + '% dari kuota terpakai';
+    
+    // Ubah warna progress bar
+    if (kuota.persentase >= 100) {
+        progressBar.style.background = '#dc3545'; // Merah
+    } else if (kuota.persentase >= 80) {
+        progressBar.style.background = '#ffc107'; // Kuning
+    } else {
+        progressBar.style.background = '#28a745'; // Hijau
+    }
+    
+    // Tampilkan warning jika over limit
+    const warningDiv = document.getElementById('warningOverLimit');
+    const warningText = document.getElementById('warningText');
+    if (kuota.status === 'melebihi') {
+        warningDiv.style.display = 'block';
+        warningText.textContent = `Santri ini sudah melebihi kuota ${kuota.kuota_maksimal} hari per tahun! Total terpakai: ${kuota.total_terpakai} hari.`;
+    } else {
+        warningDiv.style.display = 'none';
+    }
+    
+    // Restore full HTML structure
+    document.getElementById('santriInfo').style.display = 'block';
 }
 
 // Calculate durasi when dates change
@@ -246,10 +316,14 @@ function calculateDurasi() {
         return;
     }
     
+    // Hitung durasi (termasuk hari pertama)
     const diffTime = Math.abs(endDate - startDate);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
     
     durasiInfoDiv.style.display = 'block';
+    
+    // Update durasi
+    document.getElementById('durasiHari').textContent = diffDays;
     
     let totalSetelah = diffDays;
     let sisaSetelah = 12 - diffDays;
@@ -257,46 +331,52 @@ function calculateDurasi() {
     let warningMessage = '';
     
     if (currentSantriData) {
-        const currentUsage = currentSantriData.penggunaan_izin.total_hari;
-        totalSetelah = currentUsage + diffDays;
-        sisaSetelah = 12 - totalSetelah;
+        const currentUsage = currentSantriData.penggunaan_izin.total_terpakai;
+        const kuotaMaks = currentSantriData.penggunaan_izin.kuota_maksimal;
         
-        if (totalSetelah > 12) {
+        totalSetelah = currentUsage + diffDays;
+        sisaSetelah = kuotaMaks - totalSetelah;
+        
+        // Update nilai
+        document.getElementById('totalSetelahIzin').textContent = totalSetelah;
+        document.getElementById('sisaKuotaSetelah').textContent = Math.max(0, sisaSetelah);
+        
+        // Ubah warna berdasarkan status
+        const totalSetelahEl = document.getElementById('totalSetelahIzin');
+        const sisaSetelahEl = document.getElementById('sisaKuotaSetelah');
+        
+        if (totalSetelah > kuotaMaks) {
+            totalSetelahEl.style.color = '#dc3545';
+            sisaSetelahEl.style.color = '#dc3545';
             showWarning = true;
-            warningMessage = `Izin ini akan melebihi batas 12 hari per tahun (total: ${totalSetelah} hari)`;
+            warningMessage = `Izin ini akan melebihi batas ${kuotaMaks} hari per tahun (Total setelah izin: ${totalSetelah} hari, Kelebihan: ${totalSetelah - kuotaMaks} hari)`;
             isOverLimit = true;
+        } else if (totalSetelah >= kuotaMaks * 0.8) {
+            totalSetelahEl.style.color = '#ff9800';
+            sisaSetelahEl.style.color = '#ff9800';
+            showWarning = true;
+            warningMessage = `Perhatian: Kuota hampir habis! Sisa kuota setelah izin ini hanya ${sisaSetelah} hari.`;
+            isOverLimit = false;
         } else {
+            totalSetelahEl.style.color = '#2196f3';
+            sisaSetelahEl.style.color = '#28a745';
+            showWarning = false;
             isOverLimit = false;
         }
     }
     
-    const durasiColor = diffDays > 7 ? '#ffc107' : '#007bff';
-    const totalColor = totalSetelah > 12 ? '#dc3545' : '#6c757d';
-    const sisaColor = sisaSetelah < 0 ? '#dc3545' : sisaSetelah <= 3 ? '#ffc107' : '#6FBA9D';
-    
-    durasiInfoDiv.innerHTML = `
-        <h4 style="margin-top: 0; color: #2C3E50;">Informasi Durasi Izin</h4>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-            <div>
-                <p style="margin: 5px 0;"><strong>Durasi Izin:</strong> <span style="display: inline-block; background: ${durasiColor}; color: ${diffDays > 7 ? '#000' : 'white'}; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem;">${diffDays} hari</span></p>
-            </div>
-            <div>
-                <p style="margin: 5px 0;"><strong>Total Setelah Izin:</strong> <span style="display: inline-block; background: ${totalColor}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem;">${totalSetelah} hari</span></p>
-            </div>
-            <div>
-                <p style="margin: 5px 0;"><strong>Sisa Kuota Setelah Izin:</strong> <span style="display: inline-block; background: ${sisaColor}; color: ${sisaSetelah <= 3 && sisaSetelah >= 0 ? '#000' : 'white'}; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem;">${Math.max(0, sisaSetelah)} hari</span></p>
-            </div>
-        </div>
-        ${showWarning ? `
-        <div style="margin-top: 15px; padding: 12px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 6px; color: #856404;">
-            <i class="fas fa-exclamation-triangle"></i>
-            ${warningMessage}
-        </div>
-        ` : ''}
-    `;
+    // Tampilkan warning durasi
+    const warningDiv = document.getElementById('warningDurasi');
+    const warningMessageEl = document.getElementById('warningDurasiMessage');
+    if (showWarning) {
+        warningDiv.style.display = 'block';
+        warningMessageEl.textContent = warningMessage;
+    } else {
+        warningDiv.style.display = 'none';
+    }
 }
 
-// Character counter for alasan
+// Character counter
 document.getElementById('alasan').addEventListener('input', function() {
     const current = this.value.length;
     const counter = document.getElementById('charCount');
@@ -316,8 +396,8 @@ document.getElementById('kepulanganForm').addEventListener('submit', function(e)
     if (isOverLimit) {
         e.preventDefault();
         
-        const warningDiv = document.querySelector('#durasiInfo div[style*="background: #fff3cd"]');
-        const message = warningDiv ? warningDiv.textContent.trim() : 'Izin ini melebihi batas 12 hari per tahun';
+        const warningMessageEl = document.getElementById('warningDurasiMessage');
+        const message = warningMessageEl ? warningMessageEl.textContent : 'Izin ini akan melebihi batas kuota per tahun';
         document.getElementById('overLimitMessage').textContent = message;
         
         document.getElementById('overLimitModal').style.display = 'flex';
