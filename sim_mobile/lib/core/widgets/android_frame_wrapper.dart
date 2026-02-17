@@ -46,14 +46,14 @@ class AndroidFrameWrapper extends StatelessWidget {
             boxShadow: [
               // Shadow luar (biru)
               BoxShadow(
-                color: const Color(0xFF2196F3).withOpacity(0.3),
+                color: const Color(0xFF2196F3).withValues(alpha: 0.3),
                 blurRadius: 30,
                 spreadRadius: 5,
                 offset: const Offset(0, 10),
               ),
               // Shadow dalam (putih)
               BoxShadow(
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
                 blurRadius: 15,
                 spreadRadius: -5,
                 offset: const Offset(0, -5),
@@ -229,11 +229,11 @@ class AndroidFrameWrapper extends StatelessWidget {
         width: 140,
         height: 4,
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.8),
+          color: Colors.white.withValues(alpha: 0.8),
           borderRadius: BorderRadius.circular(10),
           boxShadow: [
             BoxShadow(
-              color: Colors.white.withOpacity(0.3),
+              color: Colors.white.withValues(alpha: 0.3),
               blurRadius: 8,
               spreadRadius: 2,
             ),

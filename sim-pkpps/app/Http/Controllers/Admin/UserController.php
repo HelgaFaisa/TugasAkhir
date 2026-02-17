@@ -6,7 +6,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Santri;
-use App\Models\Wali;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -18,10 +17,10 @@ class UserController extends Controller
      */
     public function santriAccounts()
     {
-        // Ambil akun user dengan role 'santri'
-        $users = User::where('role', 'santri')->get();
-        // Ambil data santri yang belum memiliki akun
-        $santris_tanpa_akun = Santri::whereDoesntHave('user')->get();
+        $users = User::where('role', 'santri')->with('santri')->get();
+        $santris_tanpa_akun = Santri::whereDoesntHave('user', function($query) {
+            $query->where('role', 'santri');
+        })->get();
 
         return view('admin.users.santri_accounts', compact('users', 'santris_tanpa_akun'));
     }
@@ -31,19 +30,15 @@ class UserController extends Controller
      */
     public function waliAccounts()
     {
-        // Ambil akun user dengan role 'wali'
-        $users = User::where('role', 'wali')->get();
+        $users = User::where('role', 'wali')->with('santri')->get();
         
-        // Asumsi: Wali tidak punya tabel biodata terpisah untuk langkah 3 ini,
-        // jadi kita ambil dari data Santri.
-        // Jika Wali memiliki tabel biodata Walis, kita bisa tambahkan logika Wali::whereDoesntHave('user')
-        $walis = Wali::all();
+        $santris_tanpa_wali = Santri::whereDoesntHave('waliUser')->get();
 
-        return view('admin.users.wali_accounts', compact('users', 'walis'));
+        return view('admin.users.wali_accounts', compact('users', 'santris_tanpa_wali'));
     }
 
     /**
-     * Tampilkan form untuk membuat akun baru (digunakan untuk santri dan wali).
+     * Tampilkan form untuk membuat akun baru.
      */
     public function createAccount(string $role)
     {
@@ -51,13 +46,13 @@ class UserController extends Controller
             abort(404);
         }
 
-        $list_data = [];
         if ($role === 'santri') {
-            // Ambil santri yang BELUM punya akun
-            $list_data = Santri::whereDoesntHave('user')->get();
-        } elseif ($role === 'wali') {
-            // Ambil semua data wali (kita asumsikan Wali adalah individu terpisah yang didata admin)
-            $list_data = Wali::all();
+            $list_data = Santri::whereDoesntHave('user', function($query) {
+                $query->where('role', 'santri');
+            })->get();
+        } else {
+            // Wali: ambil santri yang belum punya akun wali
+            $list_data = Santri::whereDoesntHave('waliUser')->get();
         }
         
         return view('admin.users.create_account', compact('role', 'list_data'));
@@ -72,30 +67,51 @@ class UserController extends Controller
             abort(404);
         }
 
-        // Validasi
-        $validated = $request->validate([
+        // Validasi berbeda untuk santri dan wali
+        $rules = [
             'role_id' => [
-                'required', 
-                Rule::unique('users', 'role_id')->where(function ($query) use ($role) {
-                    return $query->where('role', $role);
-                })
+                'required',
+                Rule::exists('santris', 'id_santri'),
+                function ($attribute, $value, $fail) use ($role) {
+                    $exists = User::where('role', $role)
+                        ->where('role_id', $value)
+                        ->exists();
+                    if ($exists) {
+                        $fail("Santri ini sudah memiliki akun {$role}.");
+                    }
+                },
             ],
             'username' => 'required|string|max:255|unique:users,username',
-            'password' => 'required|string|min:8|confirmed',
-        ], [
-            'role_id.unique' => 'Akun untuk data ini sudah ada.',
-            'role_id.required' => 'Wajib memilih data Santri/Wali yang akan dibuatkan akun.',
-            'username.unique' => 'Username ini sudah digunakan.',
-        ]);
+        ];
 
-        // Dapatkan nama berdasarkan role_id
-        if ($role === 'santri') {
-            $data_induk = Santri::where('id_santri', $request->role_id)->firstOrFail();
-            $name = $data_induk->nama_lengkap;
-        } elseif ($role === 'wali') {
-            $data_induk = Wali::where('id_wali', $request->role_id)->firstOrFail();
-            $name = $data_induk->nama_wali;
+        // Untuk wali: password tidak perlu min karena otomatis dari NIS
+        // Untuk santri: password minimal 8 karakter
+        if ($role === 'wali') {
+            $rules['password'] = 'required|string|confirmed';
+        } else {
+            $rules['password'] = 'required|string|min:8|confirmed';
         }
+
+        $messages = [
+            'role_id.required' => 'Wajib memilih santri.',
+            'role_id.exists' => 'Data santri tidak ditemukan.',
+            'username.unique' => 'Username sudah digunakan.',
+            'username.required' => 'Username wajib diisi.',
+            'password.required' => 'Password wajib diisi.',
+            'password.min' => 'Password minimal 8 karakter.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
+        ];
+
+        $validated = $request->validate($rules, $messages);
+
+        // Ambil data santri
+        $santri = Santri::where('id_santri', $validated['role_id'])->firstOrFail();
+        
+        // Untuk wali: name = nama orang tua (jika ada) atau nama santri
+        // Untuk santri: name = nama santri
+        $name = ($role === 'wali') 
+            ? ($santri->nama_orang_tua ?? $santri->nama_lengkap)
+            : $santri->nama_lengkap;
 
         // Simpan User
         User::create([
@@ -106,8 +122,67 @@ class UserController extends Controller
             'role_id' => $validated['role_id'],
         ]);
 
-        return redirect()->route('admin.users.'.$role.'_accounts')->with('success', 'Akun '.$role.' berhasil dibuat.');
+        $successMsg = $role === 'wali' 
+            ? "Akun wali untuk santri {$santri->nama_lengkap} berhasil dibuat. Login: Username={$validated['username']}, Password=NIS"
+            : "Akun santri {$santri->nama_lengkap} berhasil dibuat.";
+
+        return redirect()->route('admin.users.'.$role.'_accounts')
+            ->with('success', $successMsg);
     }
-    
-    // Tambahkan method edit/update/destroy untuk akun di langkah berikutnya
+
+    /**
+     * Hapus akun santri/wali.
+     */
+    public function destroyAccount(string $role, string $userId)
+    {
+        if (!in_array($role, ['santri', 'wali'])) {
+            abort(404);
+        }
+
+        // Cari user berdasarkan ID
+        $user = User::findOrFail($userId);
+
+        // Pastikan user yang akan dihapus adalah role yang sesuai
+        if ($user->role !== $role) {
+            return redirect()->back()->with('error', 'Akun tidak valid.');
+        }
+
+        $userName = $user->name;
+        $user->delete();
+
+        return redirect()->route('admin.users.'.$role.'_accounts')
+            ->with('success', "Akun {$role} {$userName} berhasil dihapus.");
+    }
+
+    /**
+     * Reset password akun santri/wali ke default (NIS).
+     */
+    public function resetPassword(string $role, string $userId)
+    {
+        if (!in_array($role, ['santri', 'wali'])) {
+            abort(404);
+        }
+
+        // Cari user berdasarkan ID
+        $user = User::findOrFail($userId);
+
+        // Pastikan user adalah role yang sesuai
+        if ($user->role !== $role) {
+            return redirect()->back()->with('error', 'Akun tidak valid.');
+        }
+
+        // Ambil santri terkait
+        $santri = Santri::where('id_santri', $user->role_id)->first();
+        
+        if (!$santri || !$santri->nis) {
+            return redirect()->back()->with('error', 'NIS santri tidak ditemukan. Tidak dapat mereset password.');
+        }
+
+        // Reset password ke NIS
+        $user->password = Hash::make($santri->nis);
+        $user->save();
+
+        return redirect()->route('admin.users.'.$role.'_accounts')
+            ->with('success', "Password akun {$user->name} berhasil direset ke NIS: {$santri->nis}");
+    }
 }

@@ -7,7 +7,6 @@
     <h2><i class="fas fa-edit"></i> Edit Berita</h2>
 </div>
 
-<!-- Alert Errors -->
 @if($errors->any())
     <div class="alert alert-danger">
         <strong><i class="fas fa-exclamation-circle"></i> Terdapat kesalahan:</strong>
@@ -20,7 +19,7 @@
 @endif
 
 <div class="content-box">
-    <form action="{{ route('admin.berita.update', $berita->id_berita) }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('admin.berita.update', $berita->id_berita) }}" method="POST" enctype="multipart/form-data" id="beritaForm">
         @csrf
         @method('PUT')
         
@@ -48,20 +47,24 @@
             @enderror
         </div>
 
-        <!-- Konten Berita -->
+        <!-- Konten Berita (Quill Editor) -->
         <div class="form-group">
             <label for="konten">
-                <i class="fas fa-align-left form-icon"></i>
+                <i class="fas fa-file-alt form-icon"></i>
                 Konten Berita <span style="color: var(--danger-color);">*</span>
             </label>
-            <textarea id="konten" 
-                      name="konten" 
-                      class="form-control @error('konten') is-invalid @enderror" 
-                      rows="10" 
+            <div id="editor-container" style="min-height: 300px; background: white; border: 1px solid #ddd; border-radius: 4px;"></div>
+            <textarea name="konten" 
+                      id="konten" 
+                      class="form-control @error('konten') is-invalid @enderror"
+                      style="display: none;" 
                       required>{{ old('konten', $berita->konten) }}</textarea>
             @error('konten')
-                <span class="invalid-feedback">{{ $message }}</span>
+                <span class="invalid-feedback" style="display: block;">{{ $message }}</span>
             @enderror
+            <span class="form-text">
+                <i class="fas fa-magic"></i> Gunakan toolbar untuk formatting: Bold, Italic, Daftar, Warna, dsb.
+            </span>
         </div>
 
         <!-- Penulis & Gambar -->
@@ -127,9 +130,6 @@
                     <option value="kelas_tertentu" {{ old('target_berita', $berita->target_berita) == 'kelas_tertentu' ? 'selected' : '' }}>
                         Kelas Tertentu
                     </option>
-                    <option value="santri_tertentu" {{ old('target_berita', $berita->target_berita) == 'santri_tertentu' ? 'selected' : '' }}>
-                        Santri Tertentu
-                    </option>
                 </select>
                 @error('target_berita')
                     <span class="invalid-feedback">{{ $message }}</span>
@@ -160,6 +160,9 @@
         </div>
 
         <!-- Section: Pilih Kelas Tertentu -->
+        @php
+            $selectedKelas = old('target_kelas', $berita->target_kelas ?? []);
+        @endphp
         <div id="kelas-section" class="form-group" style="display: {{ old('target_berita', $berita->target_berita) == 'kelas_tertentu' ? 'block' : 'none' }};">
             <label>
                 <i class="fas fa-graduation-cap form-icon"></i>
@@ -171,14 +174,14 @@
                     <div style="background: white; padding: 12px; border-radius: var(--border-radius-sm); box-shadow: var(--shadow-sm);">
                         <label style="display: flex; align-items: center; margin: 0; cursor: pointer;">
                             <input type="checkbox" 
-                                   id="kelas_{{ $kelas }}" 
+                                   id="kelas_{{ $kelas->id }}" 
                                    name="target_kelas[]" 
-                                   value="{{ $kelas }}" 
+                                   value="{{ $kelas->id }}" 
                                    class="kelas-checkbox"
                                    style="margin-right: 10px; width: 18px; height: 18px;"
-                                   {{ in_array($kelas, old('target_kelas', $berita->target_kelas ?? [])) ? 'checked' : '' }}>
+                                   {{ in_array($kelas->id, $selectedKelas) ? 'checked' : '' }}>
                             <span style="font-weight: 600; color: var(--text-color);">
-                                Kelas {{ $kelas }}
+                                {{ $kelas->nama_kelas }}
                             </span>
                         </label>
                     </div>
@@ -187,72 +190,7 @@
             </div>
             <small class="form-text">
                 <i class="fas fa-info-circle"></i>
-                <span id="selected-kelas-count">{{ count(old('target_kelas', $berita->target_kelas ?? [])) }}</span> kelas dipilih dari {{ count($kelasOptions) }} total kelas.
-            </small>
-        </div>
-
-        <!-- Section: Pilih Santri Tertentu -->
-        <div id="santri-section" class="form-group" style="display: {{ old('target_berita', $berita->target_berita) == 'santri_tertentu' ? 'block' : 'none' }};">
-            <label>
-                <i class="fas fa-users form-icon"></i>
-                Pilih Santri yang Akan Menerima Berita <span style="color: var(--danger-color);">*</span>
-            </label>
-            
-            <!-- Select All -->
-            <div style="background: var(--primary-light); padding: 12px; border-radius: var(--border-radius-sm); margin-bottom: 10px;">
-                <label style="display: flex; align-items: center; margin: 0; cursor: pointer; font-weight: 600;">
-                    <input type="checkbox" 
-                           id="select-all" 
-                           style="margin-right: 10px; width: 20px; height: 20px;">
-                    <span style="color: var(--primary-dark);">
-                        <i class="fas fa-check-double"></i> Pilih Semua Santri
-                    </span>
-                </label>
-            </div>
-            
-            <!-- List Santri -->
-            <div style="border: 2px solid var(--primary-light); border-radius: var(--border-radius-sm); padding: 15px; max-height: 400px; overflow-y: auto; background-color: #FAFAFA;">
-                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px;">
-                    @foreach($santri as $s)
-                    <div style="background: white; padding: 12px; border-radius: var(--border-radius-sm); box-shadow: var(--shadow-sm);">
-                        <label style="display: flex; align-items: center; gap: 10px; margin: 0; cursor: pointer;">
-                            <input type="checkbox" 
-                                   id="santri_{{ $s->id_santri }}" 
-                                   name="santri_tertentu[]" 
-                                   value="{{ $s->id_santri }}" 
-                                   class="santri-checkbox"
-                                   style="width: 18px; height: 18px; flex-shrink: 0;"
-                                   {{ in_array($s->id_santri, old('santri_tertentu', $selectedSantri)) ? 'checked' : '' }}>
-                            
-                            @if($s->foto_santri)
-                                <img src="{{ asset('storage/santri/' . $s->foto_santri) }}" 
-                                     alt="{{ $s->nama_santri }}" 
-                                     style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-color);">
-                            @else
-                                <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; flex-shrink: 0;">
-                                    {{ strtoupper(substr($s->nama_santri, 0, 1)) }}
-                                </div>
-                            @endif
-                            
-                            <div style="flex-grow: 1; min-width: 0;">
-                                <div style="font-weight: 600; color: var(--primary-color); font-size: 0.85em;">
-                                    {{ $s->id_santri }}
-                                </div>
-                                <div style="font-weight: 500; color: var(--text-color); font-size: 0.9em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                    {{ $s->nama_santri }}
-                                </div>
-                                <div style="font-size: 0.8em; color: var(--text-light);">
-                                    {{ $s->kelas }}
-                                </div>
-                            </div>
-                        </label>
-                    </div>
-                    @endforeach
-                </div>
-            </div>
-            <small class="form-text">
-                <i class="fas fa-info-circle"></i>
-                <span id="selected-count">{{ count(old('santri_tertentu', $selectedSantri)) }}</span> santri dipilih dari {{ $santri->count() }} total santri aktif.
+                <span id="selected-kelas-count">{{ count($selectedKelas) }}</span> kelas dipilih dari {{ $kelasOptions->count() }} total kelas.
             </small>
         </div>
 
@@ -271,80 +209,85 @@
     </form>
 </div>
 
+<!-- Quill Editor CDN -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const targetBerita = document.getElementById('target_berita');
-    const santriSection = document.getElementById('santri-section');
-    const kelasSection = document.getElementById('kelas-section');
-    const selectAll = document.getElementById('select-all');
-    const santriCheckboxes = document.querySelectorAll('.santri-checkbox');
-    const kelasCheckboxes = document.querySelectorAll('.kelas-checkbox');
-    const selectedCount = document.getElementById('selected-count');
-    const selectedKelasCount = document.getElementById('selected-kelas-count');
+    // Quill Editor
+    var quill = new Quill('#editor-container', {
+        theme: 'snow',
+        modules: {
+            toolbar: [
+                [{ 'header': [1, 2, 3, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ 'color': [] }, { 'background': [] }],
+                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                [{ 'indent': '-1' }, { 'indent': '+1' }],
+                [{ 'align': [] }],
+                ['clean']
+            ]
+        },
+        placeholder: 'Tulis konten berita di sini...'
+    });
 
-    // Toggle sections
+    // Load existing content
+    var existing = document.getElementById('konten').value;
+    if (existing) quill.root.innerHTML = existing;
+
+    // Sync on change
+    quill.on('text-change', function() {
+        document.getElementById('konten').value = quill.root.innerHTML;
+    });
+
+    // Sync on submit + validate
+    document.getElementById('beritaForm').onsubmit = function() {
+        document.getElementById('konten').value = quill.root.innerHTML;
+        if (quill.getText().trim().length === 0) {
+            alert('Konten berita tidak boleh kosong!');
+            return false;
+        }
+        return true;
+    };
+
+    // Target berita toggle
+    var targetBerita = document.getElementById('target_berita');
+    var kelasSection = document.getElementById('kelas-section');
+    var kelasCheckboxes = document.querySelectorAll('.kelas-checkbox');
+
     targetBerita.addEventListener('change', function() {
-        santriSection.style.display = 'none';
-        kelasSection.style.display = 'none';
-        
-        if (this.value === 'santri_tertentu') {
-            santriSection.style.display = 'block';
-        } else if (this.value === 'kelas_tertentu') {
-            kelasSection.style.display = 'block';
-        } else {
-            if (selectAll) selectAll.checked = false;
-            santriCheckboxes.forEach(cb => cb.checked = false);
-            kelasCheckboxes.forEach(cb => cb.checked = false);
-            updateSelectedCount();
-            updateSelectedKelasCount();
+        kelasSection.style.display = this.value === 'kelas_tertentu' ? 'block' : 'none';
+        if (this.value !== 'kelas_tertentu') {
+            kelasCheckboxes.forEach(function(cb) { cb.checked = false; });
+            updateKelasCount();
         }
     });
 
-    // Select All
-    if (selectAll) {
-        selectAll.addEventListener('change', function() {
-            santriCheckboxes.forEach(checkbox => {
-                checkbox.checked = this.checked;
-            });
-            updateSelectedCount();
-        });
-    }
-
-    // Individual checkboxes
-    santriCheckboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
-            const checkedCount = document.querySelectorAll('.santri-checkbox:checked').length;
-            if (selectAll) {
-                selectAll.checked = checkedCount === santriCheckboxes.length;
-                selectAll.indeterminate = checkedCount > 0 && checkedCount < santriCheckboxes.length;
-            }
-            updateSelectedCount();
-        });
+    // Kelas counter
+    kelasCheckboxes.forEach(function(cb) {
+        cb.addEventListener('change', updateKelasCount);
     });
 
-    kelasCheckboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', updateSelectedKelasCount);
-    });
-
-    function updateSelectedCount() {
-        const checkedCount = document.querySelectorAll('.santri-checkbox:checked').length;
-        if (selectedCount) selectedCount.textContent = checkedCount;
+    function updateKelasCount() {
+        var count = document.querySelectorAll('.kelas-checkbox:checked').length;
+        var el = document.getElementById('selected-kelas-count');
+        if (el) el.textContent = count;
     }
 
-    function updateSelectedKelasCount() {
-        const checkedCount = document.querySelectorAll('.kelas-checkbox:checked').length;
-        if (selectedKelasCount) selectedKelasCount.textContent = checkedCount;
-    }
-
-    // Initial setup
-    const initialCheckedCount = document.querySelectorAll('.santri-checkbox:checked').length;
-    if (selectAll) {
-        selectAll.checked = initialCheckedCount === santriCheckboxes.length;
-        selectAll.indeterminate = initialCheckedCount > 0 && initialCheckedCount < santriCheckboxes.length;
-    }
-    
-    updateSelectedCount();
-    updateSelectedKelasCount();
+    updateKelasCount();
 });
 </script>
+
+<style>
+.ql-toolbar { background-color: #f8f9fa; border-radius: 4px 4px 0 0; border-bottom: 2px solid #dee2e6; }
+.ql-container { font-size: 14px; font-family: Arial, sans-serif; min-height: 250px; }
+.ql-editor { min-height: 250px; max-height: 500px; overflow-y: auto; }
+.ql-editor h1 { font-size: 2em; color: #2c3e50; }
+.ql-editor h2 { font-size: 1.5em; color: #34495e; }
+.ql-editor h3 { font-size: 1.2em; color: #34495e; }
+.ql-editor p { margin-bottom: 1em; }
+.ql-editor ol, .ql-editor ul { padding-left: 1.5em; margin-bottom: 1em; }
+.ql-editor li { margin-bottom: 0.5em; }
+</style>
 @endsection

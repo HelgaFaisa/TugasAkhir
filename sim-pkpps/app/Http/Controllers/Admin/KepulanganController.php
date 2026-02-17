@@ -88,6 +88,7 @@ class KepulanganController extends Controller
 
     /**
      * Store a newly created kepulangan
+     * PERBAIKAN: Hapus validasi minimal karakter
      */
     public function store(Request $request)
     {
@@ -95,7 +96,7 @@ class KepulanganController extends Controller
             'id_santri' => 'required|exists:santris,id_santri',
             'tanggal_pulang' => 'required|date|after_or_equal:today',
             'tanggal_kembali' => 'required|date|after:tanggal_pulang',
-            'alasan' => 'required|string|min:10|max:500',
+            'alasan' => 'required|string|max:500',
         ], [
             'id_santri.required' => 'Santri wajib dipilih.',
             'id_santri.exists' => 'Santri tidak ditemukan.',
@@ -104,7 +105,6 @@ class KepulanganController extends Controller
             'tanggal_kembali.required' => 'Tanggal kembali wajib diisi.',
             'tanggal_kembali.after' => 'Tanggal kembali harus setelah tanggal pulang.',
             'alasan.required' => 'Alasan kepulangan wajib diisi.',
-            'alasan.min' => 'Alasan minimal 10 karakter.',
             'alasan.max' => 'Alasan maksimal 500 karakter.',
         ]);
 
@@ -192,6 +192,7 @@ class KepulanganController extends Controller
 
     /**
      * Update the specified kepulangan
+     * PERBAIKAN: Hapus validasi minimal karakter
      */
     public function update(Request $request, $id_kepulangan)
     {
@@ -205,13 +206,12 @@ class KepulanganController extends Controller
         $validated = $request->validate([
             'tanggal_pulang' => 'required|date|after_or_equal:today',
             'tanggal_kembali' => 'required|date|after:tanggal_pulang',
-            'alasan' => 'required|string|min:10|max:500',
+            'alasan' => 'required|string|max:500',
         ], [
             'tanggal_pulang.required' => 'Tanggal pulang wajib diisi.',
             'tanggal_kembali.required' => 'Tanggal kembali wajib diisi.',
             'tanggal_kembali.after' => 'Tanggal kembali harus setelah tanggal pulang.',
             'alasan.required' => 'Alasan kepulangan wajib diisi.',
-            'alasan.min' => 'Alasan minimal 10 karakter.',
         ]);
 
         // Update (durasi_izin akan otomatis dihitung ulang di model)
@@ -231,15 +231,17 @@ class KepulanganController extends Controller
 
     /**
      * Remove the specified kepulangan
+     * PERBAIKAN: Bisa hapus data Selesai juga (untuk data lama)
      */
     public function destroy($id_kepulangan)
     {
         $kepulangan = Kepulangan::where('id_kepulangan', $id_kepulangan)->firstOrFail();
         
-        if (!in_array($kepulangan->status, ['Menunggu', 'Ditolak'])) {
+        // PERBAIKAN: Bisa hapus Menunggu, Ditolak, atau Selesai
+        if (!in_array($kepulangan->status, ['Menunggu', 'Ditolak', 'Selesai'])) {
             return response()->json([
                 'success' => false,
-                'message' => 'Hanya izin dengan status "Menunggu" atau "Ditolak" yang bisa dihapus.'
+                'message' => 'Hanya izin dengan status "Menunggu", "Ditolak", atau "Selesai" yang bisa dihapus.'
             ], 403);
         }
 
@@ -286,10 +288,9 @@ class KepulanganController extends Controller
         $kepulangan = Kepulangan::where('id_kepulangan', $id_kepulangan)->firstOrFail();
         
         $validated = $request->validate([
-            'alasan_penolakan' => 'required|string|min:10',
+            'alasan_penolakan' => 'required|string',
         ], [
             'alasan_penolakan.required' => 'Alasan penolakan wajib diisi.',
-            'alasan_penolakan.min' => 'Alasan penolakan minimal 10 karakter.',
         ]);
 
         if ($kepulangan->status !== 'Menunggu') {
@@ -313,9 +314,9 @@ class KepulanganController extends Controller
     }
 
     /**
-     * Complete kepulangan
+     * Complete kepulangan dengan input tanggal kembali aktual
      */
-    public function complete($id_kepulangan)
+    public function complete(Request $request, $id_kepulangan)
     {
         $kepulangan = Kepulangan::where('id_kepulangan', $id_kepulangan)->firstOrFail();
         
@@ -326,11 +327,60 @@ class KepulanganController extends Controller
             ], 400);
         }
 
-        $kepulangan->update(['status' => 'Selesai']);
+        // Validasi tanggal kembali aktual
+        $validated = $request->validate([
+            'tanggal_kembali_aktual' => 'required|date',
+        ], [
+            'tanggal_kembali_aktual.required' => 'Tanggal kembali aktual wajib diisi.',
+            'tanggal_kembali_aktual.date' => 'Format tanggal tidak valid.',
+        ]);
+
+        // Validasi manual: tanggal kembali tidak boleh sebelum tanggal pulang
+        $tanggalKembaliAktual = Carbon::parse($validated['tanggal_kembali_aktual']);
+        if ($tanggalKembaliAktual->lt($kepulangan->tanggal_pulang)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tanggal kembali aktual tidak boleh sebelum tanggal pulang (' . $kepulangan->tanggal_pulang->format('d M Y') . ').'
+            ], 400);
+        }
+
+        // Simpan durasi rencana untuk perbandingan
+        $durasiRencana = $kepulangan->durasi_izin;
+        $tanggalKembaliRencana = $kepulangan->tanggal_kembali->format('Y-m-d');
+
+        // Update tanggal_kembali dengan tanggal aktual
+        // Durasi_izin akan otomatis recalculate di model (via updating event)
+        $kepulangan->update([
+            'tanggal_kembali' => $validated['tanggal_kembali_aktual'],
+            'status' => 'Selesai'
+        ]);
+
+        // Refresh untuk mendapat durasi yang sudah dihitung ulang
+        $kepulangan->refresh();
+        $durasiAktual = $kepulangan->durasi_izin;
+
+        // Buat pesan informatif
+        $message = 'Kepulangan santri berhasil diselesaikan.';
+        
+        if ($durasiAktual < $durasiRencana) {
+            $selisih = $durasiRencana - $durasiAktual;
+            $message .= " Santri pulang {$selisih} hari lebih cepat dari rencana (Rencana: {$durasiRencana} hari, Aktual: {$durasiAktual} hari). Kuota telah disesuaikan.";
+        } elseif ($durasiAktual > $durasiRencana) {
+            $selisih = $durasiAktual - $durasiRencana;
+            $message .= " Santri pulang {$selisih} hari lebih lambat dari rencana (Rencana: {$durasiRencana} hari, Aktual: {$durasiAktual} hari). Kuota telah disesuaikan.";
+        } else {
+            $message .= " Santri pulang sesuai rencana ({$durasiAktual} hari).";
+        }
 
         return response()->json([
             'success' => true,
-            'message' => 'Kepulangan santri berhasil diselesaikan.'
+            'message' => $message,
+            'data' => [
+                'durasi_rencana' => $durasiRencana,
+                'durasi_aktual' => $durasiAktual,
+                'tanggal_kembali_rencana' => $tanggalKembaliRencana,
+                'tanggal_kembali_aktual' => $validated['tanggal_kembali_aktual'],
+            ]
         ]);
     }
 
@@ -362,25 +412,33 @@ class KepulanganController extends Controller
 
     /**
      * API: Get santri data with penggunaan kuota
+     * PERBAIKAN: Return JSON yang benar, tidak ada HTML error
      */
     public function getSantriData($idSantri)
     {
-        $santri = Santri::where('id_santri', $idSantri)->first();
+        try {
+            $santri = Santri::where('id_santri', $idSantri)->first();
 
-        if (!$santri) {
+            if (!$santri) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Santri tidak ditemukan.'
+                ], 404);
+            }
+
+            $kuotaSantri = Kepulangan::getSisaKuotaSantri($idSantri);
+
+            return response()->json([
+                'success' => true,
+                'santri' => $santri,
+                'penggunaan_izin' => $kuotaSantri
+            ]);
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Santri tidak ditemukan.'
-            ], 404);
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
         }
-
-        $kuotaSantri = Kepulangan::getSisaKuotaSantri($idSantri);
-
-        return response()->json([
-            'success' => true,
-            'santri' => $santri,
-            'penggunaan_izin' => $kuotaSantri
-        ]);
     }
 
     /**
@@ -550,5 +608,151 @@ class KepulanganController extends Controller
             'over_limit' => $overLimit,
             'details' => $details,
         ];
+    }
+
+    /**
+     * ========================================
+     * PENGAJUAN DARI MOBILE
+     * ========================================
+     */
+
+    /**
+     * Tampilkan daftar pengajuan kepulangan dari mobile
+     */
+    public function pengajuan(Request $request)
+    {
+        $query = \App\Models\PengajuanKepulangan::with('santri');
+
+        // Search
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('id_pengajuan', 'like', "%{$search}%")
+                  ->orWhere('alasan', 'like', "%{$search}%")
+                  ->orWhereHas('santri', function($q2) use ($search) {
+                      $q2->where('nama_lengkap', 'like', "%{$search}%")
+                         ->orWhere('id_santri', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        // Filter status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Get data dengan pagination
+        $pengajuan = $query->orderBy('created_at', 'desc')->paginate(15);
+
+        // Statistics
+        $stats = [
+            'total_data' => \App\Models\PengajuanKepulangan::count(),
+            'menunggu' => \App\Models\PengajuanKepulangan::where('status', 'Menunggu')->count(),
+            'disetujui' => \App\Models\PengajuanKepulangan::where('status', 'Disetujui')->count(),
+            'ditolak' => \App\Models\PengajuanKepulangan::where('status', 'Ditolak')->count(),
+        ];
+
+        return view('admin.kepulangan.pengajuan', compact('pengajuan', 'stats'));
+    }
+
+    /**
+     * Approve pengajuan kepulangan
+     */
+    public function approvePengajuan(Request $request, $id)
+    {
+        try {
+            $validated = $request->validate([
+                'catatan_review' => 'nullable|string|max:500',
+            ]);
+
+            $pengajuan = \App\Models\PengajuanKepulangan::findOrFail($id);
+
+            // Cegah review ulang
+            if ($pengajuan->status !== 'Menunggu') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Pengajuan sudah direview sebelumnya'
+                ], 400);
+            }
+
+            // Simpan ID pengajuan untuk catatan sebelum dihapus
+            $id_pengajuan = $pengajuan->id_pengajuan;
+
+            // Pindahkan ke tabel kepulangan
+            $kepulangan = Kepulangan::create([
+                'id_santri' => $pengajuan->id_santri,
+                'tanggal_pulang' => $pengajuan->tanggal_pulang,
+                'tanggal_kembali' => $pengajuan->tanggal_kembali,
+                'durasi_izin' => $pengajuan->durasi_izin,
+                'alasan' => $pengajuan->alasan,
+                'status' => 'Disetujui',
+                'catatan' => 'Disetujui dari pengajuan mobile: ' . $id_pengajuan . ($validated['catatan_review'] ? ' - ' . $validated['catatan_review'] : ''),
+                'approved_by' => Auth::user()->name,
+                'approved_at' => now(),
+            ]);
+
+            // Hapus dari tabel pengajuan setelah dipindahkan
+            $pengajuan->delete();
+
+            // TODO: Kirim notifikasi FCM ke mobile
+            // $this->sendNotification($pengajuan->id_santri, 'approved');
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pengajuan berhasil disetujui dan ditambahkan ke data kepulangan',
+                'kepulangan_id' => $kepulangan->id_kepulangan,
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Reject pengajuan kepulangan
+     */
+    public function rejectPengajuan(Request $request, $id)
+    {
+        try {
+            $validated = $request->validate([
+                'catatan_review' => 'required|string|max:500',
+            ], [
+                'catatan_review.required' => 'Catatan penolakan wajib diisi',
+            ]);
+
+            $pengajuan = \App\Models\PengajuanKepulangan::findOrFail($id);
+
+            // Cegah review ulang
+            if ($pengajuan->status !== 'Menunggu') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Pengajuan sudah direview sebelumnya'
+                ], 400);
+            }
+
+            // Simpan data untuk notifikasi sebelum dihapus
+            $id_santri = $pengajuan->id_santri;
+            $catatan = $validated['catatan_review'];
+
+            // Hapus pengajuan yang ditolak
+            $pengajuan->delete();
+
+            // TODO: Kirim notifikasi FCM ke mobile
+            // $this->sendNotification($id_santri, 'rejected', $catatan);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pengajuan berhasil ditolak dan dihapus dari daftar'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

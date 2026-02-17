@@ -22,19 +22,42 @@
 
 
 <div class="content-box" style="margin-bottom: 20px;">
-    <form method="GET" action="<?php echo e(route('admin.materi.index')); ?>" class="filter-form-inline">
-        <select name="kategori" class="form-control" style="width: 200px;">
-            <option value="">Semua Kategori</option>
-            <option value="Al-Qur'an" <?php echo e(request('kategori') == 'Al-Qur\'an' ? 'selected' : ''); ?>>Al-Qur'an</option>
-            <option value="Hadist" <?php echo e(request('kategori') == 'Hadist' ? 'selected' : ''); ?>>Hadist</option>
-            <option value="Materi Tambahan" <?php echo e(request('kategori') == 'Materi Tambahan' ? 'selected' : ''); ?>>Materi Tambahan</option>
-        </select>
+    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+        <a href="<?php echo e(route('admin.materi.index', ['kategori' => 'Al-Qur\'an'] + request()->except('kategori'))); ?>" 
+           class="btn <?php echo e(request('kategori') == 'Al-Qur\'an' ? 'btn-primary' : 'btn-outline-primary'); ?>" 
+           style="min-width: 150px;">
+            <i class="fas fa-book-quran"></i> Al-Qur'an
+        </a>
+        <a href="<?php echo e(route('admin.materi.index', ['kategori' => 'Hadist'] + request()->except('kategori'))); ?>" 
+           class="btn <?php echo e(request('kategori') == 'Hadist' ? 'btn-primary' : 'btn-outline-primary'); ?>" 
+           style="min-width: 150px;">
+            <i class="fas fa-book"></i> Hadist
+        </a>
+        <a href="<?php echo e(route('admin.materi.index', ['kategori' => 'Materi Tambahan'] + request()->except('kategori'))); ?>" 
+           class="btn <?php echo e(request('kategori') == 'Materi Tambahan' ? 'btn-primary' : 'btn-outline-primary'); ?>" 
+           style="min-width: 150px;">
+            <i class="fas fa-graduation-cap"></i> Materi Tambahan
+        </a>
+        <?php if(request('kategori')): ?>
+            <a href="<?php echo e(route('admin.materi.index', request()->except('kategori'))); ?>" 
+               class="btn btn-secondary" 
+               style="min-width: 150px;">
+                <i class="fas fa-list"></i> Semua Kategori
+            </a>
+        <?php endif; ?>
+    </div>
+</div>
 
+
+<div class="content-box" style="margin-bottom: 20px;">
+    <form method="GET" action="<?php echo e(route('admin.materi.index')); ?>" class="filter-form-inline">
+        <input type="hidden" name="kategori" value="<?php echo e(request('kategori')); ?>">
+        
         <select name="kelas" class="form-control" style="width: 180px;">
             <option value="">Semua Kelas</option>
-            <option value="Lambatan" <?php echo e(request('kelas') == 'Lambatan' ? 'selected' : ''); ?>>Lambatan</option>
-            <option value="Cepatan" <?php echo e(request('kelas') == 'Cepatan' ? 'selected' : ''); ?>>Cepatan</option>
-            <option value="PB" <?php echo e(request('kelas') == 'PB' ? 'selected' : ''); ?>>PB</option>
+            <?php $__currentLoopData = $kelasList; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $kls): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <option value="<?php echo e($kls->nama_kelas); ?>" <?php echo e(request('kelas') == $kls->nama_kelas ? 'selected' : ''); ?>><?php echo e($kls->nama_kelas); ?></option>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </select>
 
         <input type="text" name="search" class="form-control" placeholder="Cari nama kitab..." 
@@ -44,15 +67,20 @@
             <i class="fas fa-search"></i> Filter
         </button>
 
-        <?php if(request()->anyFilled(['kategori', 'kelas', 'search'])): ?>
-            <a href="<?php echo e(route('admin.materi.index')); ?>" class="btn btn-secondary">
+        <?php if(request()->anyFilled(['kelas', 'search'])): ?>
+            <a href="<?php echo e(route('admin.materi.index', request()->only('kategori'))); ?>" class="btn btn-secondary">
                 <i class="fas fa-redo"></i> Reset
             </a>
         <?php endif; ?>
 
-        <a href="<?php echo e(route('admin.materi.create')); ?>" class="btn btn-success" style="margin-left: auto;">
-            <i class="fas fa-plus"></i> Tambah Materi
-        </a>
+        <div style="margin-left: auto; display: flex; gap: 10px;">
+            <a href="<?php echo e(route('admin.semester.index')); ?>" class="btn btn-info">
+                <i class="fas fa-calendar-alt"></i> Manajemen Semester
+            </a>
+            <a href="<?php echo e(route('admin.materi.create')); ?>" class="btn btn-success">
+                <i class="fas fa-plus"></i> Tambah Materi
+            </a>
+        </div>
     </form>
 </div>
 
@@ -90,7 +118,7 @@
                             <strong><?php echo e($materi->total_halaman); ?></strong> hal
                         </td>
                         <td class="text-center">
-                            <div class="btn-group">
+                            <div style="display: flex; justify-content: center; align-items: center; gap: 8px;">
                                 <a href="<?php echo e(route('admin.materi.show', $materi)); ?>" 
                                    class="btn btn-sm btn-info" title="Detail">
                                     <i class="fas fa-eye"></i>
@@ -100,7 +128,7 @@
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 <form action="<?php echo e(route('admin.materi.destroy', $materi)); ?>" 
-                                      method="POST" style="display: inline-block;"
+                                      method="POST" style="margin: 0;"
                                       onsubmit="return confirm('Yakin ingin menghapus materi <?php echo e($materi->nama_kitab); ?>?')">
                                     <?php echo csrf_field(); ?>
                                     <?php echo method_field('DELETE'); ?>

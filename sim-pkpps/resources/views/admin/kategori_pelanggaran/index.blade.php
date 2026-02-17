@@ -1,14 +1,12 @@
-{{-- resources/views/admin/kategori_pelanggaran/index.blade.php --}}
 @extends('layouts.app')
 
-@section('title', 'Data Kategori Pelanggaran')
+@section('title', 'Master Pelanggaran')
 
 @section('content')
 <div class="page-header">
-    <h2><i class="fas fa-list-ul"></i> Kategori Pelanggaran</h2>
+    <h2><i class="fas fa-list-ul"></i> Master Pelanggaran</h2>
 </div>
 
-<!-- Alert Messages -->
 @if(session('success'))
     <div class="alert alert-success">
         <i class="fas fa-check-circle"></i> {{ session('success') }}
@@ -21,70 +19,46 @@
     </div>
 @endif
 
-<!-- Form Tambah & Edit -->
-<div class="content-box" style="margin-bottom: 30px;">
-    <h3 style="margin-bottom: 20px; color: var(--primary-color);">
-        @if(isset($kategori))
-            <i class="fas fa-edit"></i> Edit Kategori
-        @else
-            <i class="fas fa-plus-circle"></i> Tambah Kategori
-        @endif
-    </h3>
-    <form action="@if(isset($kategori)){{ route('admin.kategori-pelanggaran.update', $kategori) }}@else{{ route('admin.kategori-pelanggaran.store') }}@endif" method="POST">
-        @csrf
-        @if(isset($kategori))
-            @method('PUT')
-        @endif
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
-            <div class="form-group">
-                <label for="nama_pelanggaran">
-                    <i class="fas fa-exclamation-triangle form-icon"></i>
-                    Nama Pelanggaran <span style="color: var(--danger-color);">*</span>
+<!-- Filter -->
+<div class="content-box" style="margin-bottom: 20px;">
+    <form method="GET" action="{{ route('admin.kategori-pelanggaran.index') }}">
+        <div style="display: grid; grid-template-columns: 2fr 1fr auto; gap: 15px; align-items: end;">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label for="id_klasifikasi">
+                    <i class="fas fa-filter form-icon"></i>
+                    Filter Klasifikasi
                 </label>
-                <input type="text" 
-                       name="nama_pelanggaran" 
-                       id="nama_pelanggaran"
-                       class="form-control @error('nama_pelanggaran') is-invalid @enderror"
-                       value="{{ old('nama_pelanggaran', $kategori->nama_pelanggaran ?? '') }}"
-                       placeholder="Contoh: Terlambat Sholat, Tidak Rapi"
-                       required>
-                @error('nama_pelanggaran')
-                    <span class="invalid-feedback">{{ $message }}</span>
-                @enderror
+                <select name="id_klasifikasi" id="id_klasifikasi" class="form-control">
+                    <option value="">-- Semua Klasifikasi --</option>
+                    @foreach($klasifikasiList as $kl)
+                        <option value="{{ $kl->id_klasifikasi }}" 
+                                {{ request('id_klasifikasi') == $kl->id_klasifikasi ? 'selected' : '' }}>
+                            {{ $kl->nama_klasifikasi }}
+                        </option>
+                    @endforeach
+                </select>
             </div>
 
-            <div class="form-group">
-                <label for="poin">
-                    <i class="fas fa-star form-icon"></i>
-                    Poin Pelanggaran <span style="color: var(--danger-color);">*</span>
+            <div class="form-group" style="margin-bottom: 0;">
+                <label for="is_active">
+                    <i class="fas fa-toggle-on form-icon"></i>
+                    Status
                 </label>
-                <input type="number" 
-                       name="poin" 
-                       id="poin" 
-                       min="1" 
-                       max="100"
-                       class="form-control @error('poin') is-invalid @enderror"
-                       value="{{ old('poin', $kategori->poin ?? '') }}"
-                       placeholder="1-100"
-                       required>
-                @error('poin')
-                    <span class="invalid-feedback">{{ $message }}</span>
-                @enderror
-                <span class="form-text">Poin antara 1-100</span>
+                <select name="is_active" id="is_active" class="form-control">
+                    <option value="">-- Semua Status --</option>
+                    <option value="1" {{ request('is_active') == '1' ? 'selected' : '' }}>Aktif</option>
+                    <option value="0" {{ request('is_active') == '0' ? 'selected' : '' }}>Nonaktif</option>
+                </select>
             </div>
-        </div>
 
-        <div class="btn-group">
-            <button type="submit" class="btn btn-primary">
-                <i class="fas fa-save"></i>
-                @if(isset($kategori)) Update @else Simpan @endif
-            </button>
-            @if(isset($kategori))
+            <div class="btn-group" style="margin-bottom: 0;">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Filter
+                </button>
                 <a href="{{ route('admin.kategori-pelanggaran.index') }}" class="btn btn-secondary">
-                    <i class="fas fa-times"></i> Batal
+                    <i class="fas fa-redo"></i> Reset
                 </a>
-            @endif
+            </div>
         </div>
     </form>
 </div>
@@ -93,11 +67,19 @@
 <div class="content-box">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <h3 style="margin: 0; color: var(--primary-color);">
-            <i class="fas fa-table"></i> Daftar Kategori Pelanggaran
+            <i class="fas fa-table"></i> Daftar Pelanggaran
         </h3>
-        <span class="badge badge-info" style="font-size: 0.9em;">
-            Total: {{ $data->count() }} Kategori
-        </span>
+        <div style="display: flex; gap: 10px;">
+            <a href="{{ route('admin.klasifikasi-pelanggaran.index') }}" class="btn btn-warning">
+                <i class="fas fa-tags"></i> Klasifikasi Pelanggaran
+            </a>
+            <a href="{{ route('admin.pembinaan-sanksi.index') }}" class="btn btn-success">
+                <i class="fas fa-book-open"></i> Pembinaan & Sanksi
+            </a>
+            <a href="{{ route('admin.kategori-pelanggaran.create') }}" class="btn btn-primary">
+                <i class="fas fa-plus-circle"></i> Tambah Pelanggaran
+            </a>
+        </div>
     </div>
 
     @if($data->isNotEmpty())
@@ -105,10 +87,12 @@
             <thead>
                 <tr>
                     <th style="width: 50px;">No</th>
-                    <th style="width: 120px;">ID Kategori</th>
+                    <th style="width: 100px;">ID</th>
+                    <th style="width: 150px;">Klasifikasi</th>
                     <th>Nama Pelanggaran</th>
-                    <th style="width: 120px; text-align: center;">Poin</th>
+                    <th style="width: 80px; text-align: center;">Poin</th>
                     <th style="width: 100px; text-align: center;">Digunakan</th>
+                    <th style="width: 100px; text-align: center;">Status</th>
                     <th style="width: 200px; text-align: center;">Aksi</th>
                 </tr>
             </thead>
@@ -116,11 +100,21 @@
                 @foreach($data as $index => $item)
                     <tr>
                         <td>{{ $index + 1 }}</td>
+                        <td><span class="badge badge-primary">{{ $item->id_kategori }}</span></td>
                         <td>
-                            <span class="badge badge-primary">{{ $item->id_kategori }}</span>
+                            @if($item->klasifikasi)
+                                <span class="badge badge-info">{{ $item->klasifikasi->nama_klasifikasi }}</span>
+                            @else
+                                <span class="badge badge-secondary">-</span>
+                            @endif
                         </td>
                         <td>
                             <strong>{{ $item->nama_pelanggaran }}</strong>
+                            @if($item->kafaroh)
+                                <br><small style="color: var(--text-light);">
+                                    <i class="fas fa-hands"></i> Kafaroh: {{ Str::limit($item->kafaroh, 50) }}
+                                </small>
+                            @endif
                         </td>
                         <td style="text-align: center;">
                             <span class="badge badge-danger" style="font-size: 0.9em;">
@@ -131,6 +125,13 @@
                             <span class="badge badge-secondary">
                                 {{ $item->riwayatPelanggaran->count() }}x
                             </span>
+                        </td>
+                        <td style="text-align: center;">
+                            @if($item->is_active)
+                                <span class="badge badge-success">Aktif</span>
+                            @else
+                                <span class="badge badge-secondary">Nonaktif</span>
+                            @endif
                         </td>
                         <td style="text-align: center;">
                             <div style="display: flex; justify-content: center; gap: 8px;">
@@ -147,7 +148,7 @@
                                 <form action="{{ route('admin.kategori-pelanggaran.destroy', $item) }}" 
                                       method="POST" 
                                       style="display: inline;"
-                                      onsubmit="return confirm('Yakin ingin menghapus kategori {{ $item->nama_pelanggaran }}?');">
+                                      onsubmit="return confirm('Yakin ingin menghapus pelanggaran {{ $item->nama_pelanggaran }}?');">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" 
@@ -165,8 +166,11 @@
     @else
         <div class="empty-state">
             <i class="fas fa-folder-open"></i>
-            <h3>Belum ada data kategori pelanggaran</h3>
-            <p>Mulai dengan menambahkan kategori pelanggaran baru menggunakan form di atas.</p>
+            <h3>Belum ada data pelanggaran</h3>
+            <p>Silakan tambah pelanggaran baru menggunakan tombol di atas.</p>
+            <a href="{{ route('admin.kategori-pelanggaran.create') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Tambah Pelanggaran
+            </a>
         </div>
     @endif
 </div>

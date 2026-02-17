@@ -1,11 +1,11 @@
 <?php
-// app/Http/Controllers/Admin/RiwayatPelanggaranController.php
 
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\RiwayatPelanggaran;
 use App\Models\KategoriPelanggaran;
+use App\Models\KlasifikasiPelanggaran;
 use App\Models\Santri;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -17,7 +17,7 @@ class RiwayatPelanggaranController extends Controller
      */
     public function index(Request $request)
     {
-        $query = RiwayatPelanggaran::with(['santri', 'kategori']);
+        $query = RiwayatPelanggaran::with(['santri', 'kategori.klasifikasi']);
 
         // Filter berdasarkan pencarian
         if ($request->has('search') && $request->search != '') {
@@ -32,6 +32,31 @@ class RiwayatPelanggaranController extends Controller
         // Filter berdasarkan kategori
         if ($request->has('id_kategori') && $request->id_kategori != '') {
             $query->byKategori($request->id_kategori);
+        }
+
+        // Filter berdasarkan klasifikasi (BARU)
+        if ($request->has('id_klasifikasi') && $request->id_klasifikasi != '') {
+            $query->whereHas('kategori', function($q) use ($request) {
+                $q->where('id_klasifikasi', $request->id_klasifikasi);
+            });
+        }
+
+        // Filter berdasarkan status kafaroh (BARU)
+        if ($request->has('status_kafaroh') && $request->status_kafaroh != '') {
+            if ($request->status_kafaroh == '1') {
+                $query->kafarohSelesai();
+            } else {
+                $query->kafarohBelumSelesai();
+            }
+        }
+
+        // Filter berdasarkan status publish (BARU)
+        if ($request->has('status_publish') && $request->status_publish != '') {
+            if ($request->status_publish == '1') {
+                $query->publishedToParent();
+            } else {
+                $query->notPublishedToParent();
+            }
         }
 
         // Filter berdasarkan tanggal
@@ -49,20 +74,28 @@ class RiwayatPelanggaranController extends Controller
 
         // Data untuk filter dropdown
         $santriList = Santri::aktif()->orderBy('nama_lengkap')->get();
-        $kategoriList = KategoriPelanggaran::orderBy('nama_pelanggaran')->get();
+        $kategoriList = KategoriPelanggaran::with('klasifikasi')
+            ->orderBy('nama_pelanggaran')
+            ->get();
+        $klasifikasiList = KlasifikasiPelanggaran::aktif()->byUrutan()->get();
 
         // Statistik
         $totalPelanggaran = RiwayatPelanggaran::count();
         $pelanggaranBulanIni = RiwayatPelanggaran::bulanIni()->count();
         $totalPoin = RiwayatPelanggaran::sum('poin');
+        $totalKafarohSelesai = RiwayatPelanggaran::kafarohSelesai()->count();
+        $totalPublished = RiwayatPelanggaran::publishedToParent()->count();
 
         return view('admin.riwayat_pelanggaran.index', compact(
             'data',
             'santriList',
             'kategoriList',
+            'klasifikasiList',
             'totalPelanggaran',
             'pelanggaranBulanIni',
-            'totalPoin'
+            'totalPoin',
+            'totalKafarohSelesai',
+            'totalPublished'
         ));
     }
 
@@ -78,11 +111,17 @@ class RiwayatPelanggaranController extends Controller
 
         // Data untuk dropdown
         $santriList = Santri::aktif()->orderBy('nama_lengkap')->get();
-        $kategoriList = KategoriPelanggaran::orderBy('nama_pelanggaran')->get();
+        $klasifikasiList = KlasifikasiPelanggaran::aktif()->byUrutan()->get();
+        $kategoriList = KategoriPelanggaran::with('klasifikasi')
+            ->aktif()
+            ->orderBy('id_klasifikasi')
+            ->orderBy('nama_pelanggaran')
+            ->get();
 
         return view('admin.riwayat_pelanggaran.create', compact(
             'nextIdRiwayat',
             'santriList',
+            'klasifikasiList',
             'kategoriList'
         ));
     }
@@ -109,6 +148,7 @@ class RiwayatPelanggaranController extends Controller
         // Ambil poin dari kategori
         $kategori = KategoriPelanggaran::where('id_kategori', $validated['id_kategori'])->first();
         $validated['poin'] = $kategori->poin;
+        $validated['poin_asli'] = $kategori->poin;
 
         RiwayatPelanggaran::create($validated);
 
@@ -121,7 +161,12 @@ class RiwayatPelanggaranController extends Controller
      */
     public function show(RiwayatPelanggaran $riwayatPelanggaran)
     {
-        $riwayatPelanggaran->load(['santri', 'kategori']);
+        $riwayatPelanggaran->load([
+            'santri', 
+            'kategori.klasifikasi',
+            'adminKafaroh',
+            'adminPublished'
+        ]);
 
         // Riwayat pelanggaran santri lainnya
         $riwayatLainnya = RiwayatPelanggaran::where('id_santri', $riwayatPelanggaran->id_santri)
@@ -146,7 +191,11 @@ class RiwayatPelanggaranController extends Controller
 
         // Data untuk dropdown
         $santriList = Santri::aktif()->orderBy('nama_lengkap')->get();
-        $kategoriList = KategoriPelanggaran::orderBy('nama_pelanggaran')->get();
+        $kategoriList = KategoriPelanggaran::with('klasifikasi')
+            ->aktif()
+            ->orderBy('id_klasifikasi')
+            ->orderBy('nama_pelanggaran')
+            ->get();
 
         return view('admin.riwayat_pelanggaran.edit', compact(
             'riwayatPelanggaran',
@@ -176,7 +225,12 @@ class RiwayatPelanggaranController extends Controller
 
         // Ambil poin dari kategori
         $kategori = KategoriPelanggaran::where('id_kategori', $validated['id_kategori'])->first();
-        $validated['poin'] = $kategori->poin;
+        
+        // Jika kategori berubah dan kafaroh belum selesai, update poin
+        if ($riwayatPelanggaran->id_kategori != $validated['id_kategori'] && !$riwayatPelanggaran->is_kafaroh_selesai) {
+            $validated['poin'] = $kategori->poin;
+            $validated['poin_asli'] = $kategori->poin;
+        }
 
         $riwayatPelanggaran->update($validated);
 
@@ -212,12 +266,83 @@ class RiwayatPelanggaranController extends Controller
 
         $totalPoin = RiwayatPelanggaran::bySantri($idSantri)->sum('poin');
         $totalPelanggaran = RiwayatPelanggaran::bySantri($idSantri)->count();
+        $totalKafarohSelesai = RiwayatPelanggaran::bySantri($idSantri)->kafarohSelesai()->count();
 
         return view('admin.riwayat_pelanggaran.riwayat_santri', compact(
             'santri',
             'riwayat',
             'totalPoin',
-            'totalPelanggaran'
+            'totalPelanggaran',
+            'totalKafarohSelesai'
         ));
+    }
+
+    /**
+     * Selesaikan Kafaroh
+     */
+    public function selesaikanKafaroh(Request $request, RiwayatPelanggaran $riwayatPelanggaran)
+    {
+        // Validasi jika kafaroh sudah selesai
+        if ($riwayatPelanggaran->is_kafaroh_selesai) {
+            return redirect()->back()
+                ->with('error', 'Kafaroh sudah diselesaikan sebelumnya.');
+        }
+
+        $validated = $request->validate([
+            'catatan_kafaroh' => 'nullable|string|max:500',
+        ]);
+
+        $riwayatPelanggaran->update([
+            'is_kafaroh_selesai' => true,
+            'tanggal_kafaroh_selesai' => now(),
+            'admin_kafaroh_id' => auth()->id(),
+            'catatan_kafaroh' => $validated['catatan_kafaroh'] ?? null,
+            'poin' => 0, // Poin dilebur menjadi 0
+        ]);
+
+        return redirect()->back()
+            ->with('success', 'Kafaroh berhasil diselesaikan. Poin telah dilebur menjadi 0.');
+    }
+
+    /**
+     * Publish ke Wali Santri
+     */
+    public function publishToParent(RiwayatPelanggaran $riwayatPelanggaran)
+    {
+        // Validasi jika sudah dipublish
+        if ($riwayatPelanggaran->is_published_to_parent) {
+            return redirect()->back()
+                ->with('error', 'Riwayat pelanggaran sudah dikirim ke wali santri sebelumnya.');
+        }
+
+        $riwayatPelanggaran->update([
+            'is_published_to_parent' => true,
+            'tanggal_published' => now(),
+            'admin_published_id' => auth()->id(),
+        ]);
+
+        return redirect()->back()
+            ->with('success', 'Riwayat pelanggaran berhasil dikirim ke wali santri.');
+    }
+
+    /**
+     * Batalkan Publish
+     */
+    public function unpublishFromParent(RiwayatPelanggaran $riwayatPelanggaran)
+    {
+        // Validasi jika belum dipublish
+        if (!$riwayatPelanggaran->is_published_to_parent) {
+            return redirect()->back()
+                ->with('error', 'Riwayat pelanggaran belum dikirim ke wali santri.');
+        }
+
+        $riwayatPelanggaran->update([
+            'is_published_to_parent' => false,
+            'tanggal_published' => null,
+            'admin_published_id' => null,
+        ]);
+
+        return redirect()->back()
+            ->with('success', 'Pengiriman ke wali santri berhasil dibatalkan.');
     }
 }

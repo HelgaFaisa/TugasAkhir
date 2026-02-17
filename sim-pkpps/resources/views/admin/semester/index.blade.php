@@ -61,7 +61,7 @@
                         </td>
                         <td>{!! $semester->status_badge !!}</td>
                         <td class="text-center">
-                            <div class="btn-group">
+                            <div style="display: flex; justify-content: center; align-items: center; gap: 8px;">
                                 <a href="{{ route('admin.semester.show', $semester) }}" 
                                    class="btn btn-sm btn-info" title="Detail">
                                     <i class="fas fa-eye"></i>
@@ -71,7 +71,7 @@
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 <form action="{{ route('admin.semester.destroy', $semester) }}" 
-                                      method="POST" style="display: inline-block;"
+                                      method="POST" style="margin: 0;"
                                       onsubmit="return confirm('Yakin ingin menghapus semester ini?')">
                                     @csrf
                                     @method('DELETE')

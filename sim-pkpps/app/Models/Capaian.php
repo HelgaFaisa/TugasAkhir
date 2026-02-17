@@ -84,11 +84,21 @@ class Capaian extends Model
      */
     public static function parseHalamanSelesai($rangeString)
     {
+        // Handle empty string
+        if (empty($rangeString) || trim($rangeString) === '') {
+            return [];
+        }
+
         $pages = [];
         $ranges = explode(',', $rangeString);
 
         foreach ($ranges as $range) {
             $range = trim($range);
+            
+            // Skip empty ranges
+            if (empty($range)) {
+                continue;
+            }
             
             if (strpos($range, '-') !== false) {
                 // Range format: "1-10"
@@ -101,7 +111,10 @@ class Capaian extends Model
                 }
             } else {
                 // Single page: "40"
-                $pages[] = intval($range);
+                $pageNum = intval($range);
+                if ($pageNum > 0) {
+                    $pages[] = $pageNum;
+                }
             }
         }
 

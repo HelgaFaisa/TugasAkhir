@@ -70,11 +70,42 @@
                 </td>
             </tr>
             <tr>
-                <th>Kelas</th>
+                <th>Kelas yang Diikuti</th>
                 <td>
-                    <strong style="color: #6FBA9D; font-size: 1.1rem;">{{ $santri->kelas }}</strong>
-                    @if($santri->kelas == 'PB')
-                        <span style="color: #7F8C8D; font-size: 0.85rem;">(Pembinaan)</span>
+                    @if($santri->kelasSantri && $santri->kelasSantri->count() > 0)
+                        @php
+                            // Group kelas by kelompok
+                            $grouped = $santri->kelasSantri
+                                ->filter(fn($sk) => $sk->kelas && $sk->kelas->kelompok)
+                                ->groupBy(fn($sk) => $sk->kelas->kelompok->nama_kelompok)
+                                ->sortBy(fn($items, $key) => $items->first()->kelas->kelompok->urutan ?? 99);
+                        @endphp
+                        <div style="display: flex; flex-direction: column; gap: 15px;">
+                            @foreach($grouped as $kelompokName => $items)
+                                <div style="padding: 12px; background: linear-gradient(135deg, #F8FBF9 0%, #E8F7F2 100%); border-radius: 8px; border-left: 4px solid #6FBA9D;">
+                                    <div style="font-weight: 600; color: #2C5F4F; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                                        <i class="fas fa-layer-group"></i>
+                                        {{ $kelompokName }}
+                                    </div>
+                                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                                        @foreach($items as $sk)
+                                            <div style="display: flex; align-items: center; gap: 8px;">
+                                                <span style="width: 8px; height: 8px; background: #6FBA9D; border-radius: 50%; flex-shrink: 0;"></span>
+                                                <strong style="color: #555; font-size: 0.95rem;">{{ $sk->kelas->nama_kelas }}</strong>
+                                                <span style="color: #7F8C8D; font-size: 0.8rem;">({{ $sk->kelas->kode_kelas }})</span>
+                                                @if($sk->is_primary)
+                                                    <span style="padding: 2px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 600; background: #FFF3CD; color: #856404;">
+                                                        <i class="fas fa-star"></i> Utama
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <span class="text-muted"><em>Belum Ada Kelas</em></span>
                     @endif
                 </td>
             </tr>

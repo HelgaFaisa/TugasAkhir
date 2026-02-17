@@ -59,7 +59,6 @@
                         $badgeClass = match($berita->target_berita) {
                             'semua' => 'badge-primary',
                             'kelas_tertentu' => 'badge-info',
-                            'santri_tertentu' => 'badge-warning',
                             default => 'badge-secondary'
                         };
                     @endphp
@@ -83,76 +82,24 @@
         <div class="detail-section">
             <h4><i class="fas fa-align-left"></i> Konten Berita</h4>
             <div style="line-height: 1.9; font-size: 1.05em; color: var(--text-color); background: var(--primary-light); padding: 25px; border-radius: var(--border-radius-sm); border-left: 4px solid var(--primary-color);">
-                {!! nl2br(e($berita->konten)) !!}
+                {!! $berita->konten !!}
             </div>
         </div>
 
-        <!-- Info Target Santri -->
-        @if($berita->target_berita === 'santri_tertentu' || $berita->target_berita === 'kelas_tertentu')
+        <!-- Info Target Kelas -->
+        @if($berita->target_berita === 'kelas_tertentu')
         <div class="detail-section">
-            @if($berita->target_berita === 'kelas_tertentu')
-                <h4>
-                    <i class="fas fa-graduation-cap"></i> 
-                    Target Kelas: {{ implode(', ', $berita->target_kelas ?? []) }}
-                </h4>
-                <div style="background: var(--info-color); background: linear-gradient(135deg, #E3F2FD 0%, #D1E9F9 100%); padding: 20px; border-radius: var(--border-radius-sm); border-left: 4px solid var(--info-color);">
-                    <p style="margin: 0; color: var(--text-color); font-size: 1em;">
-                        <i class="fas fa-info-circle"></i>
-                        Berita ini ditujukan untuk santri dari kelas: 
-                        <strong>{{ implode(', ', $berita->target_kelas ?? []) }}</strong>
-                    </p>
-                </div>
-            @endif
-            
-            @if($berita->santriTertentu->count() > 0)
-                <h4 style="margin-top: 25px;">
-                    <i class="fas fa-users"></i> 
-                    Daftar Penerima Berita ({{ $berita->santriTertentu->count() }} Santri)
-                </h4>
-                
-                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px;">
-                    @foreach($berita->santriTertentu as $santri)
-                    <div style="background: white; border: 2px solid var(--primary-light); border-radius: var(--border-radius-sm); padding: 15px; transition: all 0.3s ease; box-shadow: var(--shadow-sm);">
-                        <div style="display: flex; align-items: center; gap: 15px;">
-                            <!-- Hanya tampilkan initial, tanpa foto -->
-                            <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1.5em; flex-shrink: 0;">
-                                {{ strtoupper(substr($santri->nama_lengkap, 0, 1)) }}
-                            </div>
-                            
-                            <div style="flex-grow: 1; min-width: 0;">
-                                <div style="font-weight: 600; color: var(--primary-color); margin-bottom: 3px;">
-                                    {{ $santri->id_santri }}
-                                </div>
-                                <div style="font-weight: 600; color: var(--text-color); font-size: 1em; margin-bottom: 3px;">
-                                    {{ $santri->nama_lengkap }}
-                                </div>
-                                <div style="font-size: 0.85em; color: var(--text-light);">
-                                    <i class="fas fa-graduation-cap"></i> {{ $santri->kelas }}
-                                </div>
-                            </div>
-                            
-                            <!-- Status Baca -->
-                            <div style="text-align: center; flex-shrink: 0;">
-                                @if($santri->pivot->sudah_dibaca)
-                                    <span class="badge badge-success" title="Dibaca pada {{ $santri->pivot->tanggal_baca }}">
-                                        <i class="fas fa-check"></i> Dibaca
-                                    </span>
-                                @else
-                                    <span class="badge badge-warning">
-                                        <i class="fas fa-clock"></i> Belum
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-            @else
-                <div style="text-align: center; padding: 40px; background: var(--primary-light); border-radius: var(--border-radius-sm);">
-                    <i class="fas fa-users" style="font-size: 3em; color: #ccc; margin-bottom: 15px;"></i>
-                    <p style="color: var(--text-light); margin: 0;">Belum ada santri yang dipilih untuk berita ini.</p>
-                </div>
-            @endif
+            <h4>
+                <i class="fas fa-graduation-cap"></i> 
+                Target Kelas
+            </h4>
+            <div style="background: linear-gradient(135deg, #E3F2FD 0%, #D1E9F9 100%); padding: 20px; border-radius: var(--border-radius-sm); border-left: 4px solid var(--info-color);">
+                <p style="margin: 0; color: var(--text-color); font-size: 1em;">
+                    <i class="fas fa-info-circle"></i>
+                    Berita ini ditujukan untuk: 
+                    <strong>{{ $berita->target_audience }}</strong>
+                </p>
+            </div>
         </div>
         @endif
 

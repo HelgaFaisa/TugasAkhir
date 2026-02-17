@@ -1,5 +1,4 @@
 <?php
-// app/Models/RiwayatPelanggaran.php
 
 namespace App\Models;
 
@@ -11,113 +10,85 @@ class RiwayatPelanggaran extends Model
 {
     use HasFactory;
 
-    /**
-     * Field yang boleh diisi massal (mass assignment)
-     */
     protected $fillable = [
         'id_riwayat',
         'id_santri',
         'id_kategori',
         'tanggal',
         'poin',
+        'poin_asli',
         'keterangan',
+        'is_kafaroh_selesai',
+        'tanggal_kafaroh_selesai',
+        'admin_kafaroh_id',
+        'catatan_kafaroh',
+        'is_published_to_parent',
+        'tanggal_published',
+        'admin_published_id',
     ];
 
-    /**
-     * Cast attributes ke tipe data tertentu
-     */
     protected $casts = [
         'tanggal' => 'date',
         'poin' => 'integer',
+        'poin_asli' => 'integer',
+        'is_kafaroh_selesai' => 'boolean',
+        'is_published_to_parent' => 'boolean',
+        'tanggal_kafaroh_selesai' => 'datetime',
+        'tanggal_published' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
 
-    /**
-     * Generator ID Kustom (P001, P002, ...)
-     * Metode ini akan dijalankan setiap kali model baru dibuat (insert).
-     */
     protected static function boot()
     {
         parent::boot();
 
         static::creating(function ($model) {
-            // Pastikan ID kustom belum terisi
             if (empty($model->id_riwayat)) {
-                // Ambil data riwayat terakhir berdasarkan ID default
                 $last = RiwayatPelanggaran::orderBy('id', 'desc')->first();
-                
-                // Tentukan nomor urut berikutnya
-                // Jika ada data terakhir, ambil angka dari ID kustom (misal P001 -> 1) dan tambahkan 1
                 $num = $last ? intval(substr($last->id_riwayat, 1)) + 1 : 1;
-                
-                // Format ID: 'P' + nomor urut 3 digit (dengan padding 0)
                 $model->id_riwayat = 'P' . str_pad($num, 3, '0', STR_PAD_LEFT);
+            }
+            
+            // Set poin_asli = poin saat pertama kali dibuat
+            if (empty($model->poin_asli)) {
+                $model->poin_asli = $model->poin;
             }
         });
     }
 
-    /**
-     * Relasi: Riwayat belongsTo Santri
-     * Setiap riwayat pelanggaran dimiliki oleh satu santri
-     */
+    // Relasi
     public function santri()
     {
         return $this->belongsTo(Santri::class, 'id_santri', 'id_santri');
     }
 
-    /**
-     * Relasi: Riwayat belongsTo Kategori
-     * Setiap riwayat pelanggaran memiliki satu kategori
-     */
     public function kategori()
     {
         return $this->belongsTo(KategoriPelanggaran::class, 'id_kategori', 'id_kategori');
     }
 
-    /**
-     * Accessor: Format tanggal Indonesia
-     */
-    public function getTanggalFormatAttribute()
+    public function adminKafaroh()
     {
-        return Carbon::parse($this->tanggal)->isoFormat('D MMMM YYYY');
+        return $this->belongsTo(User::class, 'admin_kafaroh_id');
     }
 
-    /**
-     * Accessor: Get nama santri (dengan fallback)
-     */
-    public function getNamaSantriAttribute()
+    public function adminPublished()
     {
-        return $this->santri ? $this->santri->nama_lengkap : 'Santri tidak ditemukan';
+        return $this->belongsTo(User::class, 'admin_published_id');
     }
 
-    /**
-     * Accessor: Get nama kategori (dengan fallback)
-     */
-    public function getNamaKategoriAttribute()
-    {
-        return $this->kategori ? $this->kategori->nama_pelanggaran : 'Kategori tidak ditemukan';
-    }
-
-    /**
-     * Scope: Filter riwayat berdasarkan santri
-     */
+    // Scopes
     public function scopeBySantri($query, $idSantri)
     {
         return $query->where('id_santri', $idSantri);
     }
 
-    /**
-     * Scope: Filter riwayat berdasarkan kategori
-     */
     public function scopeByKategori($query, $idKategori)
     {
         return $query->where('id_kategori', $idKategori);
     }
 
-    /**
-     * Scope: Filter riwayat berdasarkan tanggal
-     */
     public function scopeByTanggal($query, $tanggalMulai, $tanggalSelesai = null)
     {
         if ($tanggalSelesai) {
@@ -126,27 +97,38 @@ class RiwayatPelanggaran extends Model
         return $query->whereDate('tanggal', $tanggalMulai);
     }
 
-    /**
-     * Scope: Filter riwayat bulan ini
-     */
     public function scopeBulanIni($query)
     {
         return $query->whereMonth('tanggal', Carbon::now()->month)
                      ->whereYear('tanggal', Carbon::now()->year);
     }
 
-    /**
-     * Scope: Urutkan berdasarkan tanggal terbaru
-     */
     public function scopeTerbaru($query)
     {
         return $query->orderBy('tanggal', 'desc')
                      ->orderBy('created_at', 'desc');
     }
 
-    /**
-     * Scope: Search riwayat
-     */
+    public function scopeKafarohSelesai($query)
+    {
+        return $query->where('is_kafaroh_selesai', true);
+    }
+
+    public function scopeKafarohBelumSelesai($query)
+    {
+        return $query->where('is_kafaroh_selesai', false);
+    }
+
+    public function scopePublishedToParent($query)
+    {
+        return $query->where('is_published_to_parent', true);
+    }
+
+    public function scopeNotPublishedToParent($query)
+    {
+        return $query->where('is_published_to_parent', false);
+    }
+
     public function scopeSearch($query, $search)
     {
         return $query->where(function($q) use ($search) {
@@ -159,5 +141,21 @@ class RiwayatPelanggaran extends Model
                   $sq->where('nama_pelanggaran', 'like', "%{$search}%");
               });
         });
+    }
+
+    // Accessor
+    public function getTanggalFormatAttribute()
+    {
+        return Carbon::parse($this->tanggal)->isoFormat('D MMMM YYYY');
+    }
+
+    public function getStatusKafarohAttribute()
+    {
+        return $this->is_kafaroh_selesai ? 'Selesai' : 'Belum Selesai';
+    }
+
+    public function getStatusPublishAttribute()
+    {
+        return $this->is_published_to_parent ? 'Terkirim' : 'Belum Terkirim';
     }
 }

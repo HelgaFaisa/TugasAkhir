@@ -50,7 +50,7 @@ class Kepulangan extends Model
                 $model->id_kepulangan = 'KP' . str_pad($num, 3, '0', STR_PAD_LEFT);
             }
 
-            // PENTING: Hitung durasi_izin otomatis
+            // Hitung durasi_izin otomatis
             if ($model->tanggal_pulang && $model->tanggal_kembali) {
                 $model->durasi_izin = $model->hitungDurasiIzin(
                     $model->tanggal_pulang,
@@ -117,14 +117,6 @@ class Kepulangan extends Model
     public function getApprovedAtFormattedAttribute()
     {
         return $this->approved_at ? $this->approved_at->format('d F Y H:i') : '-';
-    }
-
-    /**
-     * Accessor: Durasi izin calculated (untuk backward compatibility)
-     */
-    public function getDurasiIzinCalculatedAttribute()
-    {
-        return $this->durasi_izin;
     }
 
     /**
@@ -204,7 +196,7 @@ class Kepulangan extends Model
 
     /**
      * ========================================
-     * FITUR KUOTA TAHUNAN
+     * FITUR KUOTA TAHUNAN (DIPERBAIKI)
      * ========================================
      */
 
@@ -266,7 +258,9 @@ class Kepulangan extends Model
     }
 
     /**
-     * Get total hari izin santri dalam periode tertentu
+     * PERBAIKAN UTAMA: Get total hari izin santri dalam periode tertentu
+     * HANYA menghitung yang Disetujui & Selesai
+     * AKUMULASI durasi_izin (HARI), bukan COUNT jumlah pengajuan
      */
     public static function getTotalHariIzinSantri($idSantri, $periodeMulai = null, $periodeAkhir = null)
     {
@@ -276,14 +270,16 @@ class Kepulangan extends Model
             $periodeAkhir = $settings->periode_akhir;
         }
 
+        // PERBAIKAN: SUM durasi_izin (hari), bukan COUNT
         return self::where('id_santri', $idSantri)
-            ->whereIn('status', ['Disetujui', 'Selesai'])
+            ->whereIn('status', ['Disetujui', 'Selesai']) // Hanya yang approved/selesai
             ->whereBetween('tanggal_pulang', [$periodeMulai, $periodeAkhir])
-            ->sum('durasi_izin');
+            ->sum('durasi_izin'); // Akumulasi HARI
     }
 
     /**
-     * Get detail kuota santri
+     * PERBAIKAN: Get detail kuota santri
+     * Status MELEBIHI tetap dihitung (tidak direset ke 0)
      */
     public static function getSisaKuotaSantri($idSantri)
     {
@@ -295,6 +291,7 @@ class Kepulangan extends Model
             $settings->periode_akhir
         );
 
+        // PERBAIKAN: Bisa negatif jika over limit
         $sisaKuota = $settings->kuota_maksimal - $totalTerpakai;
         $persentase = $settings->kuota_maksimal > 0 ? 
             ($totalTerpakai / $settings->kuota_maksimal) * 100 : 0;
@@ -317,8 +314,9 @@ class Kepulangan extends Model
 
         return [
             'kuota_maksimal' => $settings->kuota_maksimal,
-            'total_terpakai' => $totalTerpakai,
-            'sisa_kuota' => max(0, $sisaKuota),
+            'total_terpakai' => $totalTerpakai, // Bisa > kuota_maksimal
+            'sisa_kuota' => max(0, $sisaKuota), // Tampilkan 0 jika negatif (untuk UI)
+            'sisa_kuota_real' => $sisaKuota, // Nilai asli (bisa negatif)
             'persentase' => round($persentase, 1),
             'status' => $status,
             'badge_color' => $badgeColor,
@@ -339,12 +337,14 @@ class Kepulangan extends Model
     }
 
     /**
-     * Get list santri yang over limit
+     * PERBAIKAN: Get list santri yang over limit
+     * Return array: [id_santri => total_hari_terpakai]
      */
     public static function getSantriOverLimit()
     {
         $settings = self::getSettings();
         
+        // Ambil semua santri aktif
         $santriIds = Santri::where('status', 'Aktif')->pluck('id_santri');
         $overLimitList = [];
         
@@ -355,6 +355,7 @@ class Kepulangan extends Model
                 $settings->periode_akhir
             );
             
+            // PERBAIKAN: Tampilkan total hari sebenarnya (tidak reset ke 0)
             if ($totalHari > $settings->kuota_maksimal) {
                 $overLimitList[$idSantri] = $totalHari;
             }
@@ -398,7 +399,6 @@ class Kepulangan extends Model
         ]);
 
         // Update semua kepulangan santri yang Disetujui menjadi Selesai
-        // Ini cara "reset" dengan menandai semua izin lama sebagai selesai
         self::where('id_santri', $idSantri)
             ->where('status', 'Disetujui')
             ->whereBetween('tanggal_pulang', [$settings->periode_mulai, $settings->periode_akhir])

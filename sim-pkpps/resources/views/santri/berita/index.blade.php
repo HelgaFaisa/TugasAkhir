@@ -27,13 +27,6 @@
                onmouseover="this.style.borderColor='var(--primary-light)'; this.style.boxShadow='var(--shadow-md)'; this.style.transform='translateY(-2px)';"
                onmouseout="this.style.borderColor='transparent'; this.style.boxShadow='none'; this.style.transform='translateY(0)';">
                 
-                {{-- Badge Status Baca --}}
-                @if(!$item->sudah_dibaca)
-                    <span class="badge badge-danger" style="position: absolute; top: 10px; right: 10px; z-index: 10; font-size: 0.75rem;">
-                        <i class="fas fa-circle" style="font-size: 0.5em;"></i> Baru
-                    </span>
-                @endif
-                
                 {{-- Gambar Berita (Kiri - Kecil) --}}
                 <div class="berita-thumbnail" style="flex-shrink: 0; width: 120px; height: 120px; border-radius: var(--border-radius-sm); overflow: hidden; background: linear-gradient(135deg, var(--primary-light), var(--primary-color)); box-shadow: var(--shadow-sm);">
                     @if($item->gambar)

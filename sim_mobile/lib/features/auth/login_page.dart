@@ -2,8 +2,6 @@
 
 import 'package:flutter/material.dart';
 import '../../core/api/api_service.dart';
-// ❌ HAPUS IMPORT INI - Tidak diperlukan karena pakai named routes
-// import '../dashboard/dashboard_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -14,7 +12,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
-  final _idController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _api = ApiService();
 
@@ -23,7 +21,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void dispose() {
-    _idController.dispose();
+    _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -35,22 +33,29 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       final result = await _api.login(
-        idSantri: _idController.text.trim(),
+        username: _usernameController.text.trim(),
         password: _passwordController.text,
       );
 
       if (!mounted) return;
 
       if (result['success'] == true) {
-        // Login berhasil → Redirect ke Dashboard
-        Navigator.pushReplacementNamed(context, '/dashboard');
+        // Cek role - hanya wali yang boleh akses mobile
+        final user = result['user'];
+        if (user != null && user['role'] == 'wali') {
+          // Login berhasil → Redirect ke Dashboard
+          Navigator.pushReplacementNamed(context, '/dashboard');
+        } else {
+          // Bukan wali - tampilkan error
+          _showErrorDialog('Akun ini tidak memiliki akses ke aplikasi mobile.\nHanya Wali Santri yang dapat menggunakan aplikasi ini.');
+        }
       } else {
         // Login gagal → Tampilkan error
-        _showErrorDialog(result['message'] ?? 'Login gagal');
+        _showErrorDialog(result['message'] ?? 'Username atau password salah');
       }
     } catch (e) {
       if (!mounted) return;
-      _showErrorDialog('Terjadi kesalahan: ${e.toString()}');
+      _showErrorDialog('Koneksi gagal, periksa internet Anda');
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -62,8 +67,26 @@ class _LoginPageState extends State<LoginPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Login Gagal'),
-        content: Text(message),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            const Icon(Icons.error_outline, color: Colors.red, size: 22),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                'Login Gagal',
+                style: Theme.of(context).textTheme.titleLarge,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          message,
+          maxLines: 5,
+          overflow: TextOverflow.ellipsis,
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -74,147 +97,274 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  void _showForgotPasswordDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            const Icon(Icons.help_outline, color: Colors.deepPurple, size: 22),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                'Lupa Password?',
+                style: Theme.of(context).textTheme.titleLarge,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+        content: const Text(
+          'Silakan hubungi admin pesantren untuk reset password.',
+          style: TextStyle(fontSize: 15),
+          maxLines: 3,
+          overflow: TextOverflow.ellipsis,
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.deepPurple,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: const Text('Mengerti'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Logo
-                  Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      color: Colors.deepPurple,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: const Icon(
-                      Icons.school_rounded,
-                      size: 60,
-                      color: Colors.white,
-                    ),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF7C3AED), // Purple 600
+              Color(0xFF5B21B6), // Purple 800
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                padding: EdgeInsets.symmetric(
+                  horizontal: constraints.maxWidth > 600 ? 48 : 20,
+                  vertical: 16,
+                ),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight,
                   ),
-                  const SizedBox(height: 30),
-
-                  // Title
-                  const Text(
-                    'Selamat Datang',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Login ke SIM-PKPPS Mobile',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-
-                  // Input ID Santri
-                  TextFormField(
-                    controller: _idController,
-                    decoration: InputDecoration(
-                      labelText: 'ID Santri',
-                      hintText: 'Contoh: S001',
-                      prefixIcon: const Icon(Icons.person_outline),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      filled: true,
-                      fillColor: Colors.white,
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'ID Santri wajib diisi';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Input Password
-                  TextFormField(
-                    controller: _passwordController,
-                    obscureText: _obscurePassword,
-                    decoration: InputDecoration(
-                      labelText: 'Password',
-                      hintText: 'Masukkan password',
-                      prefixIcon: const Icon(Icons.lock_outline),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscurePassword
-                              ? Icons.visibility_outlined
-                              : Icons.visibility_off_outlined,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _obscurePassword = !_obscurePassword;
-                          });
-                        },
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      filled: true,
-                      fillColor: Colors.white,
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Password wajib diisi';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Button Login
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: _isLoading ? null : _handleLogin,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepPurple,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: _isLoading
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                valueColor:
-                                    AlwaysStoppedAnimation<Color>(Colors.white),
-                                strokeWidth: 2,
+                  child: IntrinsicHeight(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Logo
+                        Container(
+                          width: 80,
+                          height: 80,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.2),
+                                blurRadius: 20,
+                                offset: const Offset(0, 10),
                               ),
-                            )
-                          : const Text(
-                              'LOGIN',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 1,
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.school_rounded,
+                            size: 48,
+                            color: Color(0xFF7C3AED),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+
+                        // Title
+                        const Text(
+                          'Login Wali Santri',
+                          style: TextStyle(
+                            fontSize: 26,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        const Text(
+                          'SIM MOBILE',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.white70,
+                            letterSpacing: 2,
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+
+                        // Login Card
+                        Card(
+                          elevation: 8,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Form(
+                              key: _formKey,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  // Input Username
+                                  TextFormField(
+                                    controller: _usernameController,
+                                    textInputAction: TextInputAction.next,
+                                    decoration: InputDecoration(
+                                      labelText: 'Username',
+                                      hintText: 'Masukkan username',
+                                      prefixIcon: const Icon(Icons.person_outline),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      filled: true,
+                                      fillColor: Colors.grey[50],
+                                      contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 16,
+                                      ),
+                                    ),
+                                    validator: (value) {
+                                      if (value == null || value.trim().isEmpty) {
+                                        return 'Username wajib diisi';
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                  const SizedBox(height: 14),
+
+                                  // Input Password
+                                  TextFormField(
+                                    controller: _passwordController,
+                                    obscureText: _obscurePassword,
+                                    textInputAction: TextInputAction.done,
+                                    onFieldSubmitted: (_) => _handleLogin(),
+                                    decoration: InputDecoration(
+                                      labelText: 'Password',
+                                      hintText: 'Masukkan password',
+                                      prefixIcon: const Icon(Icons.lock_outline),
+                                      suffixIcon: IconButton(
+                                        icon: Icon(
+                                          _obscurePassword
+                                              ? Icons.visibility_outlined
+                                              : Icons.visibility_off_outlined,
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            _obscurePassword = !_obscurePassword;
+                                          });
+                                        },
+                                      ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      filled: true,
+                                      fillColor: Colors.grey[50],
+                                      contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 16,
+                                      ),
+                                    ),
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Password wajib diisi';
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                  const SizedBox(height: 8),
+
+                                  // Helper text
+                                  Text(
+                                    'Password default adalah NIS santri',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey[600],
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 20),
+
+                                  // Button Login
+                                  SizedBox(
+                                    height: 48,
+                                    child: ElevatedButton(
+                                      onPressed: _isLoading ? null : _handleLogin,
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color(0xFF7C3AED),
+                                        foregroundColor: Colors.white,
+                                        disabledBackgroundColor: Colors.grey[300],
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        elevation: 2,
+                                      ),
+                                      child: _isLoading
+                                          ? const SizedBox(
+                                              width: 22,
+                                              height: 22,
+                                              child: CircularProgressIndicator(
+                                                valueColor: AlwaysStoppedAnimation<Color>(
+                                                  Colors.white,
+                                                ),
+                                                strokeWidth: 2.5,
+                                              ),
+                                            )
+                                          : const Text(
+                                              'LOGIN',
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold,
+                                                letterSpacing: 1,
+                                              ),
+                                            ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+
+                                  // Lupa Password Link
+                                  TextButton(
+                                    onPressed: _showForgotPasswordDialog,
+                                    child: const Text(
+                                      'Lupa Password?',
+                                      style: TextStyle(
+                                        color: Color(0xFF7C3AED),
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ),
+                ),
+              );
+            },
           ),
         ),
       ),

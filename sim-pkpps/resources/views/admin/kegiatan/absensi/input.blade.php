@@ -26,6 +26,18 @@
     </div>
 </div>
 
+{{-- Info Kelas Kegiatan --}}
+<div class="info-box" style="margin-bottom: 20px; border-left: 4px solid var(--primary-color);">
+    <i class="fas fa-info-circle"></i>
+    @if($kegiatanInfo['is_umum'])
+        <strong>Kegiatan Umum</strong> - Diikuti oleh semua santri aktif ({{ $santris->count() }} santri)
+    @else
+        <strong>Kegiatan Khusus</strong> - Diikuti oleh kelas: 
+        <strong style="color: var(--primary-color);">{{ $kegiatanInfo['kelas_list'] }}</strong>
+        ({{ $kegiatanInfo['jumlah_kelas'] }} kelas, {{ $santris->count() }} santri)
+    @endif
+</div>
+
 <!-- MODE MANUAL -->
 <div id="modeManual" class="content-box">
     <form action="{{ route('admin.absensi-kegiatan.simpan') }}" method="POST">
@@ -44,6 +56,22 @@
             <p><i class="fas fa-info-circle"></i> Pilih status absensi untuk setiap santri. Jika tidak dipilih, akan dianggap <strong>Alpa</strong>.</p>
         </div>
 
+        {{-- Filter Kelas (Manual Mode) --}}
+        @if(!$kegiatanInfo['is_umum'] && $kegiatanInfo['jumlah_kelas'] > 1)
+        <div class="form-group" style="max-width: 300px;">
+            <label for="filterKelas">
+                <i class="fas fa-filter form-icon"></i>
+                Filter Kelas
+            </label>
+            <select id="filterKelas" class="form-control">
+                <option value="">Semua Kelas</option>
+                @foreach($kegiatan->kelasKegiatan as $kelas)
+                    <option value="{{ $kelas->nama_kelas }}">{{ $kelas->nama_kelas }}</option>
+                @endforeach
+            </select>
+        </div>
+        @endif
+
         <table class="data-table">
             <thead>
                 <tr>
@@ -60,7 +88,12 @@
                     <td>{{ $index + 1 }}</td>
                     <td><strong>{{ $santri->id_santri }}</strong></td>
                     <td>{{ $santri->nama_lengkap }}</td>
-                    <td><span class="badge badge-secondary">{{ $santri->kelas }}</span></td>
+                    <td>
+                        @php
+                            $kelasName = $santri->kelas_name ?? $santri->kelas ?? '-';
+                        @endphp
+                        <span class="badge badge-secondary">{{ $kelasName }}</span>
+                    </td>
                     <td class="text-center">
                         @php
                             $currentStatus = $absensiData[$santri->id_santri] ?? 'Alpa';
@@ -276,5 +309,26 @@ setInterval(() => {
         document.getElementById('rfidInput').focus();
     }
 }, 1000);
+
+// Filter Kelas functionality (Manual Mode)
+const filterKelasEl = document.getElementById('filterKelas');
+if (filterKelasEl) {
+    filterKelasEl.addEventListener('change', function() {
+        const selectedKelas = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#modeManual tbody tr');
+        
+        rows.forEach(row => {
+            const kelasCell = row.querySelector('td:nth-child(4)'); // Kolom kelas
+            if (kelasCell) {
+                const kelasText = kelasCell.textContent.toLowerCase();
+                if (!selectedKelas || kelasText.includes(selectedKelas)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        });
+    });
+}
 </script>
 @endsection

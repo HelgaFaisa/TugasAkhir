@@ -16,44 +16,127 @@ class PembayaranSppController extends Controller
      */
     public function index(Request $request)
     {
-        $query = PembayaranSpp::with('santri');
-
-        // Search
-        if ($request->filled('search')) {
-            $query->search($request->search);
-        }
-
-        // Filter status
-        if ($request->filled('status')) {
-            if ($request->status === 'Telat') {
-                $query->telat();
-            } else {
-                $query->where('status', $request->status);
-            }
-        }
-
-        // Filter tahun
-        if ($request->filled('tahun')) {
-            $query->tahun($request->tahun);
-        }
-
-        // Filter bulan
-        if ($request->filled('bulan')) {
-            $query->bulan($request->bulan);
-        }
-
-        $pembayaranSpp = $query->orderBy('tahun', 'desc')
-                               ->orderBy('bulan', 'desc')
-                               ->orderBy('created_at', 'desc')
-                               ->paginate(20)
-                               ->appends(request()->query());
+        // Default tab
+        $tab = $request->get('tab', 'belum-bayar');
+        
+        // Default bulan dan tahun ke bulan/tahun saat ini jika tidak ada filter
+        $bulan = $request->filled('bulan') ? $request->bulan : date('n');
+        $tahun = $request->filled('tahun') ? $request->tahun : date('Y');
+        
+        // Query untuk mendapatkan data pembayaran berdasarkan filter
+        $query = PembayaranSpp::with('santri')
+            ->where('bulan', $bulan)
+            ->where('tahun', $tahun);
 
         // Data untuk filter
         $tahunList = PembayaranSpp::selectRaw('DISTINCT tahun')
                                    ->orderBy('tahun', 'desc')
                                    ->pluck('tahun');
 
-        return view('admin.pembayaran-spp.index', compact('pembayaranSpp', 'tahunList'));
+        // Tambahkan tahun saat ini jika belum ada
+        if (!$tahunList->contains(date('Y'))) {
+            $tahunList->prepend(date('Y'));
+        }
+
+        // Get santri dengan status pembayaran untuk periode yang dipilih
+        $santriList = Santri::where('status', 'Aktif')
+            ->with(['pembayaranSpp' => function($q) use ($bulan, $tahun) {
+                $q->where('bulan', $bulan)->where('tahun', $tahun);
+            }])
+            ->get()
+            ->map(function($santri) use ($bulan, $tahun) {
+                $pembayaran = $santri->pembayaranSpp->first();
+                
+                return [
+                    'id_santri' => $santri->id_santri,
+                    'nama_lengkap' => $santri->nama_lengkap,
+                    'nis' => $santri->nis,
+                    'kelas' => $santri->kelas,
+                    'pembayaran' => $pembayaran,
+                    'status' => $pembayaran ? $pembayaran->status : 'Belum Ada Tagihan',
+                    'is_telat' => $pembayaran ? $pembayaran->isTelat() : false,
+                    'nominal' => $pembayaran ? $pembayaran->nominal : 0,
+                    'tanggal_bayar' => $pembayaran ? $pembayaran->tanggal_bayar : null,
+                    'batas_bayar' => $pembayaran ? $pembayaran->batas_bayar : null,
+                ];
+            });
+
+        // Filter berdasarkan tab
+        if ($tab === 'sudah-bayar') {
+            $santriList = $santriList->filter(function($item) {
+                return $item['pembayaran'] && $item['status'] === 'Lunas';
+            });
+        } else {
+            // Belum bayar (termasuk yang belum ada tagihan dan yang telat)
+            $santriList = $santriList->filter(function($item) {
+                return !$item['pembayaran'] || $item['status'] !== 'Lunas';
+            });
+        }
+
+        // Filter search
+        if ($request->filled('search')) {
+            $search = strtolower($request->search);
+            $santriList = $santriList->filter(function($item) use ($search) {
+                return str_contains(strtolower($item['nama_lengkap']), $search) ||
+                       str_contains(strtolower($item['id_santri']), $search) ||
+                       str_contains(strtolower($item['nis']), $search);
+            });
+        }
+
+        // Filter status spesifik
+        if ($request->filled('filter_status')) {
+            if ($request->filter_status === 'Telat') {
+                $santriList = $santriList->filter(function($item) {
+                    return $item['is_telat'];
+                });
+            } elseif ($request->filter_status === 'Belum Ada Tagihan') {
+                $santriList = $santriList->filter(function($item) {
+                    return !$item['pembayaran'];
+                });
+            } else {
+                $santriList = $santriList->filter(function($item) use ($request) {
+                    return $item['status'] === $request->filter_status;
+                });
+            }
+        }
+
+        // Hitung statistik
+        $totalSantri = $santriList->count();
+        $totalLunas = $santriList->where('status', 'Lunas')->count();
+        $totalBelumBayar = $santriList->where('status', 'Belum Lunas')->count();
+        $totalTelat = $santriList->where('is_telat', true)->count();
+        $totalBelumAdaTagihan = $santriList->where('status', 'Belum Ada Tagihan')->count();
+        
+        $nominalLunas = $santriList->where('status', 'Lunas')->sum('nominal');
+        $nominalBelumLunas = $santriList->where('status', 'Belum Lunas')->sum('nominal');
+
+        // Sort
+        $santriList = $santriList->sortBy('nama_lengkap')->values();
+
+        // Manual pagination
+        $perPage = 20;
+        $currentPage = $request->get('page', 1);
+        $offset = ($currentPage - 1) * $perPage;
+        
+        $santriPaginated = $santriList->slice($offset, $perPage)->values();
+        $totalPages = ceil($santriList->count() / $perPage);
+
+        return view('admin.pembayaran-spp.index', compact(
+            'santriPaginated',
+            'tab',
+            'bulan',
+            'tahun',
+            'tahunList',
+            'totalSantri',
+            'totalLunas',
+            'totalBelumBayar',
+            'totalTelat',
+            'totalBelumAdaTagihan',
+            'nominalLunas',
+            'nominalBelumLunas',
+            'currentPage',
+            'totalPages'
+        ));
     }
 
     /**

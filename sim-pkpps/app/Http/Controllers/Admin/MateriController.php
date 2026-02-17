@@ -4,6 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Materi;
+use App\Models\Santri;
+use App\Models\Capaian;
+use App\Models\Semester;
+use App\Models\Kelas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
@@ -49,7 +53,10 @@ class MateriController extends Controller
             ->paginate(20)
             ->appends(request()->query());
 
-        return view('admin.materi.index', compact('materis'));
+        // Dynamic kelas list dari tabel kelas
+        $kelasList = Kelas::active()->ordered()->get();
+
+        return view('admin.materi.index', compact('materis', 'kelasList'));
     }
 
     /**
@@ -66,7 +73,10 @@ class MateriController extends Controller
             return 'M' . str_pad($nextNum, 3, '0', STR_PAD_LEFT);
         });
 
-        return view('admin.materi.create', compact('nextIdMateri'));
+        // Dynamic kelas list dari tabel kelas
+        $kelasList = Kelas::active()->ordered()->get();
+
+        return view('admin.materi.create', compact('nextIdMateri', 'kelasList'));
     }
 
     /**
@@ -74,9 +84,12 @@ class MateriController extends Controller
      */
     public function store(Request $request)
     {
+        // Ambil nama kelas yang valid dari tabel kelas
+        $validKelasNames = Kelas::active()->pluck('nama_kelas')->implode(',');
+
         $validated = $request->validate([
             'kategori' => 'required|in:Al-Qur\'an,Hadist,Materi Tambahan',
-            'kelas' => 'required|in:Lambatan,Cepatan,PB',
+            'kelas' => 'required|in:' . $validKelasNames,
             'nama_kitab' => 'required|string|max:255',
             'halaman_mulai' => 'required|integer|min:1',
             'halaman_akhir' => 'required|integer|min:1|gte:halaman_mulai',
@@ -84,6 +97,7 @@ class MateriController extends Controller
         ], [
             'kategori.required' => 'Kategori wajib dipilih.',
             'kelas.required' => 'Kelas wajib dipilih.',
+            'kelas.in' => 'Kelas yang dipilih tidak valid.',
             'nama_kitab.required' => 'Nama kitab wajib diisi.',
             'halaman_mulai.required' => 'Halaman mulai wajib diisi.',
             'halaman_mulai.min' => 'Halaman mulai minimal 1.',
@@ -91,13 +105,37 @@ class MateriController extends Controller
             'halaman_akhir.gte' => 'Halaman akhir harus lebih besar atau sama dengan halaman mulai.',
         ]);
 
-        Materi::create($validated);
+        // Create materi
+        $materi = Materi::create($validated);
+
+        // Auto-create capaian untuk semua santri di kelas tersebut (via relasi baru)
+        $santris = Santri::kelasByName($validated['kelas'])
+            ->where('status', 'Aktif')
+            ->get();
+
+        // Get semester aktif
+        $semesterAktif = Semester::aktif()->first();
+
+        if ($semesterAktif && $santris->count() > 0) {
+            foreach ($santris as $santri) {
+                // Create capaian dengan progress 0
+                Capaian::create([
+                    'id_santri' => $santri->id_santri,
+                    'id_materi' => $materi->id_materi,
+                    'id_semester' => $semesterAktif->id_semester,
+                    'halaman_selesai' => '',
+                    'persentase' => 0,
+                    'catatan' => 'Auto-created untuk materi baru',
+                    'tanggal_input' => now(),
+                ]);
+            }
+        }
 
         // Clear cache
         Cache::forget('next_materi_id');
 
         return redirect()->route('admin.materi.index')
-            ->with('success', 'Data materi berhasil ditambahkan.');
+            ->with('success', "Data materi berhasil ditambahkan. Capaian otomatis dibuat untuk {$santris->count()} santri kelas {$validated['kelas']}.");
     }
 
     /**
@@ -116,7 +154,8 @@ class MateriController extends Controller
      */
     public function edit(Materi $materi)
     {
-        return view('admin.materi.edit', compact('materi'));
+        $kelasList = Kelas::active()->ordered()->get();
+        return view('admin.materi.edit', compact('materi', 'kelasList'));
     }
 
     /**
@@ -124,9 +163,11 @@ class MateriController extends Controller
      */
     public function update(Request $request, Materi $materi)
     {
+        $validKelasNames = Kelas::active()->pluck('nama_kelas')->implode(',');
+
         $validated = $request->validate([
             'kategori' => 'required|in:Al-Qur\'an,Hadist,Materi Tambahan',
-            'kelas' => 'required|in:Lambatan,Cepatan,PB',
+            'kelas' => 'required|in:' . $validKelasNames,
             'nama_kitab' => 'required|string|max:255',
             'halaman_mulai' => 'required|integer|min:1',
             'halaman_akhir' => 'required|integer|min:1|gte:halaman_mulai',
@@ -134,6 +175,7 @@ class MateriController extends Controller
         ], [
             'kategori.required' => 'Kategori wajib dipilih.',
             'kelas.required' => 'Kelas wajib dipilih.',
+            'kelas.in' => 'Kelas yang dipilih tidak valid.',
             'nama_kitab.required' => 'Nama kitab wajib diisi.',
             'halaman_mulai.required' => 'Halaman mulai wajib diisi.',
             'halaman_mulai.min' => 'Halaman mulai minimal 1.',

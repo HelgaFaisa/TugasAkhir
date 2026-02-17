@@ -175,6 +175,7 @@
             }
         });
     </script>
+    <?php echo $__env->yieldContent('scripts'); ?>
 </body>
 </html>
 <?php /**PATH C:\xampp\htdocs\TugasAkhir\sim-pkpps\resources\views/layouts/app.blade.php ENDPATH**/ ?>

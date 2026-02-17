@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Direct Image Access</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #f5f5f5; }
+        .box { background: white; padding: 20px; margin: 10px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        img { max-width: 100%; border: 2px solid #4CAF50; margin: 10px 0; }
+        .error { border-color: #f44336 !important; }
+        code { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>🖼️ Test Akses Gambar Langsung</h1>
+    
+    <div class="box">
+        <h2>URL Gambar dari API:</h2>
+        <code id="imageUrl">http://localhost/TugasAkhir/sim-pkpps/public/storage/berita/cxPh4dGaR6qpyPeshxvSQAjgaY7xef9t180dgShU.jpg</code>
+        
+        <h3>Test 1: Direct IMG Tag</h3>
+        <img id="testImg1" 
+             src="http://localhost/TugasAkhir/sim-pkpps/public/storage/berita/cxPh4dGaR6qpyPeshxvSQAjgaY7xef9t180dgShU.jpg"
+             onload="console.log('✅ Gambar berhasil dimuat!'); this.style.borderColor='green';"
+             onerror="console.error('❌ Gambar gagal dimuat!'); this.style.borderColor='red'; this.alt='ERROR: Tidak bisa load gambar';">
+        
+        <h3>Test 2: JavaScript Fetch</h3>
+        <button onclick="testFetch()">Test Fetch Image</button>
+        <div id="fetchResult"></div>
+        
+        <h3>Test 3: Buka di Tab Baru</h3>
+        <a href="http://localhost/TugasAkhir/sim-pkpps/public/storage/berita/cxPh4dGaR6qpyPeshxvSQAjgaY7xef9t180dgShU.jpg" 
+           target="_blank" 
+           style="padding: 10px 20px; background: #2196F3; color: white; text-decoration: none; border-radius: 5px; display: inline-block;">
+           Buka Gambar di Tab Baru
+        </a>
+    </div>
+    
+    <div class="box">
+        <h2>Diagnosis:</h2>
+        <div id="diagnosis">
+            <p>🔄 Menunggu hasil test...</p>
+        </div>
+    </div>
+
+    <script>
+    // Auto diagnose saat page load
+    setTimeout(() => {
+        const img = document.getElementById('testImg1');
+        const diagnosis = document.getElementById('diagnosis');
+        
+        if (img.complete && img.naturalHeight !== 0) {
+            diagnosis.innerHTML = `
+                <p style="color: green;">✅ <strong>Gambar BERHASIL dimuat!</strong></p>
+                <p>Ukuran: ${img.naturalWidth} x ${img.naturalHeight} px</p>
+                <p>Masalah mungkin di Flutter, bukan di server.</p>
+            `;
+        } else {
+            diagnosis.innerHTML = `
+                <p style="color: red;">❌ <strong>Gambar GAGAL dimuat!</strong></p>
+                <p>Kemungkinan masalah:</p>
+                <ul>
+                    <li>File tidak ada di server</li>
+                    <li>Path salah</li>
+                    <li>Permission file salah</li>
+                    <li>Symlink storage tidak benar</li>
+                </ul>
+                <p><strong>Solusi:</strong></p>
+                <ol>
+                    <li>Cek file di: <code>sim-pkpps/storage/app/public/berita/</code></li>
+                    <li>Jalankan: <code>php artisan storage:link</code></li>
+                    <li>Cek permission folder</li>
+                </ol>
+            `;
+        }
+    }, 1000);
+    
+    async function testFetch() {
+        const resultDiv = document.getElementById('fetchResult');
+        const url = 'http://localhost/TugasAkhir/sim-pkpps/public/storage/berita/cxPh4dGaR6qpyPeshxvSQAjgaY7xef9t180dgShU.jpg';
+        
+        resultDiv.innerHTML = '<p>Loading...</p>';
+        
+        try {
+            const response = await fetch(url, { method: 'HEAD' });
+            
+            if (response.ok) {
+                const contentType = response.headers.get('Content-Type');
+                const contentLength = response.headers.get('Content-Length');
+                
+                resultDiv.innerHTML = `
+                    <p style="color: green;">✅ Fetch berhasil!</p>
+                    <p>Status: ${response.status}</p>
+                    <p>Content-Type: ${contentType}</p>
+                    <p>Size: ${contentLength} bytes</p>
+                `;
+            } else {
+                resultDiv.innerHTML = `
+                    <p style="color: red;">❌ Fetch gagal!</p>
+                    <p>Status: ${response.status} - ${response.statusText}</p>
+                `;
+            }
+        } catch (error) {
+            resultDiv.innerHTML = `
+                <p style="color: red;">❌ Error: ${error.message}</p>
+            `;
+        }
+    }
+    </script>
+</body>
+</html>

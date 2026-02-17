@@ -80,16 +80,66 @@
         @error('jenis_kelamin')<div class="invalid-feedback">{{ $message }}</div>@enderror
     </div>
 
-    <div class="form-group">
-        <label for="kelas">Kelas *</label>
-        <select id="kelas" name="kelas" class="form-control @error('kelas') is-invalid @enderror" required>
-            <option value="">Pilih Kelas</option>
-            <option value="PB" {{ old('kelas', $isEdit ? $santri->kelas : '') == 'PB' ? 'selected' : '' }}>PB (Pembinaan)</option>
-            <option value="Lambatan" {{ old('kelas', $isEdit ? $santri->kelas : '') == 'Lambatan' ? 'selected' : '' }}>Lambatan</option>
-            <option value="Cepatan" {{ old('kelas', $isEdit ? $santri->kelas : '') == 'Cepatan' ? 'selected' : '' }}>Cepatan</option>
-        </select>
-        @error('kelas')<div class="invalid-feedback">{{ $message }}</div>@enderror
-    </div>
+    {{-- ═══════════════════════════════════════ --}}
+    {{-- KELAS PER KELOMPOK (checkbox list per kelompok) --}}
+    {{-- ═══════════════════════════════════════ --}}
+    <hr>
+    <h4><i class="fas fa-layer-group"></i> Kelas Santri</h4>
+    <small class="form-text text-muted" style="margin-bottom: 15px; display: block;">
+        <i class="fas fa-info-circle"></i> Pilih kelas untuk setiap kelompok. Santri bisa mengikuti beberapa kelas dalam 1 kelompok.
+    </small>
+    @error('kelas_ids')
+        <div class="alert alert-danger" style="padding: 8px 12px; font-size: 0.9rem;">
+            <i class="fas fa-exclamation-triangle"></i> {{ $message }}
+        </div>
+    @enderror
+
+    @foreach($kelompokKelas as $index => $kelompok)
+        @php
+            $existingKelasIds = [];
+            if ($isEdit && $santri->kelasSantri) {
+                $existingKelasIds = $santri->kelasSantri
+                    ->filter(fn($sk) => $sk->kelas && $sk->kelas->id_kelompok === $kelompok->id_kelompok)
+                    ->pluck('id_kelas')
+                    ->toArray();
+            }
+            // Support old() untuk setiap kelompok
+            $selectedIds = old('kelas_ids.' . $kelompok->id_kelompok, $existingKelasIds);
+            if (!is_array($selectedIds)) {
+                $selectedIds = $selectedIds ? [$selectedIds] : [];
+            }
+        @endphp
+        <div class="form-group" style="padding: 15px; border-left: 4px solid {{ $index === 0 ? '#6FBA9D' : '#81C6E8' }}; background: {{ $index % 2 === 0 ? '#FAFFFE' : '#F8FBFD' }}; border-radius: 0 8px 8px 0; margin-bottom: 15px;">
+            <label style="font-weight: 600; margin-bottom: 10px; display: block;">
+                <i class="fas fa-bookmark" style="color: {{ $index === 0 ? '#6FBA9D' : '#81C6E8' }};"></i>
+                {{ $kelompok->nama_kelompok }}
+                @if($kelompok->deskripsi)
+                    <small style="font-weight: normal; color: #7F8C8D; display: block; margin-top: 3px;">{{ $kelompok->deskripsi }}</small>
+                @endif
+            </label>
+            
+            @if($kelompok->kelas && $kelompok->kelas->count() > 0)
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px;">
+                    @foreach($kelompok->kelas as $kelas)
+                        <label style="display: flex; align-items: center; padding: 8px 12px; background: white; border: 2px solid {{ in_array($kelas->id, $selectedIds) ? '#6FBA9D' : '#E8ECF0' }}; border-radius: 6px; cursor: pointer; transition: all 0.2s; margin: 0;">
+                            <input type="checkbox" 
+                                   name="kelas_ids[{{ $kelompok->id_kelompok }}][]" 
+                                   value="{{ $kelas->id }}"
+                                   {{ in_array($kelas->id, $selectedIds) ? 'checked' : '' }}
+                                   style="margin-right: 8px; width: 18px; height: 18px; cursor: pointer;"
+                                   onchange="this.parentElement.style.borderColor = this.checked ? '#6FBA9D' : '#E8ECF0';">
+                            <span style="font-size: 0.9rem; flex: 1;">{{ $kelas->nama_kelas }}</span>
+                        </label>
+                    @endforeach
+                </div>
+                <small class="form-text text-muted" style="margin-top: 8px; display: block;">
+                    <i class="fas fa-hand-pointer"></i> Klik untuk memilih. Bisa pilih lebih dari 1 kelas.
+                </small>
+            @else
+                <p style="color: #7F8C8D; font-style: italic; margin: 0;">Belum ada kelas tersedia di kelompok ini.</p>
+            @endif
+        </div>
+    @endforeach
 
     <div class="form-group">
         <label for="status">Status *</label>

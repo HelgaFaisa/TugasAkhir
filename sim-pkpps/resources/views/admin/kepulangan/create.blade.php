@@ -128,7 +128,7 @@
                 </div>
                 <div style="text-align: center; padding: 15px; background: white; border-radius: 8px;">
                     <div style="font-size: 0.85rem; color: #7F8C8D; margin-bottom: 5px;">Sisa Kuota</div>
-                    <div id="sisaKuotaSetelah" style="font-size: 2rem; font-weight: 700; color: #28a745;">12</div>
+                    <div id="sisaKuotaSetelah" style="font-size: 2rem; font-weight: 700; color: #28a745;">{{ $settings->kuota_maksimal }}</div>
                     <div style="font-size: 0.8rem; color: #7F8C8D;">hari tersisa</div>
                 </div>
             </div>
@@ -147,7 +147,7 @@
                       id="alasan" 
                       class="form-control" 
                       rows="4" 
-                      placeholder="Jelaskan alasan kepulangan secara detail (minimal 10 karakter)"
+                      placeholder="Jelaskan alasan kepulangan"
                       required>{{ old('alasan') }}</textarea>
             <small style="color: #7F8C8D; margin-top: 5px; display: block;">
                 <span id="charCount">0</span>/500 karakter
@@ -216,82 +216,94 @@ document.getElementById('id_santri').addEventListener('change', function() {
 
     const infoDiv = document.getElementById('santriInfo');
     infoDiv.style.display = 'block';
+    
+    // Show loading state
     infoDiv.innerHTML = '<div style="text-align: center; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Memuat data santri...</div>';
 
-    fetch(`/admin/api/kepulangan/santri/${santriId}`)
-        .then(response => response.json())
+    // PERBAIKAN: Proper error handling untuk API
+    fetch(`/admin/kepulangan/api/santri/${santriId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 currentSantriData = data;
                 updateSantriInfo(data);
                 calculateDurasi();
             } else {
-                infoDiv.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+                showError(data.message || 'Gagal memuat data santri');
             }
         })
         .catch(error => {
-            infoDiv.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+            console.error('Error:', error);
+            showError('Terjadi kesalahan saat memuat data santri: ' + error.message);
         });
 });
+
+// PERBAIKAN: Function untuk show error
+function showError(message) {
+    const infoDiv = document.getElementById('santriInfo');
+    infoDiv.innerHTML = `
+        <div style="padding: 15px; background: #ffebee; border: 1px solid #ffcdd2; border-radius: 6px; color: #c62828;">
+            <i class="fas fa-exclamation-circle"></i>
+            <strong>Error:</strong> ${message}
+        </div>
+    `;
+    currentSantriData = null;
+}
 
 function updateSantriInfo(data) {
     const santri = data.santri;
     const kuota = data.penggunaan_izin;
     
-    // Tentukan warna badge berdasarkan status
-    let badgeColor = '#28a745'; // Hijau (aman)
-    let badgeTextColor = 'white';
-    if (kuota.status === 'hampir_habis') {
-        badgeColor = '#ffc107'; // Kuning
-        badgeTextColor = '#000';
-    } else if (kuota.status === 'melebihi') {
-        badgeColor = '#dc3545'; // Merah
-    }
-    
-    // Update info santri
-    document.getElementById('santriNama').textContent = santri.nama_lengkap;
-    document.getElementById('santriKelas').textContent = santri.kelas;
-    document.getElementById('santriPeriode').textContent = kuota.periode_mulai + ' - ' + kuota.periode_akhir;
-    document.getElementById('kuotaMaksimal').textContent = kuota.kuota_maksimal + ' hari';
-    
-    const totalTerpakaiSpan = document.getElementById('totalTerpakai');
-    totalTerpakaiSpan.textContent = kuota.total_terpakai + ' hari';
-    totalTerpakaiSpan.style.background = badgeColor;
-    totalTerpakaiSpan.style.color = badgeTextColor;
-    
-    const sisaKuotaSpan = document.getElementById('sisaKuota');
-    sisaKuotaSpan.textContent = kuota.sisa_kuota + ' hari';
-    sisaKuotaSpan.style.background = badgeColor;
-    sisaKuotaSpan.style.color = badgeTextColor;
-    
-    // Update progress bar
-    const progressBar = document.getElementById('progressBar');
-    const progressText = document.getElementById('progressText');
-    progressBar.style.width = Math.min(100, kuota.persentase) + '%';
-    progressBar.textContent = kuota.persentase + '%';
-    progressText.textContent = kuota.persentase + '% dari kuota terpakai';
-    
-    // Ubah warna progress bar
-    if (kuota.persentase >= 100) {
-        progressBar.style.background = '#dc3545'; // Merah
-    } else if (kuota.persentase >= 80) {
-        progressBar.style.background = '#ffc107'; // Kuning
-    } else {
-        progressBar.style.background = '#28a745'; // Hijau
-    }
-    
-    // Tampilkan warning jika over limit
-    const warningDiv = document.getElementById('warningOverLimit');
-    const warningText = document.getElementById('warningText');
-    if (kuota.status === 'melebihi') {
-        warningDiv.style.display = 'block';
-        warningText.textContent = `Santri ini sudah melebihi kuota ${kuota.kuota_maksimal} hari per tahun! Total terpakai: ${kuota.total_terpakai} hari.`;
-    } else {
-        warningDiv.style.display = 'none';
-    }
-    
-    // Restore full HTML structure
-    document.getElementById('santriInfo').style.display = 'block';
+    // Rebuild HTML structure
+    const infoDiv = document.getElementById('santriInfo');
+    infoDiv.innerHTML = `
+        <h4 style="margin-top: 0; color: #2C3E50;">📋 Informasi Santri & Kuota</h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+            <div>
+                <p style="margin: 5px 0;"><strong>Nama:</strong> <span id="santriNama">${santri.nama_lengkap}</span></p>
+                <p style="margin: 5px 0;"><strong>Kelas:</strong> <span id="santriKelas">${santri.kelas}</span></p>
+                <p style="margin: 5px 0;"><strong>Periode:</strong> <span id="santriPeriode">${kuota.periode_mulai} - ${kuota.periode_akhir}</span></p>
+            </div>
+            <div>
+                <p style="margin: 5px 0;"><strong>Kuota Maksimal:</strong> <span id="kuotaMaksimal">${kuota.kuota_maksimal} hari</span></p>
+                <p style="margin: 5px 0;"><strong>Total Terpakai:</strong> <span id="totalTerpakai" class="badge" style="background: ${getBadgeColor(kuota.badge_color)}; color: ${kuota.badge_color === 'warning' ? '#000' : 'white'};">${kuota.total_terpakai} hari</span></p>
+                <p style="margin: 5px 0;"><strong>Sisa Kuota:</strong> <span id="sisaKuota" class="badge" style="background: ${getBadgeColor(kuota.badge_color)}; color: ${kuota.badge_color === 'warning' ? '#000' : 'white'};">${kuota.sisa_kuota} hari</span></p>
+            </div>
+        </div>
+        
+        <div style="margin-top: 15px;">
+            <label style="font-size: 0.9rem; color: #7F8C8D; margin-bottom: 5px;">Penggunaan Kuota:</label>
+            <div style="width: 100%; height: 20px; background: #E0F0EC; border-radius: 10px; overflow: hidden; position: relative;">
+                <div id="progressBar" style="height: 100%; width: ${Math.min(100, kuota.persentase)}%; background: ${getProgressColor(kuota.persentase)}; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.75rem; font-weight: 600;">${kuota.persentase}%</div>
+            </div>
+            <small id="progressText" style="color: #7F8C8D; margin-top: 5px; display: block;">${kuota.persentase}% dari kuota terpakai</small>
+        </div>
+
+        <div id="warningOverLimit" style="display: ${kuota.status === 'melebihi' ? 'block' : 'none'}; margin-top: 15px; padding: 12px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 6px; color: #856404;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <strong>⚠️ PERHATIAN:</strong> <span id="warningText">Santri ini sudah melebihi kuota ${kuota.kuota_maksimal} hari per tahun! Total terpakai: ${kuota.total_terpakai} hari.</span>
+        </div>
+    `;
+}
+
+function getBadgeColor(badge) {
+    const colors = {
+        'success': '#28a745',
+        'warning': '#ffc107',
+        'danger': '#dc3545'
+    };
+    return colors[badge] || '#6c757d';
+}
+
+function getProgressColor(persentase) {
+    if (persentase >= 100) return '#dc3545';
+    if (persentase >= 80) return '#ffc107';
+    return '#28a745';
 }
 
 // Calculate durasi when dates change
@@ -326,7 +338,7 @@ function calculateDurasi() {
     document.getElementById('durasiHari').textContent = diffDays;
     
     let totalSetelah = diffDays;
-    let sisaSetelah = 12 - diffDays;
+    let sisaSetelah = {{ $settings->kuota_maksimal }} - diffDays;
     let showWarning = false;
     let warningMessage = '';
     
@@ -376,7 +388,7 @@ function calculateDurasi() {
     }
 }
 
-// Character counter
+// Character counter (PERBAIKAN: Tidak ada validasi minimal)
 document.getElementById('alasan').addEventListener('input', function() {
     const current = this.value.length;
     const counter = document.getElementById('charCount');
@@ -384,10 +396,8 @@ document.getElementById('alasan').addEventListener('input', function() {
     
     if (current > 500) {
         counter.style.color = 'red';
-    } else if (current < 10) {
-        counter.style.color = 'orange';
     } else {
-        counter.style.color = 'green';
+        counter.style.color = '#7F8C8D';
     }
 });
 

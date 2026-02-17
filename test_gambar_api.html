@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Gambar Berita API</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .card { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 8px; }
+        .success { color: green; }
+        .error { color: red; }
+        img { max-width: 400px; border: 2px solid #ccc; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Gambar Berita dari API</h1>
+    <button onclick="testAPI()">Test API Berita</button>
+    <div id="result"></div>
+
+    <script>
+    async function testAPI() {
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = '<p>Loading...</p>';
+        
+        try {
+            // Get token dari login (ganti dengan token yang valid)
+            const token = prompt('Masukkan token (dari localStorage setelah login):');
+            if (!token) {
+                resultDiv.innerHTML = '<p class="error">Token diperlukan!</p>';
+                return;
+            }
+            
+            // Call API
+            const response = await fetch('http://localhost/TugasAkhir/sim-pkpps/public/api/v1/berita', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json'
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (!data.success) {
+                resultDiv.innerHTML = `<p class="error">Error: ${data.message}</p>`;
+                return;
+            }
+            
+            let html = `<h2 class="success">✅ Berhasil! Total: ${data.data.length} berita</h2>`;
+            
+            data.data.forEach(berita => {
+                html += `
+                    <div class="card">
+                        <h3>${berita.judul}</h3>
+                        <p><strong>ID:</strong> ${berita.id_berita}</p>
+                        <p><strong>Gambar URL:</strong> <code>${berita.gambar_url || 'null'}</code></p>
+                        ${berita.gambar_url ? `
+                            <img src="${berita.gambar_url}" 
+                                 onerror="this.style.border='2px solid red'; this.alt='❌ Gagal load'">
+                            <br>
+                            <a href="${berita.gambar_url}" target="_blank">Buka di tab baru</a>
+                        ` : '<p class="error">Tidak ada gambar</p>'}
+                    </div>
+                `;
+            });
+            
+            resultDiv.innerHTML = html;
+            
+        } catch (error) {
+            resultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+        }
+    }
+    </script>
+</body>
+</html>

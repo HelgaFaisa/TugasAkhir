@@ -52,19 +52,21 @@
                     <td>{{ Str::limit($kategori->keterangan, 50) ?? '-' }}</td>
                     <td>{{ $kategori->created_at->format('d M Y') }}</td>
                     <td class="text-center">
-                        <a href="{{ route('admin.kategori-kegiatan.show', $kategori) }}" class="btn btn-sm btn-primary" title="Detail">
-                            <i class="fas fa-eye"></i>
-                        </a>
-                        <a href="{{ route('admin.kategori-kegiatan.edit', $kategori) }}" class="btn btn-sm btn-warning" title="Edit">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        <form action="{{ route('admin.kategori-kegiatan.destroy', $kategori) }}" method="POST" style="display: inline-block;" onsubmit="return confirm('Yakin ingin menghapus kategori ini?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </form>
+                        <div style="display: flex; justify-content: center; align-items: center; gap: 8px;">
+                            <a href="{{ route('admin.kategori-kegiatan.show', $kategori) }}" class="btn btn-sm btn-primary" title="Detail">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{{ route('admin.kategori-kegiatan.edit', $kategori) }}" class="btn btn-sm btn-warning" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form action="{{ route('admin.kategori-kegiatan.destroy', $kategori) }}" method="POST" style="margin: 0;" onsubmit="return confirm('Yakin ingin menghapus kategori ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
                 @endforeach

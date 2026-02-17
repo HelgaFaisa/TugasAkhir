@@ -1,291 +1,283 @@
-{{-- resources/views/admin/riwayat_pelanggaran/show.blade.php --}}
 @extends('layouts.app')
 
 @section('title', 'Detail Riwayat Pelanggaran')
 
 @section('content')
 <div class="page-header">
-    <h2><i class="fas fa-info-circle"></i> Detail Riwayat Pelanggaran</h2>
+    <h2><i class="fas fa-eye"></i> Detail Riwayat Pelanggaran</h2>
 </div>
 
-<!-- Breadcrumb -->
-<div style="margin-bottom: 20px;">
-    <nav style="display: flex; align-items: center; gap: 8px; color: var(--text-light); font-size: 0.9em;">
-        <a href="{{ route('admin.riwayat-pelanggaran.index') }}" style="color: var(--primary-color); text-decoration: none;">
-            <i class="fas fa-history"></i> Riwayat Pelanggaran
-        </a>
-        <i class="fas fa-chevron-right" style="font-size: 0.7em;"></i>
-        <span>Detail</span>
-    </nav>
-</div>
+@if(session('success'))
+    <div class="alert alert-success">
+        <i class="fas fa-check-circle"></i> {{ session('success') }}
+    </div>
+@endif
 
-<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
-    <!-- Detail Riwayat -->
-    <div>
-        <div class="content-box">
-            <div class="detail-header">
-                <h3><i class="fas fa-clipboard-list"></i> Informasi Riwayat</h3>
-                <div style="display: flex; gap: 10px;">
-                    <a href="{{ route('admin.riwayat-pelanggaran.edit', $riwayatPelanggaran) }}" class="btn btn-warning btn-sm">
-                        <i class="fas fa-edit"></i> Edit
-                    </a>
-                    <a href="{{ route('admin.riwayat-pelanggaran.index') }}" class="btn btn-secondary btn-sm">
-                        <i class="fas fa-arrow-left"></i> Kembali
-                    </a>
-                </div>
-            </div>
-
-            <table class="detail-table">
+<div class="content-box">
+    <div style="margin-bottom: 30px;">
+        <h3 style="color: var(--primary-color); margin-bottom: 15px;">Informasi Riwayat</h3>
+        
+        <table style="width: 100%; margin-bottom: 20px;">
+            <tr>
+                <td style="width: 200px; padding: 10px 0; font-weight: 600;">ID Riwayat</td>
+                <td style="padding: 10px 0;">
+                    <span class="badge badge-secondary" style="font-size: 1em;">{{ $riwayatPelanggaran->id_riwayat }}</span>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; font-weight: 600;">Tanggal</td>
+                <td style="padding: 10px 0;">{{ $riwayatPelanggaran->tanggal_format }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; font-weight: 600;">Santri</td>
+                <td style="padding: 10px 0;">
+                    @if($riwayatPelanggaran->santri)
+                        <strong>{{ $riwayatPelanggaran->santri->nama_lengkap }}</strong><br>
+                        <small style="color: var(--text-light);">{{ $riwayatPelanggaran->id_santri }}</small>
+                    @else
+                        -
+                    @endif
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; font-weight: 600;">Klasifikasi</td>
+                <td style="padding: 10px 0;">
+                    @if($riwayatPelanggaran->kategori && $riwayatPelanggaran->kategori->klasifikasi)
+                        <span class="badge badge-info">{{ $riwayatPelanggaran->kategori->klasifikasi->nama_klasifikasi }}</span>
+                    @else
+                        -
+                    @endif
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; font-weight: 600;">Kategori Pelanggaran</td>
+                <td style="padding: 10px 0;">
+                    @if($riwayatPelanggaran->kategori)
+                        <strong>{{ $riwayatPelanggaran->kategori->nama_pelanggaran }}</strong><br>
+                        <small style="color: var(--text-light);">{{ $riwayatPelanggaran->id_kategori }}</small>
+                    @else
+                        -
+                    @endif
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; font-weight: 600;">Poin Asli</td>
+                <td style="padding: 10px 0;">
+                    <span class="badge badge-danger" style="font-size: 1em;">{{ $riwayatPelanggaran->poin_asli }}</span>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; font-weight: 600;">Poin Saat Ini</td>
+                <td style="padding: 10px 0;">
+                    <span class="badge badge-danger" style="font-size: 1.1em; padding: 8px 12px;">
+                        <i class="fas fa-fire"></i> {{ $riwayatPelanggaran->poin }}
+                    </span>
+                    @if($riwayatPelanggaran->is_kafaroh_selesai)
+                        <small style="color: var(--success-color); margin-left: 10px;">
+                            <i class="fas fa-check-circle"></i> Poin telah dilebur
+                        </small>
+                    @endif
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; font-weight: 600; vertical-align: top;">Kafaroh</td>
+                <td style="padding: 10px 0;">
+                    @if($riwayatPelanggaran->kategori && $riwayatPelanggaran->kategori->kafaroh)
+                        <div style="background: #fff3cd; padding: 15px; border-radius: 8px; border-left: 4px solid var(--warning-color);">
+                            {{ $riwayatPelanggaran->kategori->kafaroh }}
+                        </div>
+                    @else
+                        <span style="color: var(--text-light);">Tidak ada kafaroh</span>
+                    @endif
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 10px 0; font-weight: 600;">Status Kafaroh</td>
+                <td style="padding: 10px 0;">
+                    @if($riwayatPelanggaran->is_kafaroh_selesai)
+                        <span class="badge badge-success">Selesai</span><br>
+                        <small style="color: var(--text-light);">
+                            Diselesaikan: {{ $riwayatPelanggaran->tanggal_kafaroh_selesai ? $riwayatPelanggaran->tanggal_kafaroh_selesai->format('d M Y H:i') : '-' }}<br>
+                            Oleh: {{ $riwayatPelanggaran->adminKafaroh->name ?? '-' }}
+                        </small>
+                    @else
+                        <span class="badge badge-warning">Belum Selesai</span>
+                    @endif
+                </td>
+            </tr>
+            @if($riwayatPelanggaran->catatan_kafaroh)
                 <tr>
-                    <th><i class="fas fa-tag"></i> ID Riwayat</th>
-                    <td>
-                        <span class="badge badge-secondary" style="font-size: 1em;">
-                            {{ $riwayatPelanggaran->id_riwayat }}
-                        </span>
+                    <td style="padding: 10px 0; font-weight: 600; vertical-align: top;">Catatan Kafaroh</td>
+                    <td style="padding: 10px 0;">
+                        <div style="background: #d1ecf1; padding: 15px; border-radius: 8px;">
+                            {{ $riwayatPelanggaran->catatan_kafaroh }}
+                        </div>
                     </td>
                 </tr>
+            @endif
+            <tr>
+                <td style="padding: 10px 0; font-weight: 600;">Status Publish ke Wali</td>
+                <td style="padding: 10px 0;">
+                    @if($riwayatPelanggaran->is_published_to_parent)
+                        <span class="badge badge-success">Terkirim</span><br>
+                        <small style="color: var(--text-light);">
+                            Dikirim: {{ $riwayatPelanggaran->tanggal_published ? $riwayatPelanggaran->tanggal_published->format('d M Y H:i') : '-' }}<br>
+                            Oleh: {{ $riwayatPelanggaran->adminPublished->name ?? '-' }}
+                        </small>
+                    @else
+                        <span class="badge badge-secondary">Belum Terkirim</span>
+                    @endif
+                </td>
+            </tr>
+            @if($riwayatPelanggaran->keterangan)
                 <tr>
-                    <th><i class="fas fa-calendar"></i> Tanggal Pelanggaran</th>
-                    <td>
-                        <strong style="font-size: 1.1em;">
-                            {{ \Carbon\Carbon::parse($riwayatPelanggaran->tanggal)->isoFormat('dddd, D MMMM YYYY') }}
-                        </strong>
-                    </td>
+                    <td style="padding: 10px 0; font-weight: 600; vertical-align: top;">Keterangan</td>
+                    <td style="padding: 10px 0;">{{ $riwayatPelanggaran->keterangan }}</td>
                 </tr>
-                <tr>
-                    <th><i class="fas fa-fire"></i> Poin Pelanggaran</th>
-                    <td>
-                        <span class="badge badge-danger" style="font-size: 1.2em; padding: 10px 20px;">
-                            <i class="fas fa-star"></i> {{ $riwayatPelanggaran->poin }} Poin
-                        </span>
-                    </td>
-                </tr>
-                <tr>
-                    <th><i class="fas fa-calendar-plus"></i> Tanggal Dicatat</th>
-                    <td>{{ $riwayatPelanggaran->created_at->format('d F Y, H:i') }} WIB</td>
-                </tr>
-                <tr>
-                    <th><i class="fas fa-calendar-check"></i> Terakhir Diperbarui</th>
-                    <td>{{ $riwayatPelanggaran->updated_at->format('d F Y, H:i') }} WIB</td>
-                </tr>
-            </table>
-        </div>
+            @endif
+        </table>
+    </div>
 
-        <!-- Data Santri -->
-        <div class="content-box" style="margin-top: 30px;">
-            <h3 style="margin-bottom: 20px; color: var(--primary-color);">
-                <i class="fas fa-user"></i> Data Santri
-            </h3>
-            
-            @if($riwayatPelanggaran->santri)
-                <table class="detail-table">
-                    <tr>
-                        <th><i class="fas fa-id-card"></i> ID Santri</th>
-                        <td>
-                            <span class="badge badge-primary">{{ $riwayatPelanggaran->santri->id_santri }}</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th><i class="fas fa-user"></i> Nama Lengkap</th>
-                        <td>
-                            <strong style="font-size: 1.1em;">{{ $riwayatPelanggaran->santri->nama_lengkap }}</strong>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th><i class="fas fa-graduation-cap"></i> Kelas</th>
-                        <td>{{ $riwayatPelanggaran->santri->kelas }}</td>
-                    </tr>
-                    <tr>
-                        <th><i class="fas fa-hashtag"></i> NIS</th>
-                        <td>{{ $riwayatPelanggaran->santri->nis }}</td>
-                    </tr>
-                    <tr>
-                        <th><i class="fas fa-chart-line"></i> Total Poin Pelanggaran</th>
-                        <td>
-                            <span class="badge badge-danger" style="font-size: 1em;">
-                                {{ $riwayatPelanggaran->santri->total_poin_pelanggaran }} Poin
-                            </span>
-                        </td>
-                    </tr>
-                </table>
+    <!-- Tombol Aksi -->
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+        <h4 style="margin-bottom: 15px; color: var(--primary-color);">
+            <i class="fas fa-cogs"></i> Aksi
+        </h4>
+        
+        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+            @if(!$riwayatPelanggaran->is_kafaroh_selesai && $riwayatPelanggaran->kategori && $riwayatPelanggaran->kategori->kafaroh)
+                <button type="button" 
+                        class="btn btn-success"
+                        onclick="document.getElementById('modal-kafaroh').style.display='block'">
+                    <i class="fas fa-check-circle"></i> Selesaikan Kafaroh
+                </button>
+            @endif
 
-                <div style="margin-top: 15px;">
-                    <a href="{{ route('admin.santri.show', $riwayatPelanggaran->santri) }}" class="btn btn-primary" style="width: 100%;">
-                        <i class="fas fa-eye"></i> Lihat Detail Santri
-                    </a>
-                </div>
+            @if(!$riwayatPelanggaran->is_published_to_parent)
+                <form action="{{ route('admin.riwayat-pelanggaran.publish-to-parent', $riwayatPelanggaran) }}" 
+                      method="POST" 
+                      style="display: inline;"
+                      onsubmit="return confirm('Yakin ingin mengirim pelanggaran ini ke wali santri?');">
+                    @csrf
+                    <button type="submit" class="btn btn-info">
+                        <i class="fas fa-paper-plane"></i> Kirim ke Wali Santri
+                    </button>
+                </form>
             @else
-                <div style="text-align: center; padding: 30px; color: var(--danger-color);">
-                    <i class="fas fa-exclamation-triangle" style="font-size: 3em; margin-bottom: 15px;"></i>
-                    <p>Data santri tidak ditemukan</p>
-                </div>
+                <form action="{{ route('admin.riwayat-pelanggaran.unpublish-from-parent', $riwayatPelanggaran) }}" 
+                      method="POST" 
+                      style="display: inline;"
+                      onsubmit="return confirm('Yakin ingin membatalkan pengiriman ke wali santri?');">
+                    @csrf
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-undo"></i> Batalkan Kirim ke Wali
+                    </button>
+                </form>
             @endif
         </div>
+    </div>
 
-        <!-- Kategori Pelanggaran -->
-        <div class="content-box" style="margin-top: 30px;">
-            <h3 style="margin-bottom: 20px; color: var(--primary-color);">
-                <i class="fas fa-tags"></i> Kategori Pelanggaran
-            </h3>
-            
-            @if($riwayatPelanggaran->kategori)
-                <table class="detail-table">
+    <!-- Riwayat Lainnya -->
+    @if($riwayatLainnya->isNotEmpty())
+        <h3 style="color: var(--primary-color); margin-bottom: 15px;">
+            <i class="fas fa-list"></i> Riwayat Pelanggaran Lainnya (Santri yang Sama)
+        </h3>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th style="width: 100px;">ID</th>
+                    <th style="width: 120px;">Tanggal</th>
+                    <th>Pelanggaran</th>
+                    <th style="width: 80px; text-align: center;">Poin</th>
+                    <th style="width: 120px; text-align: center;">Status Kafaroh</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($riwayatLainnya as $item)
                     <tr>
-                        <th><i class="fas fa-tag"></i> ID Kategori</th>
-                        <td>
-                            <span class="badge badge-primary">{{ $riwayatPelanggaran->kategori->id_kategori }}</span>
+                        <td><span class="badge badge-secondary">{{ $item->id_riwayat }}</span></td>
+                        <td>{{ \Carbon\Carbon::parse($item->tanggal)->format('d M Y') }}</td>
+                        <td>{{ $item->kategori->nama_pelanggaran ?? '-' }}</td>
+                        <td style="text-align: center;">
+                            <span class="badge badge-danger">{{ $item->poin }}</span>
                         </td>
-                    </tr>
-                    <tr>
-                        <th><i class="fas fa-exclamation-triangle"></i> Nama Pelanggaran</th>
-                        <td>
-                            <strong style="font-size: 1.1em;">{{ $riwayatPelanggaran->kategori->nama_pelanggaran }}</strong>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th><i class="fas fa-star"></i> Poin Kategori</th>
-                        <td>
-                            <span class="badge badge-danger" style="font-size: 1em;">
-                                {{ $riwayatPelanggaran->kategori->poin }} Poin
-                            </span>
-                        </td>
-                    </tr>
-                </table>
-
-                <div style="margin-top: 15px;">
-                    <a href="{{ route('admin.kategori-pelanggaran.show', $riwayatPelanggaran->kategori) }}" class="btn btn-primary" style="width: 100%;">
-                        <i class="fas fa-eye"></i> Lihat Detail Kategori
-                    </a>
-                </div>
-            @else
-                <div style="text-align: center; padding: 30px; color: var(--danger-color);">
-                    <i class="fas fa-exclamation-triangle" style="font-size: 3em; margin-bottom: 15px;"></i>
-                    <p>Kategori tidak ditemukan</p>
-                </div>
-            @endif
-        </div>
-
-        <!-- Keterangan -->
-        @if($riwayatPelanggaran->keterangan)
-        <div class="content-box" style="margin-top: 30px;">
-            <h3 style="margin-bottom: 15px; color: var(--primary-color);">
-                <i class="fas fa-comment"></i> Keterangan Tambahan
-            </h3>
-            <div style="background: var(--bg-color); padding: 15px; border-radius: var(--border-radius-sm); border-left: 4px solid var(--primary-color);">
-                <p style="margin: 0; line-height: 1.6;">{{ $riwayatPelanggaran->keterangan }}</p>
-            </div>
-        </div>
-        @endif
-
-        <!-- Riwayat Pelanggaran Lainnya -->
-        @if($riwayatLainnya->isNotEmpty())
-        <div class="content-box" style="margin-top: 30px;">
-            <h3 style="margin-bottom: 20px; color: var(--primary-color);">
-                <i class="fas fa-history"></i> Riwayat Pelanggaran Lainnya (Santri yang Sama)
-            </h3>
-            
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th style="width: 50px;">No</th>
-                        <th>Tanggal</th>
-                        <th>Kategori</th>
-                        <th style="text-align: center;">Poin</th>
-                        <th style="width: 100px; text-align: center;">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($riwayatLainnya as $index => $riwayat)
-                    <tr>
-                        <td>{{ $index + 1 }}</td>
-                        <td>{{ \Carbon\Carbon::parse($riwayat->tanggal)->format('d M Y') }}</td>
-                        <td>
-                            @if($riwayat->kategori)
-                                <strong>{{ $riwayat->kategori->nama_pelanggaran }}</strong>
+                        <td style="text-align: center;">
+                            @if($item->is_kafaroh_selesai)
+                                <span class="badge badge-success">Selesai</span>
                             @else
-                                <span style="color: var(--danger-color);">-</span>
+                                <span class="badge badge-warning">Belum</span>
                             @endif
                         </td>
-                        <td style="text-align: center;">
-                            <span class="badge badge-danger">{{ $riwayat->poin }}</span>
-                        </td>
-                        <td style="text-align: center;">
-                            <a href="{{ route('admin.riwayat-pelanggaran.show', $riwayat) }}" class="btn btn-sm btn-success">
-                                <i class="fas fa-eye"></i>
-                            </a>
-                        </td>
                     </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                @endforeach
+            </tbody>
+        </table>
+    @endif
 
-            <div style="text-align: center; margin-top: 15px;">
-                <a href="{{ route('admin.riwayat-pelanggaran.index') }}?id_santri={{ $riwayatPelanggaran->id_santri }}" class="btn btn-primary">
-                    <i class="fas fa-list"></i> Lihat Semua Riwayat Santri Ini
-                </a>
-            </div>
-        </div>
-        @endif
-    </div>
-
-    <!-- Sidebar -->
-    <div>
-        <!-- Quick Actions -->
-        <div class="card card-primary">
-            <h3 style="margin-bottom: 15px;">
-                <i class="fas fa-bolt"></i> Aksi Cepat
-            </h3>
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-                <a href="{{ route('admin.riwayat-pelanggaran.edit', $riwayatPelanggaran) }}" class="btn btn-warning" style="width: 100%;">
-                    <i class="fas fa-edit"></i> Edit Riwayat
-                </a>
-                <a href="{{ route('admin.riwayat-pelanggaran.create') }}" class="btn btn-primary" style="width: 100%;">
-                    <i class="fas fa-plus"></i> Tambah Riwayat Baru
-                </a>
-                <a href="{{ route('admin.riwayat-pelanggaran.index') }}" class="btn btn-secondary" style="width: 100%;">
-                    <i class="fas fa-list"></i> Semua Riwayat
-                </a>
-                
-                @if($riwayatPelanggaran->santri)
-                <a href="{{ route('admin.santri.show', $riwayatPelanggaran->santri) }}" class="btn btn-success" style="width: 100%;">
-                    <i class="fas fa-user"></i> Lihat Santri
-                </a>
-                @endif
-            </div>
-        </div>
-
-        <!-- Statistik Poin -->
-        <div class="card card-danger" style="margin-top: 20px;">
-            <h3 style="margin-bottom: 15px;">
-                <i class="fas fa-fire"></i> Poin Pelanggaran
-            </h3>
-            <div style="text-align: center;">
-                <div class="card-value" style="color: var(--danger-color);">{{ $riwayatPelanggaran->poin }}</div>
-                <p style="margin: 0; color: var(--text-light);">Poin Pelanggaran Ini</p>
-            </div>
-            
-            @if($riwayatPelanggaran->santri)
-            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255, 139, 148, 0.3);">
-                <div style="text-align: center;">
-                    <div class="card-value-small" style="color: var(--danger-color);">
-                        {{ $riwayatPelanggaran->santri->total_poin_pelanggaran }}
-                    </div>
-                    <p style="margin: 0; color: var(--text-light);">Total Poin Santri</p>
-                </div>
-            </div>
-            @endif
-        </div>
-
-        <!-- Info Box -->
-        <div class="card card-info" style="margin-top: 20px;">
-            <h3 style="margin-bottom: 10px;">
-                <i class="fas fa-info-circle"></i> Informasi
-            </h3>
-            <p style="font-size: 0.9em; line-height: 1.6; margin: 0; color: var(--text-color);">
-                Riwayat ini dicatat pada <strong>{{ $riwayatPelanggaran->created_at->format('d F Y') }}</strong> 
-                untuk pelanggaran yang terjadi pada <strong>{{ \Carbon\Carbon::parse($riwayatPelanggaran->tanggal)->format('d F Y') }}</strong>.
-            </p>
-        </div>
+    <div class="btn-group" style="margin-top: 30px;">
+        <a href="{{ route('admin.riwayat-pelanggaran.edit', $riwayatPelanggaran) }}" class="btn btn-warning">
+            <i class="fas fa-edit"></i> Edit
+        </a>
+        <a href="{{ route('admin.riwayat-pelanggaran.index') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Kembali
+        </a>
     </div>
 </div>
+
+<!-- Modal Selesaikan Kafaroh -->
+<div id="modal-kafaroh" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+    <div style="background-color: white; margin: 10% auto; padding: 30px; border-radius: 10px; width: 90%; max-width: 500px;">
+        <h3 style="margin-bottom: 20px; color: var(--primary-color);">
+            <i class="fas fa-check-circle"></i> Selesaikan Kafaroh
+        </h3>
+        
+        <form action="{{ route('admin.riwayat-pelanggaran.selesaikan-kafaroh', $riwayatPelanggaran) }}" method="POST">
+            @csrf
+            
+            <p style="margin-bottom: 20px; color: var(--text-color);">
+                Dengan menyelesaikan kafaroh, poin pelanggaran akan <strong>dilebur menjadi 0</strong>.
+            </p>
+            
+            <div class="form-group">
+                <label for="catatan_kafaroh">Catatan (Opsional)</label>
+                <textarea name="catatan_kafaroh" 
+                          id="catatan_kafaroh"
+                          class="form-control"
+                          rows="4"
+                          placeholder="Contoh: Santri telah menyelesaikan kafaroh dengan baik..."></textarea>
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-save"></i> Simpan
+                </button>
+                <button type="button" 
+                        class="btn btn-secondary"
+                        onclick="document.getElementById('modal-kafaroh').style.display='none'">
+                    <i class="fas fa-times"></i> Batal
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('modal-kafaroh');
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+
+// Auto hide alerts
+setTimeout(function() {
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        alert.style.transition = 'opacity 0.5s';
+        alert.style.opacity = '0';
+        setTimeout(() => alert.remove(), 500);
+    });
+}, 5000);
+</script>
 @endsection

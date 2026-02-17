@@ -1,0 +1,298 @@
+// lib/features/profil/profil_page.dart
+
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../core/api/api_service.dart';
+
+class ProfilPage extends StatefulWidget {
+  const ProfilPage({super.key});
+
+  @override
+  State<ProfilPage> createState() => _ProfilPageState();
+}
+
+class _ProfilPageState extends State<ProfilPage> {
+  final _api = ApiService();
+  Map<String, dynamic>? _santriData;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
+
+  Future<void> _loadProfile() async {
+    setState(() => _isLoading = true);
+
+    // Ambil dari cache dulu untuk UX yang cepat
+    final prefs = await SharedPreferences.getInstance();
+    final cachedData = prefs.getString('santri_data');
+
+    if (cachedData != null) {
+      if (mounted) {
+        setState(() {
+          _santriData = json.decode(cachedData);
+          _isLoading = false;
+        });
+      }
+    }
+
+    // Refresh dari API di background
+    final result = await _api.getProfile();
+
+    if (mounted && result['success'] == true && result['data'] != null) {
+      setState(() {
+        _santriData = result['data'];
+        _isLoading = false;
+      });
+    } else if (mounted && _santriData == null) {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey[100],
+      appBar: AppBar(
+        title: const Text('Profil Santri'),
+        backgroundColor: const Color(0xFF7C3AED),
+        foregroundColor: Colors.white,
+        elevation: 0,
+      ),
+      body: _isLoading && _santriData == null
+          ? const Center(child: CircularProgressIndicator())
+          : RefreshIndicator(
+              onRefresh: _loadProfile,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Column(
+                  children: [
+                    // Header dengan foto
+                    _buildHeader(),
+                    
+                    // Content
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Informasi Dasar
+                          _buildSectionCard(
+                            title: 'Informasi Dasar',
+                            icon: Icons.info_outline,
+                            children: [
+                              _buildInfoRow('ID Santri', _santriData?['id_santri']),
+                              _buildInfoRow('NIS', _santriData?['nis']),
+                              _buildInfoRow('Nama Lengkap', _santriData?['nama_lengkap']),
+                              _buildInfoRow('Jenis Kelamin', _santriData?['jenis_kelamin']),
+                              _buildInfoRow('Status', _santriData?['status'], isLast: true),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Kelas yang Diikuti
+                          if (_santriData?['kelas_list'] != null && (_santriData!['kelas_list'] as List).isNotEmpty)
+                            _buildKelasListSection(),
+                          if (_santriData?['kelas_list'] != null && (_santriData!['kelas_list'] as List).isNotEmpty)
+                            const SizedBox(height: 16),
+
+                          // Alamat & Asal
+                          _buildSectionCard(
+                            title: 'Alamat & Asal',
+                            icon: Icons.location_on_outlined,
+                            children: [
+                              _buildInfoRow('Alamat Santri', _santriData?['alamat_santri'], isMultiline: true),
+                              _buildInfoRow('Daerah Asal', _santriData?['daerah_asal'], isLast: true),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Data Orang Tua / Wali
+                          _buildSectionCard(
+                            title: 'Data Orang Tua / Wali',
+                            icon: Icons.family_restroom,
+                            children: [
+                              _buildInfoRow('Nama Orang Tua', _santriData?['nama_orang_tua']),
+                              _buildInfoRow('Nomor HP Orang Tua', _santriData?['nomor_hp_ortu'], isLast: true),
+                            ],
+                          ),
+                          const SizedBox(height: 24),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+    );
+  }
+
+  Widget _buildHeader() {
+    final namaLengkap = _santriData?['nama_lengkap'] ?? 'Nama Santri';
+    final idSantri = _santriData?['id_santri'] ?? '-';
+    final status = _santriData?['status'] ?? 'Aktif';
+
+    return Container(
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Color(0xFF7C3AED),
+            Color(0xFF5B21B6),
+          ],
+        ),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(32),
+          bottomRight: Radius.circular(32),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+        child: Column(
+          children: [
+            // Avatar
+            Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 3),
+              ),
+              child: CircleAvatar(
+                radius: 50,
+                backgroundColor: Colors.white,
+                child: Icon(
+                  Icons.person,
+                  size: 50,
+                  color: const Color(0xFF7C3AED).withValues(alpha: 0.7),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Nama
+            Text(
+              namaLengkap,
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 4),
+
+            // ID Santri
+            Text(
+              idSantri,
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.white70,
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // Primary Kelas Badge
+            _buildPrimaryKelasBadge(),
+            const SizedBox(height: 8),
+
+            // Status Badge
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              decoration: BoxDecoration(
+                color: status == 'Aktif' ? Colors.green : Colors.orange,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                status,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionCard({
+    required String title,
+    required IconData icon,
+    required List<Widget> children,
+  }) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Section Title
+            Row(
+              children: [
+                Icon(icon, size: 20, color: const Color(0xFF7C3AED)),
+                const SizedBox(width: 8),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF7C3AED),
+                  ),
+                ),
+              ],
+            ),
+            const Divider(height: 24),
+            // Content
+            ...children,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(String label, String? value, {bool isMultiline = false, bool isLast = false}) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: isLast ? 0 : 12),
+      child: Row(
+        crossAxisAlignment: isMultiline ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 130,
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[600],
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              value ?? '-',
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+              maxLines: isMultiline ? 4 : 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

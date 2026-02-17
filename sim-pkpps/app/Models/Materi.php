@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Kelas;
 
 class Materi extends Model
 {
@@ -107,17 +108,31 @@ class Materi extends Model
     }
 
     /**
-     * Accessor untuk badge kelas
+     * Accessor untuk badge kelas (dynamic - dari tabel kelas)
      */
     public function getKelasBadgeAttribute()
     {
-        $badges = [
-            'Lambatan' => '<span class="badge badge-secondary">Lambatan</span>',
-            'Cepatan' => '<span class="badge badge-warning">Cepatan</span>',
-            'PB' => '<span class="badge badge-danger">PB</span>',
-        ];
+        // Warna badge dynamic berdasarkan urutan kelas
+        $colorCycle = ['badge-secondary', 'badge-warning', 'badge-danger', 'badge-info', 'badge-primary', 'badge-success'];
 
-        return $badges[$this->kelas] ?? $this->kelas;
+        // Coba ambil dari relasi kelas jika ada
+        $kelasModel = $this->kelasRelasi;
+        if ($kelasModel) {
+            $colorIdx = ($kelasModel->urutan - 1) % count($colorCycle);
+            $color = $colorCycle[$colorIdx];
+            return '<span class="badge ' . $color . '">' . e($kelasModel->nama_kelas) . '</span>';
+        }
+
+        // Fallback: gunakan string kelas langsung
+        return '<span class="badge badge-secondary">' . e($this->kelas) . '</span>';
+    }
+
+    /**
+     * Relasi: Materi belongs to Kelas (by nama_kelas)
+     */
+    public function kelasRelasi()
+    {
+        return $this->belongsTo(Kelas::class, 'kelas', 'nama_kelas');
     }
 
     /**

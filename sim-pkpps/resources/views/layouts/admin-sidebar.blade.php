@@ -7,7 +7,7 @@
 </li>
 
 <!-- DATA MASTER -->
-<li class="menu-toggle {{ Request::routeIs('admin.santri.*') || Request::routeIs('admin.users.*') ? 'active' : '' }}">
+<li class="menu-toggle {{ Request::routeIs('admin.santri.*') || Request::routeIs('admin.users.*') || Request::routeIs('admin.kelas.*') ? 'active' : '' }}">
     <a href="javascript:void(0)" class="menu-parent">
         <i class="fas fa-database"></i><span>Data Master</span>
         <i class="fas fa-chevron-down toggle-icon"></i>
@@ -28,6 +28,11 @@
                 <i class="fas fa-user-shield"></i><span>Akun Wali Santri</span>
             </a>
         </li>
+        <li>
+            <a href="{{ route('admin.kelas.index') }}" class="{{ Request::routeIs('admin.kelas.*') ? 'active' : '' }}">
+                <i class="fas fa-layer-group"></i><span>Kelola Kelas</span>
+            </a>
+        </li>
     </ul>
 </li>
 
@@ -44,13 +49,8 @@
             </a>
         </li>
         <li>
-            <a href="{{ route('admin.materi.index') }}" class="{{ Request::routeIs('admin.materi.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.materi.index') }}" class="{{ Request::routeIs('admin.materi.*') || Request::routeIs('admin.semester.*') ? 'active' : '' }}">
                 <i class="fas fa-book"></i><span>Master Materi</span>
-            </a>
-        </li>
-        <li>
-            <a href="{{ route('admin.semester.index') }}" class="{{ Request::routeIs('admin.semester.*') ? 'active' : '' }}">
-                <i class="fas fa-calendar-alt"></i><span>Manajemen Semester</span>
             </a>
         </li>
         <li>
@@ -58,52 +58,43 @@
                 <i class="fas fa-clipboard-list"></i><span>Data Capaian</span>
             </a>
         </li>
-        <li>
-            <a href="{{ route('admin.capaian.rekap-kelas') }}" class="{{ Request::routeIs('admin.capaian.rekap-kelas') ? 'active' : '' }}">
-                <i class="fas fa-table"></i><span>Rekap per Kelas</span>
-            </a>
-        </li>
     </ul>
 </li>
 
 <!-- KEGIATAN SANTRI -->
-<li class="menu-toggle {{ Request::routeIs('admin.kategori-kegiatan.*') || Request::routeIs('admin.kegiatan.*') || Request::routeIs('admin.absensi-kegiatan.*') || Request::routeIs('admin.kartu-rfid.*') || Request::routeIs('admin.riwayat-kegiatan.*') ? 'active' : '' }}">
+<li class="menu-toggle {{ 
+    Request::routeIs('admin.kategori-kegiatan.*') || 
+    Request::routeIs('admin.kegiatan.*') || 
+    Request::routeIs('admin.kartu-rfid.*') || 
+    Request::routeIs('admin.laporan-kegiatan.*') || 
+    Request::routeIs('admin.riwayat-kegiatan.*') 
+    ? 'active' : '' }}">
     <a href="javascript:void(0)" class="menu-parent">
         <i class="fas fa-calendar-alt"></i><span>Kegiatan Santri</span>
         <i class="fas fa-chevron-down toggle-icon"></i>
     </a>
     <ul class="submenu">
-        <li>
-            <a href="{{ route('admin.kategori-kegiatan.index') }}" 
-               class="{{ Request::routeIs('admin.kategori-kegiatan.*') ? 'active' : '' }}">
-                <i class="fas fa-list-alt"></i><span>Kategori Kegiatan</span>
-            </a>
-        </li>
-        <li>
-            <a href="{{ route('admin.kegiatan.index') }}" 
-               class="{{ Request::routeIs('admin.kegiatan.*') && !Request::routeIs('admin.riwayat-kegiatan.*') ? 'active' : '' }}">
-                <i class="fas fa-calendar-check"></i><span>Jadwal Kegiatan</span>
-            </a>
-        </li>
-        <li>
-            <a href="{{ route('admin.absensi-kegiatan.index') }}" 
-               class="{{ Request::routeIs('admin.absensi-kegiatan.*') ? 'active' : '' }}">
-                <i class="fas fa-clipboard-check"></i><span>Absensi Kegiatan</span>
-            </a>
-        </li>
-        <li>
-            <a href="{{ route('admin.kartu-rfid.index') }}" 
-               class="{{ Request::routeIs('admin.kartu-rfid.*') ? 'active' : '' }}">
-                <i class="fas fa-id-card"></i><span>Kartu RFID</span>
-            </a>
-        </li>
-        <li>
-            <a href="{{ route('admin.riwayat-kegiatan.index') }}" 
-               class="{{ Request::routeIs('admin.riwayat-kegiatan.*') ? 'active' : '' }}">
-                <i class="fas fa-history"></i><span>Riwayat & Statistik</span>
-            </a>
-        </li>
-    </ul>
+    <li>
+        <a href="{{ route('admin.kegiatan.index') }}" 
+           class="{{ Request::routeIs('admin.kegiatan.index') ? 'active' : '' }}">
+            <i class="fas fa-tachometer-alt"></i><span>Dashboard Kegiatan</span>
+        </a>
+    </li>
+
+    <li>
+        <a href="{{ route('admin.laporan-kegiatan.index') }}" 
+           class="{{ Request::routeIs('admin.laporan-kegiatan.*') || Request::routeIs('admin.riwayat-kegiatan.*') ? 'active' : '' }}">
+            <i class="fas fa-chart-line"></i><span>Laporan & Analitik</span>
+        </a>
+    </li>
+
+    <li>
+        <a href="{{ route('admin.kartu-rfid.index') }}" 
+           class="{{ Request::routeIs('admin.kartu-rfid.*') ? 'active' : '' }}">
+            <i class="fas fa-id-card"></i><span>Kartu RFID</span>
+        </a>
+    </li>
+</ul>
 </li>
 
 <!-- PELANGGARAN -->

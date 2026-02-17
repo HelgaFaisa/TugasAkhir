@@ -59,6 +59,27 @@ class Kegiatan extends Model
         return $this->hasMany(AbsensiKegiatan::class, 'kegiatan_id', 'kegiatan_id');
     }
 
+    // ==========================================
+    // RELASI SISTEM KELAS BARU
+    // ==========================================
+
+    /**
+     * Relasi: Kegiatan belongs to many Kelas (many-to-many through kegiatan_kelas)
+     */
+    public function kelasKegiatan()
+    {
+        return $this->belongsToMany(Kelas::class, 'kegiatan_kelas', 'kegiatan_id', 'id_kelas', 'kegiatan_id', 'id')
+                    ->withTimestamps();
+    }
+
+    /**
+     * Relasi: Kegiatan memiliki banyak record kegiatan_kelas (hasMany)
+     */
+    public function kegiatanKelasPivot()
+    {
+        return $this->hasMany(KegiatanKelas::class, 'kegiatan_id', 'kegiatan_id');
+    }
+
     /**
      * Scope: Filter berdasarkan hari
      */
@@ -86,5 +107,95 @@ class Kegiatan extends Model
     {
         return date('H:i', strtotime($this->waktu_mulai)) . ' - ' . 
                date('H:i', strtotime($this->waktu_selesai));
+    }
+
+    // ==========================================
+    // HELPER METHODS SISTEM KELAS BARU
+    // ==========================================
+
+    /**
+     * Check apakah kegiatan untuk semua kelas (umum)
+     * Kegiatan dianggap umum jika tidak ada relasi ke kegiatan_kelas
+     *
+     * @return bool
+     */
+    public function isForAllClasses()
+    {
+        return $this->kegiatanKelasPivot()->count() === 0;
+    }
+
+    /**
+     * Check apakah kegiatan untuk kelas tertentu
+     * Return true jika kegiatan umum ATAU ada relasi ke kelas tersebut
+     *
+     * @param int $id_kelas
+     * @return bool
+     */
+    public function isForKelas($id_kelas)
+    {
+        // Jika kegiatan umum (tidak ada relasi kelas), semua kelas bisa
+        if ($this->isForAllClasses()) {
+            return true;
+        }
+        
+        // Cek apakah ada relasi ke kelas tertentu
+        return $this->kelasKegiatan()->where('kelas.id', $id_kelas)->exists();
+    }
+
+    /**
+     * Get santri yang eligible untuk kegiatan ini
+     * - Jika umum: return all active santri
+     * - Jik a specific: return santri yang kelasnya match
+     *
+     * @param string|null $tahun_ajaran - Filter by tahun ajaran
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function getEligibleSantris($tahun_ajaran = null)
+    {
+        if ($tahun_ajaran === null) {
+            $tahun_ajaran = SantriKelas::getCurrentAcademicYear();
+        }
+        
+        // Jika kegiatan umum, return semua santri aktif
+        if ($this->isForAllClasses()) {
+            return Santri::where('status', 'Aktif');
+        }
+        
+        // Jika specific, return santri yang kelasnya match
+        $kelasIds = $this->kelasKegiatan()->pluck('kelas.id');
+        
+        return Santri::where('status', 'Aktif')
+                     ->whereHas('kelasSantri', function($q) use ($kelasIds, $tahun_ajaran) {
+                         $q->whereIn('id_kelas', $kelasIds)
+                           ->where('tahun_ajaran', $tahun_ajaran);
+                     });
+    }
+
+    /**
+     * Assign kegiatan ke kelas-kelas tertentu
+     * Akan replace semua relasi kelas existing
+     *
+     * @param array $kelas_ids - Array of kelas IDs
+     * @return void
+     */
+    public function assignKelas(array $kelas_ids)
+    {
+        // Delete existing relations
+        $this->kegiatanKelasPivot()->delete();
+        
+        // Create new relations
+        if (!empty($kelas_ids)) {
+            $data = [];
+            foreach ($kelas_ids as $id_kelas) {
+                $data[] = [
+                    'kegiatan_id' => $this->kegiatan_id,
+                    'id_kelas' => $id_kelas,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+            
+            KegiatanKelas::insert($data);
+        }
     }
 }

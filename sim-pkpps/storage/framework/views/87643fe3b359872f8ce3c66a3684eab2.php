@@ -10,6 +10,24 @@
 </div>
 
 
+<?php
+    $pendingPengajuan = \App\Models\PengajuanKepulangan::where('status', 'Menunggu')->count();
+?>
+
+<?php if($pendingPengajuan > 0): ?>
+    <div class="alert alert-warning" style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px; background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%); border: none; color: #000;">
+        <i class="fas fa-bell" style="font-size: 2rem;"></i>
+        <div style="flex: 1;">
+            <strong style="font-size: 1.1rem;">Ada <?php echo e($pendingPengajuan); ?> pengajuan kepulangan dari mobile yang menunggu review!</strong>
+            <p style="margin: 5px 0 0 0; opacity: 0.8;">Klik tombol di bawah untuk melihat dan meninjau pengajuan.</p>
+        </div>
+        <a href="<?php echo e(route('admin.kepulangan.pengajuan')); ?>" class="btn btn-dark" style="white-space: nowrap;">
+            <i class="fas fa-mobile-alt"></i> Lihat Pengajuan
+        </a>
+    </div>
+<?php endif; ?>
+
+
 <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; align-items: center;">
         <div>
@@ -89,6 +107,17 @@
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
             <a href="<?php echo e(route('admin.kepulangan.create')); ?>" class="btn btn-primary">
                 <i class="fas fa-plus"></i> Tambah Izin Kepulangan
+            </a>
+            
+            
+            <a href="<?php echo e(route('admin.kepulangan.pengajuan')); ?>" class="btn btn-warning">
+                <i class="fas fa-mobile-alt"></i> Pengajuan izin
+                <?php if($pendingPengajuan > 0): ?>
+                    <span class="badge" style="background: #dc3545; color: white; margin-left: 5px; padding: 3px 8px; border-radius: 10px; font-size: 0.75rem;">
+                        <?php echo e($pendingPengajuan); ?>
+
+                    </span>
+                <?php endif; ?>
             </a>
         </div>
     </div>
@@ -215,7 +244,11 @@
                                     <?php echo e($kuotaSantri['total_terpakai']); ?> / <?php echo e($kuotaSantri['kuota_maksimal']); ?> hari
                                 </span>
                                 <div style="margin-top: 5px; font-size: 0.75rem; color: #7F8C8D;">
-                                    Sisa: <?php echo e($kuotaSantri['sisa_kuota']); ?> hari (<?php echo e($kuotaSantri['persentase']); ?>%)
+                                    <?php if($kuotaSantri['status'] === 'melebihi'): ?>
+                                        <strong style="color: #dc3545;">OVER LIMIT</strong>
+                                    <?php else: ?>
+                                        Sisa: <?php echo e($kuotaSantri['sisa_kuota']); ?> hari (<?php echo e($kuotaSantri['persentase']); ?>%)
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </td>
@@ -275,13 +308,13 @@
                                     </a>
                                     <button type="button" 
                                             class="btn btn-sm btn-success" 
-                                            onclick="completeKepulangan('<?php echo e($item->id_kepulangan); ?>')"
+                                            onclick="completeKepulangan('<?php echo e($item->id_kepulangan); ?>', '<?php echo e($item->santri->nama_lengkap); ?>', '<?php echo e($item->tanggal_pulang->format('Y-m-d')); ?>', '<?php echo e($item->tanggal_kembali->format('Y-m-d')); ?>', <?php echo e($item->durasi_izin); ?>)"
                                             title="Selesaikan">
                                         <i class="fas fa-check-double"></i>
                                     </button>
                                 <?php endif; ?>
                                 
-                                <?php if(in_array($item->status, ['Menunggu', 'Ditolak'])): ?>
+                                <?php if(in_array($item->status, ['Menunggu', 'Ditolak', 'Selesai'])): ?>
                                     <button type="button" 
                                             class="btn btn-sm btn-danger" 
                                             onclick="deleteKepulangan('<?php echo e($item->id_kepulangan); ?>')"
@@ -344,6 +377,7 @@
     </div>
 </div>
 
+
 <div class="modal fade" id="rejectModal" tabindex="-1" style="display: none;">
     <div class="modal-dialog">
         <div class="modal-content" style="background: white; border-radius: 12px; padding: 20px;">
@@ -368,6 +402,7 @@
     </div>
 </div>
 
+
 <div class="modal fade" id="deleteModal" tabindex="-1" style="display: none;">
     <div class="modal-dialog">
         <div class="modal-content" style="background: white; border-radius: 12px; padding: 20px;">
@@ -382,6 +417,58 @@
                     <i class="fas fa-trash"></i> Hapus
                 </button>
             </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="completeModal" tabindex="-1" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content" style="background: white; border-radius: 12px; padding: 20px;">
+            <form id="completeForm">
+                <?php echo csrf_field(); ?>
+                <div style="margin-bottom: 20px;">
+                    <h3 style="margin: 0; color: #2C3E50;">
+                        <i class="fas fa-check-circle" style="color: #28a745;"></i> 
+                        Selesaikan Kepulangan
+                    </h3>
+                </div>
+                
+                <div style="background: #E8F7F2; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #6FBA9D;">
+                    <p style="margin: 5px 0;"><strong>ID Kepulangan:</strong> <span id="completeIdKepulangan"></span></p>
+                    <p style="margin: 5px 0;"><strong>Santri:</strong> <span id="completeNamaSantri"></span></p>
+                    <p style="margin: 5px 0;"><strong>Tanggal Pulang:</strong> <span id="completeTanggalPulang"></span></p>
+                    <p style="margin: 5px 0;"><strong>Rencana Kembali:</strong> <span id="completeTanggalKembaliRencana"></span></p>
+                    <p style="margin: 5px 0;"><strong>Durasi Rencana:</strong> <span id="completeDurasiRencana"></span> hari</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="tanggal_kembali_aktual">
+                        <i class="fas fa-calendar-check"></i> 
+                        Tanggal Kembali Aktual <span style="color: #dc3545;">*</span>
+                    </label>
+                    <input type="date" 
+                           name="tanggal_kembali_aktual" 
+                           id="tanggal_kembali_aktual" 
+                           class="form-control" 
+                           required>
+                    <small style="color: #7F8C8D; margin-top: 5px; display: block;">
+                        Masukkan tanggal santri kembali ke pesantren. Jika pulang lebih cepat, kuota akan disesuaikan otomatis.
+                    </small>
+                </div>
+
+                <div id="durasiAktualInfo" style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #007bff; display: none;">
+                    <p style="margin: 0;"><strong>Durasi Aktual:</strong> <span id="durasiAktual" style="font-weight: 600; color: #007bff;">-</span> hari</p>
+                    <p style="margin: 5px 0 0 0; font-size: 0.9rem; color: #7F8C8D;" id="selisihInfo"></p>
+                </div>
+
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('completeModal')">Batal</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-check"></i> Selesaikan
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -483,24 +570,121 @@ document.getElementById('rejectForm').addEventListener('submit', function(e) {
     });
 });
 
-// Complete
-function completeKepulangan(id) {
-    if (confirm('Apakah Anda yakin ingin menandai kepulangan ini sebagai selesai?')) {
-        fetch(`/admin/kepulangan/${id}/complete`, {
-            method: 'POST',
-            headers: { 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>' }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showAlert('success', data.message);
-                setTimeout(() => window.location.reload(), 1000);
-            } else {
-                showAlert('danger', data.message);
-            }
-        })
-        .catch(error => showAlert('danger', 'Error: ' + error.message));
+// Complete (Selesaikan Kepulangan)
+let currentCompleteData = {};
+
+function completeKepulangan(id, namaSantri, tanggalPulang, tanggalKembaliRencana, durasiRencana) {
+    currentCompleteData = {
+        id: id,
+        namaSantri: namaSantri,
+        tanggalPulang: tanggalPulang,
+        tanggalKembaliRencana: tanggalKembaliRencana,
+        durasiRencana: durasiRencana
+    };
+    
+    // Populate modal
+    document.getElementById('completeIdKepulangan').textContent = id;
+    document.getElementById('completeNamaSantri').textContent = namaSantri;
+    document.getElementById('completeTanggalPulang').textContent = formatTanggal(tanggalPulang);
+    document.getElementById('completeTanggalKembaliRencana').textContent = formatTanggal(tanggalKembaliRencana);
+    document.getElementById('completeDurasiRencana').textContent = durasiRencana;
+    
+    // Set default tanggal kembali aktual = hari ini
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('tanggal_kembali_aktual').value = today;
+    document.getElementById('tanggal_kembali_aktual').min = tanggalPulang;
+    
+    // Hitung durasi aktual
+    calculateDurasiAktual();
+    
+    // Show modal
+    document.getElementById('completeModal').style.display = 'flex';
+}
+
+// Calculate durasi aktual
+function calculateDurasiAktual() {
+    const tanggalPulang = currentCompleteData.tanggalPulang;
+    const tanggalKembaliAktual = document.getElementById('tanggal_kembali_aktual').value;
+    
+    if (!tanggalKembaliAktual) return;
+    
+    const startDate = new Date(tanggalPulang);
+    const endDate = new Date(tanggalKembaliAktual);
+    
+    if (endDate < startDate) {
+        document.getElementById('durasiAktualInfo').style.display = 'none';
+        return;
     }
+    
+    const diffTime = Math.abs(endDate - startDate);
+    const durasiAktual = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+    const durasiRencana = currentCompleteData.durasiRencana;
+    
+    document.getElementById('durasiAktual').textContent = durasiAktual;
+    document.getElementById('durasiAktualInfo').style.display = 'block';
+    
+    // Show selisih
+    let selisihText = '';
+    let selisihColor = '#007bff';
+    
+    if (durasiAktual < durasiRencana) {
+        const selisih = durasiRencana - durasiAktual;
+        selisihText = `✅ Santri pulang ${selisih} hari lebih cepat dari rencana. Kuota akan berkurang ${durasiAktual} hari.`;
+        selisihColor = '#28a745';
+    } else if (durasiAktual > durasiRencana) {
+        const selisih = durasiAktual - durasiRencana;
+        selisihText = `⚠️ Santri pulang ${selisih} hari lebih lambat dari rencana. Kuota akan bertambah ${selisih} hari.`;
+        selisihColor = '#ffc107';
+    } else {
+        selisihText = `✓ Sesuai rencana (${durasiAktual} hari).`;
+        selisihColor = '#007bff';
+    }
+    
+    const selisihInfo = document.getElementById('selisihInfo');
+    selisihInfo.textContent = selisihText;
+    selisihInfo.style.color = selisihColor;
+    document.getElementById('durasiAktual').style.color = selisihColor;
+}
+
+// Event listener untuk tanggal kembali aktual
+document.getElementById('tanggal_kembali_aktual')?.addEventListener('change', calculateDurasiAktual);
+
+// Submit form complete
+document.getElementById('completeForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+    
+    fetch(`/admin/kepulangan/${currentCompleteData.id}/complete`, {
+        method: 'POST',
+        body: formData,
+        headers: { 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            closeModal('completeModal');
+            showAlert('success', data.message);
+            setTimeout(() => window.location.reload(), 1500);
+        } else {
+            showAlert('danger', data.message);
+        }
+    })
+    .catch(error => showAlert('danger', 'Error: ' + error.message))
+    .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+    });
+});
+
+// Helper: Format tanggal
+function formatTanggal(dateString) {
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString('id-ID', options);
 }
 
 // Delete

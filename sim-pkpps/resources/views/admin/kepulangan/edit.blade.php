@@ -78,7 +78,7 @@
                       id="alasan" 
                       class="form-control" 
                       rows="4" 
-                      placeholder="Jelaskan alasan kepulangan secara detail (minimal 10 karakter)"
+                      placeholder="Jelaskan alasan kepulangan"
                       required>{{ old('alasan', $kepulangan->alasan) }}</textarea>
             <small style="color: #7F8C8D; margin-top: 5px; display: block;">
                 <span id="charCount">{{ strlen(old('alasan', $kepulangan->alasan)) }}</span>/500 karakter
@@ -123,7 +123,7 @@ function calculateDurasi() {
     document.getElementById('durasiHari').style.color = textColor;
 }
 
-// Character counter
+// Character counter (PERBAIKAN: Tidak ada validasi minimal)
 document.getElementById('alasan').addEventListener('input', function() {
     const current = this.value.length;
     const counter = document.getElementById('charCount');
@@ -131,10 +131,8 @@ document.getElementById('alasan').addEventListener('input', function() {
     
     if (current > 500) {
         counter.style.color = 'red';
-    } else if (current < 10) {
-        counter.style.color = 'orange';
     } else {
-        counter.style.color = 'green';
+        counter.style.color = '#7F8C8D';
     }
 });
 

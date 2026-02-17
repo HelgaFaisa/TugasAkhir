@@ -18,14 +18,13 @@ class Santri extends Model
         'nis',
         'nama_lengkap',
         'jenis_kelamin',
-        'kelas',
         'status',
         'alamat_santri',
         'daerah_asal',
         'nama_orang_tua',
         'nomor_hp_ortu',
         'rfid_uid',
-        'foto', // TAMBAHAN BARU
+        'foto',
     ];
 
     /**
@@ -62,6 +61,15 @@ class Santri extends Model
     }
 
     /**
+     * Relasi: Santri memiliki satu akun Wali (orang tua)
+     */
+    public function waliUser()
+    {
+        return $this->hasOne(User::class, 'role_id', 'id_santri')
+                    ->where('role', 'wali');
+    }
+
+    /**
      * Relasi: Santri memiliki banyak data kesehatan
      */
     public function kesehatanSantri()
@@ -95,16 +103,6 @@ class Santri extends Model
                     ->where('status', 'Disetujui')
                     ->whereDate('tanggal_pulang', '<=', now())
                     ->whereDate('tanggal_kembali', '>=', now());
-    }
-
-    /**
-     * Relasi: Santri memiliki banyak berita (Many-to-Many)
-     */
-    public function berita()
-    {
-        return $this->belongsToMany(Berita::class, 'berita_santri', 'id_santri', 'id_berita', 'id_santri', 'id_berita')
-                    ->withPivot('sudah_dibaca', 'tanggal_baca')
-                    ->withTimestamps();
     }
 
     /**
@@ -159,17 +157,11 @@ class Santri extends Model
     }
 
     /**
-     * Accessor untuk mendapatkan nama kelas lengkap
+     * Accessor: Nama kelompok kelas
      */
-    public function getKelasLengkapAttribute()
+    public function getKelompokNameAttribute()
     {
-        $kelasMap = [
-            'PB' => 'Pembinaan (PB)',
-            'Lambatan' => 'Lambatan',
-            'Cepatan' => 'Cepatan',
-        ];
-
-        return $kelasMap[$this->kelas] ?? $this->kelas;
+        return $this->kelasPrimary?->kelas?->kelompok?->nama_kelompok ?? '-';
     }
 
     /**
@@ -180,6 +172,7 @@ class Santri extends Model
         $badges = [
             'Aktif' => '<span class="badge badge-success"><i class="fas fa-check-circle"></i> Aktif</span>',
             'Lulus' => '<span class="badge badge-info"><i class="fas fa-graduation-cap"></i> Lulus</span>',
+            'Khatam' => '<span class="badge badge-primary"><i class="fas fa-award"></i> Khatam</span>',
             'Tidak Aktif' => '<span class="badge badge-secondary"><i class="fas fa-times-circle"></i> Tidak Aktif</span>',
         ];
 
@@ -289,11 +282,60 @@ class Santri extends Model
     }
 
     /**
-     * Scope untuk filter berdasarkan kelas
+     * Scope untuk filter berdasarkan kelas (santri yang punya kelas ini)
      */
-    public function scopeKelas($query, $kelas)
+    public function scopeKelas($query, $idKelas)
     {
-        return $query->where('kelas', $kelas);
+        return $query->whereHas('kelasSantri', function($q) use ($idKelas) {
+            $q->where('id_kelas', $idKelas);
+        });
+    }
+
+    /**
+     * Scope untuk filter berdasarkan kelompok kelas
+     */
+    public function scopeKelompok($query, $idKelompok)
+    {
+        return $query->whereHas('kelasSantri', function($q) use ($idKelompok) {
+            $q->whereHas('kelas', function($q2) use ($idKelompok) {
+                $q2->where('id_kelompok', $idKelompok);
+            });
+        });
+    }
+
+    /**
+     * Scope: Filter santri by kelas name (via relational system)
+     * Replaces old Santri::where('kelas', $name) queries
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string $namaKelas - Nama kelas (e.g., 'PB', 'Lambatan', 'Cepatan')
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeKelasByName($query, $namaKelas)
+    {
+        return $query->whereHas('kelasSantri', function($q) use ($namaKelas) {
+            $q->whereHas('kelas', function($q2) use ($namaKelas) {
+                $q2->where('nama_kelas', $namaKelas);
+            });
+        });
+    }
+
+    /**
+     * Scope: Filter santri by PRIMARY kelas name only
+     * Used in dashboard/capaian where only primary class matters
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string $namaKelas - Nama kelas (e.g., 'PB', 'Lambatan', 'SMA 12')
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopePrimaryKelasByName($query, $namaKelas)
+    {
+        return $query->whereHas('kelasSantri', function($q) use ($namaKelas) {
+            $q->where('is_primary', true)
+              ->whereHas('kelas', function($q2) use ($namaKelas) {
+                  $q2->where('nama_kelas', $namaKelas);
+              });
+        });
     }
 
     /**
@@ -316,11 +358,167 @@ class Santri extends Model
         return $this->hasMany(Capaian::class, 'id_santri', 'id_santri');
     }
 
+    // ==========================================
+    // RELASI SISTEM KELAS BARU
+    // ==========================================
+
+    /**
+     * Relasi: Santri memiliki banyak record kelas (hasMany ke santri_kelas)
+     */
+    public function kelasSantri()
+    {
+        return $this->hasMany(SantriKelas::class, 'id_santri', 'id_santri');
+    }
+
+    /**
+     * Relasi: Santri memiliki satu kelas primary (hasOne ke santri_kelas dengan is_primary = true)
+     */
+    public function kelasPrimary()
+    {
+        return $this->hasOne(SantriKelas::class, 'id_santri', 'id_santri')
+                    ->where('is_primary', true)
+                    ->with('kelas');
+    }
+
+    /**
+     * Relasi: Santri belongs to many Kelas (many-to-many through santri_kelas)
+     */
+    public function kelasMany()
+    {
+        return $this->belongsToMany(Kelas::class, 'santri_kelas', 'id_santri', 'id_kelas', 'id_santri', 'id')
+                    ->withPivot('tahun_ajaran', 'is_primary')
+                    ->withTimestamps();
+    }
+
     /**
      * Get rata-rata capaian per semester
      */
     public function getRataRataCapaianAttribute()
     {
         return $this->capaian()->avg('persentase') ?? 0;
+    }
+
+    // ==========================================
+    // ACCESSOR SISTEM KELAS BARU
+    // ==========================================
+
+    /**
+     * Accessor: Get kelas name (primary atau pertama)
+     *
+     * @return string
+     */
+    public function getKelasNameAttribute()
+    {
+        $primary = $this->kelasPrimary;
+        if ($primary && $primary->kelas) {
+            return $primary->kelas->nama_kelas;
+        }
+
+        // Fallback ke kelas pertama jika tidak ada primary
+        $first = $this->kelasSantri->first();
+        return $first && $first->kelas ? $first->kelas->nama_kelas : 'Belum Ada Kelas';
+    }
+
+    /**
+     * Accessor: Backward compatible kelas accessor (replaces dropped column)
+     * Returns primary kelas name for seamless migration from old system
+     *
+     * @return string
+     */
+    public function getKelasAttribute()
+    {
+        return $this->kelas_name;
+    }
+
+    /**
+     * Accessor: Get semua kelas sebagai string (untuk display ringkas)
+     *
+     * @return string
+     */
+    public function getKelasListStringAttribute()
+    {
+        $items = $this->kelasSantri
+            ->filter(fn($sk) => $sk->kelas && $sk->kelas->kelompok)
+            ->map(fn($sk) => $sk->kelas->kelompok->nama_kelompok . ': ' . $sk->kelas->nama_kelas);
+
+        return $items->isNotEmpty() ? $items->implode(', ') : 'Belum Ada Kelas';
+    }
+
+    /**
+     * Accessor: Get kelas ID dari sistem baru (primary class ID)
+     *
+     * @return int|null
+     */
+    public function getPrimaryKelasIdAttribute()
+    {
+        $kelasPrimary = $this->kelasPrimary;
+        return $kelasPrimary ? $kelasPrimary->id_kelas : null;
+    }
+
+    // ==========================================
+    // HELPER METHODS SISTEM KELAS BARU
+    // ==========================================
+
+    /**
+     * Check apakah santri ada di kelas tertentu
+     *
+     * @param int $id_kelas
+     * @return bool
+     */
+    public function hasKelas($id_kelas)
+    {
+        return $this->kelasMany()->where('kelas.id', $id_kelas)->exists();
+    }
+
+    /**
+     * Get all kelas santri untuk tahun ajaran tertentu
+     *
+     * @param string|null $tahun_ajaran - Format: 2024/2025, null untuk tahun ajaran saat ini
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getKelasByTahun($tahun_ajaran = null)
+    {
+        if ($tahun_ajaran === null) {
+            $tahun_ajaran = SantriKelas::getCurrentAcademicYear();
+        }
+        
+        return $this->kelasSantri()
+                    ->with('kelas.kelompok')
+                    ->where('tahun_ajaran', $tahun_ajaran)
+                    ->get();
+    }
+
+    /**
+     * Assign santri ke kelas baru
+     *
+     * @param int $id_kelas
+     * @param string|null $tahun_ajaran - Format: 2024/2025, null untuk tahun ajaran saat ini
+     * @param bool $is_primary - Set sebagai kelas utama
+     * @return \App\Models\SantriKelas
+     */
+    public function assignKelas($id_kelas, $tahun_ajaran = null, $is_primary = false)
+    {
+        if ($tahun_ajaran === null) {
+            $tahun_ajaran = SantriKelas::getCurrentAcademicYear();
+        }
+        
+        // Jika set as primary, unset kelas primary lainnya di tahun ajaran yang sama
+        if ($is_primary) {
+            $this->kelasSantri()
+                 ->where('tahun_ajaran', $tahun_ajaran)
+                 ->update(['is_primary' => false]);
+        }
+        
+        // Create or update santri_kelas
+        return SantriKelas::updateOrCreate(
+            [
+                'id_santri' => $this->id_santri,
+                'id_kelas' => $id_kelas,
+                'tahun_ajaran' => $tahun_ajaran,
+            ],
+            [
+                'is_primary' => $is_primary,
+            ]
+        );
     }
 }

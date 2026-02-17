@@ -74,7 +74,7 @@ class DashboardController extends Controller
             // ✅ Ambil semester aktif dengan FALLBACK
             $semesterAktif = null;
             try {
-                $semesterAktif = Semester::where('status', 'aktif')
+                $semesterAktif = Semester::aktif()
                     ->select('id_semester', 'nama_semester', 'tahun_ajaran')
                     ->first();
                 

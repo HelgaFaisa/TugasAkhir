@@ -244,37 +244,17 @@ let halamanMulai = 0;
 let halamanAkhir = 0;
 let selectedPages = new Set();
 
-// Switch metode input
-function switchMetode(metode) {
-    currentMetode = metode;
-    
-    // Hide all metode
-    document.querySelectorAll('.metode-input').forEach(el => el.style.display = 'none');
-    
-    // Show selected metode
-    document.getElementById('metode' + metode).style.display = 'block';
-    
-    // Update button styles
-    for (let i = 1; i <= 3; i++) {
-        const btn = document.getElementById('btnMetode' + i);
-        if (i === metode) {
-            btn.classList.remove('btn-secondary');
-            btn.classList.add('btn-primary');
-        } else {
-            btn.classList.remove('btn-primary');
-            btn.classList.add('btn-secondary');
-        }
+// Initialize on page load - check for pre-selected santri
+document.addEventListener('DOMContentLoaded', function() {
+    const santriSelect = document.getElementById('id_santri');
+    if (santriSelect.value) {
+        // Trigger the materi loading for pre-selected santri
+        loadMateriForSantri(santriSelect.value, santriSelect.options[santriSelect.selectedIndex].dataset.kelas);
     }
-    
-    // Sync input
-    syncInputBetweenMetodes();
-}
+});
 
-// Load materi saat santri dipilih
-document.getElementById('id_santri').addEventListener('change', function() {
-    const idSantri = this.value;
-    const kelasSantri = this.options[this.selectedIndex].dataset.kelas;
-    
+// Function to load materi (can be reused)
+function loadMateriForSantri(idSantri, kelasSantri) {
     if (!idSantri) {
         document.getElementById('kelasDisplay').style.display = 'none';
         document.getElementById('id_materi').disabled = true;
@@ -313,6 +293,39 @@ document.getElementById('id_santri').addEventListener('change', function() {
         selectMateri.disabled = false;
     })
     .catch(error => console.error('Error:', error));
+}
+
+// Switch metode input
+function switchMetode(metode) {
+    currentMetode = metode;
+    
+    // Hide all metode
+    document.querySelectorAll('.metode-input').forEach(el => el.style.display = 'none');
+    
+    // Show selected metode
+    document.getElementById('metode' + metode).style.display = 'block';
+    
+    // Update button styles
+    for (let i = 1; i <= 3; i++) {
+        const btn = document.getElementById('btnMetode' + i);
+        if (i === metode) {
+            btn.classList.remove('btn-secondary');
+            btn.classList.add('btn-primary');
+        } else {
+            btn.classList.remove('btn-primary');
+            btn.classList.add('btn-secondary');
+        }
+    }
+    
+    // Sync input
+    syncInputBetweenMetodes();
+}
+
+// Load materi saat santri dipilih
+document.getElementById('id_santri').addEventListener('change', function() {
+    const idSantri = this.value;
+    const kelasSantri = this.options[this.selectedIndex].dataset.kelas;
+    loadMateriForSantri(idSantri, kelasSantri);
 });
 
 // Load detail materi saat materi dipilih
@@ -350,6 +363,11 @@ document.getElementById('id_materi').addEventListener('change', function() {
     document.getElementById('quickInputValue').placeholder = totalHalaman;
     
     // Check existing capaian
+    checkExistingCapaian();
+});
+
+// Check existing capaian juga saat semester berubah
+document.getElementById('id_semester').addEventListener('change', function() {
     checkExistingCapaian();
 });
 
@@ -583,10 +601,49 @@ function checkExistingCapaian() {
     })
     .then(response => response.json())
     .then(data => {
-        if (data.existing_capaian) {
-            const confirm = window.confirm('Capaian untuk santri, materi, dan semester ini sudah ada. Apakah Anda ingin edit data yang ada?');
-            if (confirm) {
-                window.location.href = `/admin/capaian/${data.existing_capaian.id_capaian}/edit`;
+        if (data.existing_capaian && data.existing_capaian.halaman_selesai) {
+            // Tampilkan info bahwa data akan di-update
+            const infoBox = document.createElement('div');
+            infoBox.className = 'alert alert-info';
+            infoBox.style.cssText = 'margin: 15px 0; padding: 15px; background: #e3f2fd; border-left: 4px solid #2196F3; border-radius: 4px;';
+            infoBox.innerHTML = `
+                <i class="fas fa-info-circle"></i> 
+                <strong>Data Existing Ditemukan!</strong><br>
+                Capaian untuk santri dan materi ini sudah ada. 
+                Data sebelumnya akan dimuat ke form. Saat submit, data akan di-update otomatis.
+            `;
+            
+            // Insert info box sebelum form
+            const formElement = document.getElementById('formCapaian');
+            if (!document.querySelector('.alert-info')) {
+                formElement.insertBefore(infoBox, formElement.firstChild);
+            }
+            
+            // Load data existing ke form
+            const halamanSelesai = data.existing_capaian.halaman_selesai;
+            document.getElementById('halaman_selesai').value = halamanSelesai;
+            
+            // Parse dan load ke selected pages
+            if (halamanSelesai) {
+                selectedPages = parseRangeString(halamanSelesai);
+                updateGridDisplay();
+                updatePreview();
+            }
+            
+            // Load catatan jika ada
+            if (data.existing_capaian.catatan) {
+                document.getElementById('catatan').value = data.existing_capaian.catatan;
+            }
+            
+            // Load tanggal input
+            if (data.existing_capaian.tanggal_input) {
+                document.getElementById('tanggal_input').value = data.existing_capaian.tanggal_input;
+            }
+        } else {
+            // Hapus info box jika tidak ada data existing
+            const existingAlert = document.querySelector('.alert-info');
+            if (existingAlert) {
+                existingAlert.remove();
             }
         }
     })

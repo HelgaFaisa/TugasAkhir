@@ -18,7 +18,10 @@
                 <strong>Kelas:</strong> <span class="badge badge-secondary">{{ $santri->kelas }}</span>
             </p>
         </div>
-        <div style="text-align: right;">
+        <div style="text-align: right; display: flex; gap: 10px; justify-content: flex-end;">
+            <a href="{{ route('admin.capaian.index') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Kembali ke Data Capaian
+            </a>
             <a href="{{ route('admin.santri.show', $santri) }}" class="btn btn-info">
                 <i class="fas fa-user"></i> Profil Santri
             </a>
@@ -66,11 +69,14 @@
             @endforeach
         </select>
 
+        <input type="text" name="search" class="form-control" placeholder="Cari nama materi..." 
+               value="{{ request('search') }}" style="width: 300px;">
+
         <button type="submit" class="btn btn-primary">
-            <i class="fas fa-filter"></i> Filter
+            <i class="fas fa-search"></i> Filter
         </button>
 
-        @if(request()->filled('id_semester'))
+        @if(request()->filled('id_semester') || request()->filled('search'))
             <a href="{{ route('admin.capaian.riwayat-santri', $santri->id_santri) }}" class="btn btn-secondary">
                 <i class="fas fa-redo"></i> Reset
             </a>

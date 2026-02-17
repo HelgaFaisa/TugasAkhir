@@ -41,9 +41,9 @@
     </div>
     
     <div class="card card-secondary">
-        <h3>Target Tertentu</h3>
-        <div class="card-value">{{ $beritaTertentu }}</div>
-        <i class="fas fa-users card-icon"></i>
+        <h3>Kelas Tertentu</h3>
+        <div class="card-value">{{ $beritaKelas }}</div>
+        <i class="fas fa-graduation-cap card-icon"></i>
     </div>
 </div>
 
@@ -114,7 +114,7 @@
             
             @php
                 $semuaPercent = round(($beritaSemua / $totalForPercentage) * 100, 1);
-                $tertentuPercent = round(($beritaTertentu / $totalForPercentage) * 100, 1);
+                $kelasPercent = round(($beritaKelas / $totalForPercentage) * 100, 1);
             @endphp
             
             <!-- Semua Santri -->
@@ -135,21 +135,21 @@
                 </small>
             </div>
             
-            <!-- Santri Tertentu -->
+            <!-- Kelas Tertentu -->
             <div>
                 <div style="display: flex; justify-content: space-between; margin-bottom: 8px; align-items: center;">
                     <span style="font-weight: 600; color: var(--text-color);">
-                        <i class="fas fa-users" style="color: var(--secondary-color);"></i> Target Tertentu
+                        <i class="fas fa-graduation-cap" style="color: var(--secondary-color);"></i> Kelas Tertentu
                     </span>
                     <span style="font-weight: 700; color: var(--secondary-color); font-size: 1.1em;">
-                        {{ $tertentuPercent }}%
+                        {{ $kelasPercent }}%
                     </span>
                 </div>
                 <div style="background-color: #FFE8EA; border-radius: 20px; height: 12px; overflow: hidden;">
-                    <div style="background: linear-gradient(90deg, var(--secondary-color), #FF6B7A); width: {{ $tertentuPercent }}%; height: 100%; border-radius: 20px; transition: width 0.5s ease;"></div>
+                    <div style="background: linear-gradient(90deg, var(--secondary-color), #FF6B7A); width: {{ $kelasPercent }}%; height: 100%; border-radius: 20px; transition: width 0.5s ease;"></div>
                 </div>
                 <small style="color: var(--text-light); margin-top: 5px; display: block;">
-                    {{ $beritaTertentu }} dari {{ $totalBerita }} berita
+                    {{ $beritaKelas }} dari {{ $totalBerita }} berita
                 </small>
             </div>
         </div>
@@ -176,8 +176,8 @@
             <i class="fas fa-eye"></i> Lihat Published ({{ $totalPublished }})
         </a>
         
-        <a href="{{ route('admin.berita.index') }}?target=santri_tertentu" class="btn btn-secondary">
-            <i class="fas fa-users"></i> Berita Target Tertentu ({{ $beritaTertentu }})
+        <a href="{{ route('admin.berita.index') }}?target=kelas_tertentu" class="btn btn-secondary">
+            <i class="fas fa-graduation-cap"></i> Berita Kelas Tertentu ({{ $beritaKelas }})
         </a>
     </div>
 </div>

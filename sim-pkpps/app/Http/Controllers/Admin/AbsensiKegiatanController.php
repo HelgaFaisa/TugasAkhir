@@ -16,16 +16,45 @@ class AbsensiKegiatanController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Kegiatan::with('kategori');
+        // Query dengan eager loading untuk optimasi
+        $query = Kegiatan::with(['kategori', 'kelasKegiatan'])
+            ->select('id', 'kegiatan_id', 'kategori_id', 'nama_kegiatan', 'hari', 'waktu_mulai', 'waktu_selesai');
 
+        // Filter Hari
         if ($request->filled('hari')) {
             $query->where('hari', $request->hari);
         }
 
-        $kegiatans = $query->orderBy('hari')->orderBy('waktu_mulai')->paginate(10);
-        $hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Ahad'];
+        // Filter Kategori
+        if ($request->filled('kategori_id')) {
+            $query->where('kategori_id', $request->kategori_id);
+        }
 
-        return view('admin.kegiatan.absensi.index', compact('kegiatans', 'hariList'));
+        // Filter Kelas
+        if ($request->filled('id_kelas')) {
+            $query->whereHas('kelasKegiatan', function($q) use ($request) {
+                $q->where('kelas.id', $request->id_kelas);
+            });
+        }
+
+        // Search
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('nama_kegiatan', 'like', "%{$search}%")
+                  ->orWhere('kegiatan_id', 'like', "%{$search}%");
+            });
+        }
+
+        // Pagination dengan 15 item per page
+        $kegiatans = $query->orderBy('hari')->orderBy('waktu_mulai')->paginate(15)->appends(request()->query());
+        
+        // Data untuk filter
+        $hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Ahad'];
+        $kategoris = \App\Models\KategoriKegiatan::select('kategori_id', 'nama_kategori')->get();
+        $kelasList = \App\Models\Kelas::with('kelompok')->orderBy('urutan')->get();
+
+        return view('admin.kegiatan.absensi.index', compact('kegiatans', 'hariList', 'kategoris', 'kelasList'));
     }
 
     /**
@@ -33,14 +62,43 @@ class AbsensiKegiatanController extends Controller
      */
     public function inputAbsensi($kegiatan_id)
     {
-        $kegiatan = Kegiatan::with('kategori')->where('kegiatan_id', $kegiatan_id)->firstOrFail();
+        // Get kegiatan dengan relasi kategori dan kelas
+        $kegiatan = Kegiatan::with(['kategori', 'kelasKegiatan'])
+            ->where('kegiatan_id', $kegiatan_id)
+            ->firstOrFail();
+            
         $tanggal = request('tanggal', now()->format('Y-m-d'));
         
-        // Ambil semua santri aktif
-        $santris = Santri::where('status', 'Aktif')
-            ->select('id', 'id_santri', 'nama_lengkap', 'kelas', 'rfid_uid')
-            ->orderBy('nama_lengkap')
-            ->get();
+        // Get santri sesuai kelas kegiatan
+        if ($kegiatan->isForAllClasses()) {
+            // Kegiatan umum: ambil SEMUA santri aktif
+            $santris = Santri::where('status', 'Aktif')
+                ->with('kelasSantri.kelas')
+                ->orderBy('nama_lengkap')
+                ->get();
+        } else {
+            // Kegiatan khusus: ambil santri yang kelasnya match
+            $kelasIds = $kegiatan->kelasKegiatan->pluck('id')->toArray();
+            
+            // Coba ambil santri dari sistem kelas baru
+            $santris = Santri::where('status', 'Aktif')
+                ->whereHas('kelasSantri', function($query) use ($kelasIds) {
+                    $query->whereIn('id_kelas', $kelasIds);
+                })
+                ->with('kelasSantri.kelas')
+                ->orderBy('nama_lengkap')
+                ->get();
+            
+            // Fallback: Jika tidak ada santri (belum migrasi), gunakan old column kelas
+            if ($santris->isEmpty()) {
+                $kelasNames = $kegiatan->kelasKegiatan->pluck('nama_kelas')->toArray();
+                $santris = Santri::where('status', 'Aktif')
+                    ->whereIn('kelas', $kelasNames)
+                    ->with('kelasSantri.kelas')
+                    ->orderBy('nama_lengkap')
+                    ->get();
+            }
+        }
 
         // Ambil data absensi yang sudah ada
         $absensiData = AbsensiKegiatan::where('kegiatan_id', $kegiatan_id)
@@ -48,7 +106,14 @@ class AbsensiKegiatanController extends Controller
             ->pluck('status', 'id_santri')
             ->toArray();
 
-        return view('admin.kegiatan.absensi.input', compact('kegiatan', 'santris', 'absensiData', 'tanggal'));
+        // Info kelas kegiatan untuk view
+        $kegiatanInfo = [
+            'is_umum' => $kegiatan->isForAllClasses(),
+            'kelas_list' => $kegiatan->kelasKegiatan->pluck('nama_kelas')->implode(', '),
+            'jumlah_kelas' => $kegiatan->kelasKegiatan->count(),
+        ];
+
+        return view('admin.kegiatan.absensi.input', compact('kegiatan', 'santris', 'absensiData', 'tanggal', 'kegiatanInfo'));
     }
 
     /**
@@ -94,7 +159,7 @@ class AbsensiKegiatanController extends Controller
      */
     public function rekapAbsensi(Request $request, $kegiatan_id)
     {
-        $kegiatan = Kegiatan::with('kategori')->where('kegiatan_id', $kegiatan_id)->firstOrFail();
+        $kegiatan = Kegiatan::with(['kategori', 'kelasKegiatan'])->where('kegiatan_id', $kegiatan_id)->firstOrFail();
         
         $query = AbsensiKegiatan::with('santri')
             ->where('kegiatan_id', $kegiatan_id);

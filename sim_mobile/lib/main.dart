@@ -7,6 +7,17 @@ import 'features/splash/splash_screen.dart';
 import 'features/auth/login_page.dart';
 import 'features/dashboard/dashboard_page.dart';
 import 'features/profil/profil_page.dart';
+import 'features/uang_saku/uang_saku_page.dart';
+import 'features/berita/berita_page.dart';
+import 'features/kesehatan/kesehatan_page.dart';
+import 'features/spp/spp_page.dart';
+import 'features/kepulangan/presentation/pages/kepulangan_page.dart';
+import 'features/kepulangan/presentation/pages/pengajuan_kepulangan_page.dart';
+import 'features/pelanggaran/pelanggaran_page.dart';
+import 'features/capaian/presentation/pages/capaian_page.dart';
+import 'features/absensi/pages/absensi_page.dart';
+import 'features/absensi/pages/detail_minggu_page.dart';
+import 'features/absensi/pages/riwayat_bulan_page.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,10 +59,7 @@ class MyApp extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
           ),
         ),
-        appBarTheme: const AppBarTheme(
-          centerTitle: true,
-          elevation: 0,
-        ),
+        appBarTheme: const AppBarTheme(centerTitle: true, elevation: 0),
       ),
       // 🔥 KUNCI SOLUSI: Wrap builder dengan AndroidFrameWrapper
       builder: (context, child) {
@@ -67,6 +75,17 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginPage(),
         '/dashboard': (context) => const DashboardPage(),
         '/profil': (context) => const ProfilPage(),
+        '/uang-saku': (context) => const UangSakuPage(),
+        '/berita': (context) => const BeritaPage(),
+        '/kesehatan': (context) => const KesehatanPage(),
+        '/spp': (context) => const SppPage(),
+        '/kepulangan': (context) => const KepulanganPage(),
+        '/kepulangan/pengajuan': (context) => const PengajuanKepulanganFormPage(),
+        '/pelanggaran': (context) => const PelanggaranPage(),
+        '/capaian': (context) => const CapaianPage(),
+        '/absensi': (context) => const AbsensiPage(),
+        '/absensi/detail-minggu': (context) => const DetailMingguPage(),
+        '/absensi/riwayat-bulan': (context) => const RiwayatBulanPage(),
       },
     );
   }

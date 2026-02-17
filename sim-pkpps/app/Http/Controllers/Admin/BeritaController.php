@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Berita;
-use App\Models\Santri;
+use App\Models\Kelas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -15,19 +15,16 @@ class BeritaController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Berita::query()->with('santriTertentu');
+        $query = Berita::query();
 
-        // Search
         if ($request->filled('search')) {
             $query->search($request->search);
         }
 
-        // Filter status
         if ($request->filled('status')) {
             $query->status($request->status);
         }
 
-        // Filter target
         if ($request->filled('target')) {
             $query->target($request->target);
         }
@@ -42,15 +39,9 @@ class BeritaController extends Controller
      */
     public function create()
     {
-        // Ambil data santri aktif - sesuaikan dengan kolom yang ada di model Santri
-        $santri = Santri::aktif()
-                       ->select('id_santri', 'nama_lengkap', 'kelas')
-                       ->orderBy('nama_lengkap')
-                       ->get();
-        
-        $kelasOptions = ['PB', 'Lambatan', 'Cepatan'];
+        $kelasOptions = Kelas::where('is_active', true)->ordered()->get();
 
-        return view('admin.berita.create', compact('santri', 'kelasOptions'));
+        return view('admin.berita.create', compact('kelasOptions'));
     }
 
     /**
@@ -64,11 +55,9 @@ class BeritaController extends Controller
             'penulis' => 'required|string|max:255',
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'status' => 'required|in:draft,published',
-            'target_berita' => 'required|in:semua,kelas_tertentu,santri_tertentu',
+            'target_berita' => 'required|in:semua,kelas_tertentu',
             'target_kelas' => 'nullable|array',
-            'target_kelas.*' => 'in:PB,Lambatan,Cepatan',
-            'santri_tertentu' => 'nullable|array',
-            'santri_tertentu.*' => 'exists:santris,id_santri',
+            'target_kelas.*' => 'exists:kelas,id',
         ], [
             'judul.required' => 'Judul berita wajib diisi',
             'konten.required' => 'Konten berita wajib diisi',
@@ -82,21 +71,14 @@ class BeritaController extends Controller
             $validated['gambar'] = $request->file('gambar')->store('berita', 'public');
         }
 
-        // Buat berita
-        $berita = Berita::create($validated);
-
-        // Attach santri jika target santri_tertentu
-        if ($validated['target_berita'] === 'santri_tertentu' && $request->filled('santri_tertentu')) {
-            $berita->santriTertentu()->attach($request->santri_tertentu);
-        }
-
-        // Attach santri berdasarkan kelas jika target kelas_tertentu
+        // Konversi target_kelas ke array integer jika kelas_tertentu
         if ($validated['target_berita'] === 'kelas_tertentu' && $request->filled('target_kelas')) {
-            $santriKelas = Santri::whereIn('kelas', $request->target_kelas)
-                                 ->where('status', 'Aktif')
-                                 ->pluck('id_santri');
-            $berita->santriTertentu()->attach($santriKelas);
+            $validated['target_kelas'] = array_map('intval', $request->target_kelas);
+        } else {
+            $validated['target_kelas'] = null;
         }
+
+        Berita::create($validated);
 
         return redirect()->route('admin.berita.index')
             ->with('success', 'Berita berhasil ditambahkan!');
@@ -107,7 +89,6 @@ class BeritaController extends Controller
      */
     public function show(Berita $berita)
     {
-        $berita->load('santriTertentu');
         return view('admin.berita.show', compact('berita'));
     }
 
@@ -116,19 +97,9 @@ class BeritaController extends Controller
      */
     public function edit(Berita $berita)
     {
-        $berita->load('santriTertentu');
-        
-        // Ambil data santri aktif - sesuaikan dengan kolom yang ada di model Santri
-        $santri = Santri::aktif()
-                       ->select('id_santri', 'nama_lengkap', 'kelas')
-                       ->orderBy('nama_lengkap')
-                       ->get();
-        
-        $kelasOptions = ['PB', 'Lambatan', 'Cepatan'];
-        
-        $selectedSantri = $berita->santriTertentu->pluck('id_santri')->toArray();
+        $kelasOptions = Kelas::where('is_active', true)->ordered()->get();
 
-        return view('admin.berita.edit', compact('berita', 'santri', 'kelasOptions', 'selectedSantri'));
+        return view('admin.berita.edit', compact('berita', 'kelasOptions'));
     }
 
     /**
@@ -142,36 +113,27 @@ class BeritaController extends Controller
             'penulis' => 'required|string|max:255',
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'status' => 'required|in:draft,published',
-            'target_berita' => 'required|in:semua,kelas_tertentu,santri_tertentu',
+            'target_berita' => 'required|in:semua,kelas_tertentu',
             'target_kelas' => 'nullable|array',
-            'target_kelas.*' => 'in:PB,Lambatan,Cepatan',
-            'santri_tertentu' => 'nullable|array',
-            'santri_tertentu.*' => 'exists:santris,id_santri',
+            'target_kelas.*' => 'exists:kelas,id',
         ]);
 
         // Upload gambar baru jika ada
         if ($request->hasFile('gambar')) {
-            // Hapus gambar lama
             if ($berita->gambar) {
                 Storage::disk('public')->delete($berita->gambar);
             }
             $validated['gambar'] = $request->file('gambar')->store('berita', 'public');
         }
 
-        // Update berita
-        $berita->update($validated);
-
-        // Sync santri
-        if ($validated['target_berita'] === 'santri_tertentu' && $request->filled('santri_tertentu')) {
-            $berita->santriTertentu()->sync($request->santri_tertentu);
-        } elseif ($validated['target_berita'] === 'kelas_tertentu' && $request->filled('target_kelas')) {
-            $santriKelas = Santri::whereIn('kelas', $request->target_kelas)
-                                 ->where('status', 'Aktif')
-                                 ->pluck('id_santri');
-            $berita->santriTertentu()->sync($santriKelas);
+        // Konversi target_kelas
+        if ($validated['target_berita'] === 'kelas_tertentu' && $request->filled('target_kelas')) {
+            $validated['target_kelas'] = array_map('intval', $request->target_kelas);
         } else {
-            $berita->santriTertentu()->detach();
+            $validated['target_kelas'] = null;
         }
+
+        $berita->update($validated);
 
         return redirect()->route('admin.berita.index')
             ->with('success', 'Berita berhasil diperbarui!');
@@ -182,7 +144,6 @@ class BeritaController extends Controller
      */
     public function destroy(Berita $berita)
     {
-        // Hapus gambar jika ada
         if ($berita->gambar) {
             Storage::disk('public')->delete($berita->gambar);
         }
@@ -202,14 +163,14 @@ class BeritaController extends Controller
         $totalPublished = Berita::where('status', 'published')->count();
         $totalDraft = Berita::where('status', 'draft')->count();
         $beritaSemua = Berita::where('target_berita', 'semua')->count();
-        $beritaTertentu = Berita::where('target_berita', 'santri_tertentu')->count();
+        $beritaKelas = Berita::where('target_berita', 'kelas_tertentu')->count();
 
         return view('admin.berita.statistik', compact(
             'totalBerita',
             'totalPublished',
             'totalDraft',
             'beritaSemua',
-            'beritaTertentu'
+            'beritaKelas'
         ));
     }
 }

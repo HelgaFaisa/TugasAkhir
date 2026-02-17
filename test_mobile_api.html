@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API dari Device</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: bold;
+            text-align: center;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #28a745;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #dc3545;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 2px solid #17a2b8;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:active {
+            background: #5568d3;
+            transform: scale(0.98);
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .info-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+        .info-box strong {
+            color: #667eea;
+            display: block;
+            margin-bottom: 5px;
+        }
+        pre {
+            background: #2d3748;
+            color: #68d391;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔌 Test Koneksi API</h1>
+        
+        <div class="info-box">
+            <strong>IP Server:</strong> 10.130.244.240<br>
+            <strong>API URL:</strong> /TugasAkhir/sim-pkpps/public/api/v1/login
+        </div>
+
+        <button class="btn-primary" onclick="testConnection()">
+            🌐 Test Koneksi Server
+        </button>
+
+        <button class="btn-success" onclick="testLogin()">
+            🔐 Test Login API
+        </button>
+
+        <div id="result"></div>
+
+        <div class="info-box">
+            <strong>Cara Pakai:</strong><br>
+            1. Pastikan HP dan Komputer terhubung WiFi yang sama<br>
+            2. Buka halaman ini di HP: <strong>http://10.130.244.240/TugasAkhir/test_mobile_api.html</strong><br>
+            3. Klik tombol "Test Koneksi Server"<br>
+            4. Jika sukses, klik "Test Login API"
+        </div>
+
+        <div class="info-box">
+            <strong>Troubleshooting:</strong><br>
+            ❌ Jika tidak bisa akses halaman ini:<br>
+            • Cek Windows Firewall<br>
+            • Pastikan WiFi sama<br>
+            • Pastikan XAMPP Apache running<br>
+            <br>
+            ✅ Jika bisa akses tapi API gagal:<br>
+            • Cek Laravel .env<br>
+            • Cek routes<br>
+            • Cek database connection
+        </div>
+    </div>
+
+    <script>
+        function showResult(message, type = 'info') {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        function showLoader() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<div class="loader"></div>';
+        }
+
+        async function testConnection() {
+            showLoader();
+            
+            try {
+                const response = await fetch('/TugasAkhir/sim-pkpps/public/api/v1/login', {
+                    method: 'HEAD',
+                    mode: 'cors'
+                });
+                
+                if (response.ok || response.status === 405 || response.status === 422) {
+                    showResult('✅ KONEKSI BERHASIL!<br>Server dapat diakses dari device Anda.', 'success');
+                } else {
+                    showResult(`⚠️ Server merespons dengan status: ${response.status}<br>Tapi koneksi OK!`, 'info');
+                }
+            } catch (error) {
+                showResult(`❌ KONEKSI GAGAL!<br>Error: ${error.message}<br><br>Periksa:<br>• WiFi sama?<br>• Firewall?<br>• XAMPP running?`, 'error');
+            }
+        }
+
+        async function testLogin() {
+            showLoader();
+            
+            const credentials = {
+                id_santri: 'Aydin Fauzan',
+                password: 's002'
+            };
+
+            try {
+                const response = await fetch('/TugasAkhir/sim-pkpps/public/api/v1/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(credentials)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showResult(`
+                        ✅ LOGIN BERHASIL!<br><br>
+                        <strong>Token:</strong> ${data.token.substring(0, 30)}...<br>
+                        <strong>User:</strong> ${data.user.name}<br>
+                        <strong>Role:</strong> ${data.user.role}<br>
+                        <strong>Santri:</strong> ${data.santri.nama_lengkap}<br><br>
+                        🎉 API berfungsi dengan baik!<br>
+                        Sekarang bisa login di Flutter app.
+                    `, 'success');
+                } else {
+                    showResult(`❌ LOGIN GAGAL!<br>${data.message || 'Unknown error'}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ ERROR!<br>${error.message}<br><br>API tidak dapat diakses.`, 'error');
+            }
+        }
+
+        // Auto test on load
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                showResult('👆 Klik tombol di atas untuk mulai test', 'info');
+            }, 500);
+        });
+    </script>
+</body>
+</html>

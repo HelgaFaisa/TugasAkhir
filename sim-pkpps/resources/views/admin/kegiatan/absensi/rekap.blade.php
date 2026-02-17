@@ -71,7 +71,12 @@
                     <td>{{ $absensi->tanggal->format('d/m/Y') }}</td>
                     <td><strong>{{ $absensi->id_santri }}</strong></td>
                     <td>{{ $absensi->santri->nama_lengkap }}</td>
-                    <td><span class="badge badge-secondary">{{ $absensi->santri->kelas }}</span></td>
+                    <td>
+                        @php
+                            $kelasName = $absensi->santri->kelas_name ?? $absensi->santri->kelas ?? '-';
+                        @endphp
+                        <span class="badge badge-secondary">{{ $kelasName }}</span>
+                    </td>
                     <td class="text-center">{!! $absensi->status_badge !!}</td>
                     <td>
                         @if($absensi->metode_absen == 'RFID')

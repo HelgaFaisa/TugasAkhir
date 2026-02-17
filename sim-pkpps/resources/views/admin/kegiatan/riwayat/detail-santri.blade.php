@@ -66,6 +66,51 @@
 </div>
 @endif
 
+<!-- Kehadiran Per Kelas Santri -->
+@if($statsByKelasSantri->count() > 0)
+<div class="content-box" style="margin-bottom: 20px;">
+    <h3 style="margin: 0 0 20px 0; color: var(--primary-color);">
+        <i class="fas fa-layer-group"></i> Kehadiran Per Kelas
+    </h3>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Kelompok</th>
+                <th>Kelas</th>
+                <th style="width: 120px; text-align: center;">Total Kegiatan</th>
+                <th style="width: 120px; text-align: center;">Hadir</th>
+                <th style="width: 150px; text-align: center;">Persentase</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($statsByKelasSantri as $stat)
+            <tr>
+                <td><span class="badge badge-info">{{ $stat['kelompok'] }}</span></td>
+                <td><strong>{{ $stat['kelas'] }}</strong></td>
+                <td class="text-center">{{ $stat['total'] }}</td>
+                <td class="text-center"><strong>{{ $stat['hadir'] }}</strong></td>
+                <td class="text-center">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="flex: 1; background: #e9ecef; border-radius: 10px; height: 20px; overflow: hidden;">
+                            <div style="background: 
+                                @if($stat['persen'] >= 85) var(--success-color)
+                                @elseif($stat['persen'] >= 70) var(--warning-color)
+                                @else var(--danger-color)
+                                @endif; 
+                                height: 100%; width: {{ $stat['persen'] }}%; 
+                                transition: width 0.3s ease;">
+                            </div>
+                        </div>
+                        <strong style="min-width: 45px;">{{ $stat['persen'] }}%</strong>
+                    </div>
+                </td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+</div>
+@endif
+
 <!-- Riwayat Lengkap -->
 <div class="content-box">
     <h3 style="margin: 0 0 20px 0; color: var(--primary-color);">

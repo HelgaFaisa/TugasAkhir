@@ -33,8 +33,18 @@
                 <td>{{ $user->name }}</td>
                 <td>{{ $user->username }}</td>
                 <td>
-                    <a href="#" class="btn btn-sm btn-warning"><i class="fas fa-key"></i> Reset Password</a>
-                    <a href="#" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i> Hapus Akun</a>
+                    <form action="{{ route('admin.users.santri_reset_password', $user->id) }}" method="POST" style="display:inline;">
+                        @csrf
+                        <button type="submit" class="btn btn-sm btn-warning" onclick="return confirm('Reset password akun {{ $user->name }} ke NIS?')">
+                            <i class="fas fa-key"></i> Reset Password
+                        </button>
+                    </form>
+                    <form action="{{ route('admin.users.santri_destroy', $user->id) }}" method="POST" style="display:inline;">
+                        @csrf
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Yakin hapus akun santri {{ $user->name }}?')">
+                            <i class="fas fa-trash"></i> Hapus Akun
+                        </button>
+                    </form>
                 </td>
             </tr>
             @empty

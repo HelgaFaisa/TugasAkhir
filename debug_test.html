@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug - Test Semua Fungsi</title>
+    <style>
+        body { 
+            font-family: Arial; 
+            padding: 20px; 
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #333; border-bottom: 3px solid #007bff; padding-bottom: 10px; }
+        h2 { color: #555; margin-top: 30px; }
+        .test-box { 
+            background: #f8f9fa; 
+            border-left: 4px solid #007bff;
+            padding: 15px; 
+            margin: 15px 0; 
+        }
+        .status { 
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status.ok { background: #28a745; color: white; }
+        .status.error { background: #dc3545; color: white; }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-warning { background: #ffc107; color: black; }
+        .btn-info { background: #17a2b8; color: white; }
+        pre { background: #f4f4f4; padding: 10px; border-radius: 4px; overflow-x: auto; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 4px; }
+        .result.success { background: #d4edda; color: #155724; }
+        .result.error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Debug Test - SIM-PKPPS</h1>
+        <p><strong>Waktu Test:</strong> <?php echo date('Y-m-d H:i:s'); ?></p>
+
+        <!-- Test 1: Laravel Routes -->
+        <div class="test-box">
+            <h2>1️⃣ Test Laravel Routes</h2>
+            <button class="btn-primary" onclick="testRoutes()">Test Routes</button>
+            <div id="routes-result"></div>
+        </div>
+
+        <!-- Test 2: Database Connection -->
+        <div class="test-box">
+            <h2>2️⃣ Test Database</h2>
+            <button class="btn-primary" onclick="testDatabase()">Test Database</button>
+            <div id="db-result"></div>
+        </div>
+
+        <!-- Test 3: API Login -->
+        <div class="test-box">
+            <h2>3️⃣ Test API Login</h2>
+            <p>Username: <strong>Aydin Fauzan</strong>, Password: <strong>s002</strong></p>
+            <button class="btn-info" onclick="testApiLogin()">Test Login</button>
+            <div id="api-result"></div>
+        </div>
+
+        <!-- Test 4: Flutter Config -->
+        <div class="test-box">
+            <h2>4️⃣ Flutter Configuration</h2>
+            <pre>Base URL: http://10.0.2.2/TugasAkhir/sim-pkpps/public/api/v1</pre>
+            <p>✅ URL sudah benar untuk emulator Android</p>
+            <p>⚠️ Pastikan:</p>
+            <ul>
+                <li>Apache/XAMPP sudah running</li>
+                <li>Buka dari emulator (bukan real device)</li>
+                <li>Hot reload Flutter setelah ubah config</li>
+            </ul>
+        </div>
+
+        <!-- Test 5: Manual Action -->
+        <div class="test-box">
+            <h2>5️⃣ Manual Test Delete & Reset</h2>
+            <p><strong>Akun tersedia:</strong></p>
+            <ul>
+                <li>ID 6: Aydin Fauzan</li>
+                <li>ID 7: HELGA FAISA_1</li>
+                <li>ID 9: Leni Yulia</li>
+                <li>ID 10: Mifta Okta Yanti</li>
+            </ul>
+            <form action="/TugasAkhir/sim-pkpps/public/admin/users/wali/9/reset-password" method="POST" style="display:inline;">
+                <button type="submit" class="btn-warning">🔑 Reset Password ID 9</button>
+            </form>
+            <form action="/TugasAkhir/sim-pkpps/public/admin/users/wali/10/delete" method="POST" style="display:inline;">
+                <button type="submit" class="btn-danger" onclick="return confirm('Hapus ID 10?')">🗑️ Delete ID 10</button>
+            </form>
+        </div>
+
+        <!-- Instructions -->
+        <div class="test-box">
+            <h2>📋 Troubleshooting Checklist</h2>
+            <ul>
+                <li>✅ Clear cache Laravel (sudah dilakukan)</li>
+                <li>❓ Refresh browser dengan Ctrl+Shift+R (hard refresh)</li>
+                <li>❓ Login dulu ke admin panel</li>
+                <li>❓ Cek console browser (F12) untuk error JavaScript</li>
+                <li>❓ Flutter: Hot restart (bukan hot reload)</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function testRoutes() {
+            const result = document.getElementById('routes-result');
+            result.innerHTML = '<p>Testing...</p>';
+            
+            fetch('/TugasAkhir/sim-pkpps/public/api/v1/login', {
+                method: 'HEAD'
+            })
+            .then(response => {
+                result.innerHTML = `<div class="result success">✅ Route API accessible (Status: ${response.status})</div>`;
+            })
+            .catch(error => {
+                result.innerHTML = `<div class="result error">❌ Error: ${error.message}</div>`;
+            });
+        }
+
+        function testDatabase() {
+            const result = document.getElementById('db-result');
+            result.innerHTML = '<p>Testing database...</p>';
+            
+            // Simple check via API
+            fetch('/TugasAkhir/sim-pkpps/public/api/v1/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    id_santri: 'test',
+                    password: 'test'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                result.innerHTML = '<div class="result success">✅ Database connection OK (API responding)</div>';
+            })
+            .catch(error => {
+                result.innerHTML = `<div class="result error">❌ Database error: ${error.message}</div>`;
+            });
+        }
+
+        function testApiLogin() {
+            const result = document.getElementById('api-result');
+            result.innerHTML = '<p>Testing login...</p>';
+            
+            fetch('/TugasAkhir/sim-pkpps/public/api/v1/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    id_santri: 'Aydin Fauzan',
+                    password: 's002'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    result.innerHTML = `
+                        <div class="result success">
+                            <strong>✅ LOGIN BERHASIL!</strong><br>
+                            Token: ${data.token}<br>
+                            User: ${data.user.name}<br>
+                            Role: ${data.user.role}<br>
+                            Santri: ${data.santri.nama_lengkap}
+                        </div>
+                    `;
+                } else {
+                    result.innerHTML = `<div class="result error">❌ Login gagal: ${data.message}</div>`;
+                }
+            })
+            .catch(error => {
+                result.innerHTML = `<div class="result error">❌ Error: ${error.message}</div>`;
+            });
+        }
+    </script>
+</body>
+</html>

@@ -45,13 +45,11 @@ class Berita extends Model
     }
 
     /**
-     * Relasi Many-to-Many dengan Santri
+     * Relasi: Kelas yang ditargetkan (via JSON target_kelas berisi id kelas)
      */
-    public function santriTertentu()
+    public function kelasTertentu()
     {
-        return $this->belongsToMany(Santri::class, 'berita_santri', 'id_berita', 'id_santri', 'id_berita', 'id_santri')
-                    ->withPivot('sudah_dibaca', 'tanggal_baca')
-                    ->withTimestamps();
+        return Kelas::whereIn('id', $this->target_kelas ?? [])->get();
     }
 
     /**
@@ -75,10 +73,14 @@ class Berita extends Model
      */
     public function getTargetAudienceAttribute()
     {
+        if ($this->target_berita === 'kelas_tertentu') {
+            $namaKelas = Kelas::whereIn('id', $this->target_kelas ?? [])
+                ->pluck('nama_kelas')->toArray();
+            return 'Kelas: ' . (count($namaKelas) ? implode(', ', $namaKelas) : '-');
+        }
+
         return match($this->target_berita) {
             'semua' => 'Semua Santri',
-            'kelas_tertentu' => 'Kelas: ' . implode(', ', $this->target_kelas ?? []),
-            'santri_tertentu' => $this->santriTertentu->count() . ' Santri',
             default => '-'
         };
     }

@@ -58,6 +58,26 @@
                 <td>{{ $kegiatan->materi ?? '-' }}</td>
             </tr>
             <tr>
+                <th>Kelas yang Mengikuti</th>
+                <td>
+                    @if($kegiatan->kelasKegiatan->isEmpty())
+                        <span class="badge badge-info">Kegiatan Umum (Semua Santri)</span>
+                    @else
+                        @foreach($kegiatan->kelasKegiatan as $kelas)
+                            <span class="badge badge-secondary badge-lg" style="margin-right: 5px;">
+                                {{ $kelas->kelompok->nama_kelompok }} - {{ $kelas->nama_kelas }}
+                            </span>
+                        @endforeach
+                        <div style="margin-top: 8px;">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle"></i> 
+                                {{ $kegiatan->kelasKegiatan->count() }} kelas dipilih
+                            </small>
+                        </div>
+                    @endif
+                </td>
+            </tr>
+            <tr>
                 <th>Keterangan</th>
                 <td>{{ $kegiatan->keterangan ?? '-' }}</td>
             </tr>

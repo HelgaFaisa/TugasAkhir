@@ -18,21 +18,44 @@
     </div>
 @endif
 
+{{-- Filter Kategori Buttons --}}
+<div class="content-box" style="margin-bottom: 20px;">
+    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+        <a href="{{ route('admin.materi.index', ['kategori' => 'Al-Qur\'an'] + request()->except('kategori')) }}" 
+           class="btn {{ request('kategori') == 'Al-Qur\'an' ? 'btn-primary' : 'btn-outline-primary' }}" 
+           style="min-width: 150px;">
+            <i class="fas fa-book-quran"></i> Al-Qur'an
+        </a>
+        <a href="{{ route('admin.materi.index', ['kategori' => 'Hadist'] + request()->except('kategori')) }}" 
+           class="btn {{ request('kategori') == 'Hadist' ? 'btn-primary' : 'btn-outline-primary' }}" 
+           style="min-width: 150px;">
+            <i class="fas fa-book"></i> Hadist
+        </a>
+        <a href="{{ route('admin.materi.index', ['kategori' => 'Materi Tambahan'] + request()->except('kategori')) }}" 
+           class="btn {{ request('kategori') == 'Materi Tambahan' ? 'btn-primary' : 'btn-outline-primary' }}" 
+           style="min-width: 150px;">
+            <i class="fas fa-graduation-cap"></i> Materi Tambahan
+        </a>
+        @if(request('kategori'))
+            <a href="{{ route('admin.materi.index', request()->except('kategori')) }}" 
+               class="btn btn-secondary" 
+               style="min-width: 150px;">
+                <i class="fas fa-list"></i> Semua Kategori
+            </a>
+        @endif
+    </div>
+</div>
+
 {{-- Filter & Search Section --}}
 <div class="content-box" style="margin-bottom: 20px;">
     <form method="GET" action="{{ route('admin.materi.index') }}" class="filter-form-inline">
-        <select name="kategori" class="form-control" style="width: 200px;">
-            <option value="">Semua Kategori</option>
-            <option value="Al-Qur'an" {{ request('kategori') == 'Al-Qur\'an' ? 'selected' : '' }}>Al-Qur'an</option>
-            <option value="Hadist" {{ request('kategori') == 'Hadist' ? 'selected' : '' }}>Hadist</option>
-            <option value="Materi Tambahan" {{ request('kategori') == 'Materi Tambahan' ? 'selected' : '' }}>Materi Tambahan</option>
-        </select>
-
+        <input type="hidden" name="kategori" value="{{ request('kategori') }}">
+        
         <select name="kelas" class="form-control" style="width: 180px;">
             <option value="">Semua Kelas</option>
-            <option value="Lambatan" {{ request('kelas') == 'Lambatan' ? 'selected' : '' }}>Lambatan</option>
-            <option value="Cepatan" {{ request('kelas') == 'Cepatan' ? 'selected' : '' }}>Cepatan</option>
-            <option value="PB" {{ request('kelas') == 'PB' ? 'selected' : '' }}>PB</option>
+            @foreach($kelasList as $kls)
+                <option value="{{ $kls->nama_kelas }}" {{ request('kelas') == $kls->nama_kelas ? 'selected' : '' }}>{{ $kls->nama_kelas }}</option>
+            @endforeach
         </select>
 
         <input type="text" name="search" class="form-control" placeholder="Cari nama kitab..." 
@@ -42,15 +65,20 @@
             <i class="fas fa-search"></i> Filter
         </button>
 
-        @if(request()->anyFilled(['kategori', 'kelas', 'search']))
-            <a href="{{ route('admin.materi.index') }}" class="btn btn-secondary">
+        @if(request()->anyFilled(['kelas', 'search']))
+            <a href="{{ route('admin.materi.index', request()->only('kategori')) }}" class="btn btn-secondary">
                 <i class="fas fa-redo"></i> Reset
             </a>
         @endif
 
-        <a href="{{ route('admin.materi.create') }}" class="btn btn-success" style="margin-left: auto;">
-            <i class="fas fa-plus"></i> Tambah Materi
-        </a>
+        <div style="margin-left: auto; display: flex; gap: 10px;">
+            <a href="{{ route('admin.semester.index') }}" class="btn btn-info">
+                <i class="fas fa-calendar-alt"></i> Manajemen Semester
+            </a>
+            <a href="{{ route('admin.materi.create') }}" class="btn btn-success">
+                <i class="fas fa-plus"></i> Tambah Materi
+            </a>
+        </div>
     </form>
 </div>
 
@@ -87,7 +115,7 @@
                             <strong>{{ $materi->total_halaman }}</strong> hal
                         </td>
                         <td class="text-center">
-                            <div class="btn-group">
+                            <div style="display: flex; justify-content: center; align-items: center; gap: 8px;">
                                 <a href="{{ route('admin.materi.show', $materi) }}" 
                                    class="btn btn-sm btn-info" title="Detail">
                                     <i class="fas fa-eye"></i>
@@ -97,7 +125,7 @@
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 <form action="{{ route('admin.materi.destroy', $materi) }}" 
-                                      method="POST" style="display: inline-block;"
+                                      method="POST" style="margin: 0;"
                                       onsubmit="return confirm('Yakin ingin menghapus materi {{ $materi->nama_kitab }}?')">
                                     @csrf
                                     @method('DELETE')

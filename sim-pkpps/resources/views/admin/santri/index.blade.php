@@ -25,25 +25,33 @@
         <form action="{{ route('admin.santri.index') }}" method="GET" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
             <input type="text" name="search" class="form-control" placeholder="Cari nama, NIS, atau ID..." value="{{ request('search') }}" style="width: 220px; height: 38px;">
             
-            <select name="status" class="form-control" style="width: 130px; height: 38px;">
-                <option value="">Semua Status</option>
-                <option value="Aktif" {{ request('status') == 'Aktif' ? 'selected' : '' }}>Aktif</option>
-                <option value="Lulus" {{ request('status') == 'Lulus' ? 'selected' : '' }}>Lulus</option>
-                <option value="Tidak Aktif" {{ request('status') == 'Tidak Aktif' ? 'selected' : '' }}>Tidak Aktif</option>
+            <select name="status" class="form-control" style="width: 150px; height: 38px;">
+                <option value="">⚪ Semua Status</option>
+                <option value="Aktif" {{ request('status') == 'Aktif' ? 'selected' : '' }}>✅ Aktif</option>
+                <option value="Lulus" {{ request('status') == 'Lulus' ? 'selected' : '' }}>🎓 Lulus</option>
+                <option value="Tidak Aktif" {{ request('status') == 'Tidak Aktif' ? 'selected' : '' }}>❌ Tidak Aktif</option>
             </select>
             
-            <select name="kelas" class="form-control" style="width: 130px; height: 38px;">
-                <option value="">Semua Kelas</option>
-                <option value="PB" {{ request('kelas') == 'PB' ? 'selected' : '' }}>PB</option>
-                <option value="Lambatan" {{ request('kelas') == 'Lambatan' ? 'selected' : '' }}>Lambatan</option>
-                <option value="Cepatan" {{ request('kelas') == 'Cepatan' ? 'selected' : '' }}>Cepatan</option>
+            <select name="id_kelas" class="form-control" style="width: 180px; height: 38px;">
+                <option value="">📚 Semua Kelas</option>
+                @foreach($kelompokKelas as $kelompok)
+                    @if($kelompok->kelas && $kelompok->kelas->count() > 0)
+                        <optgroup label="{{ $kelompok->nama_kelompok }}">
+                            @foreach($kelompok->kelas as $kelas)
+                                <option value="{{ $kelas->id }}" {{ request('id_kelas') == $kelas->id ? 'selected' : '' }}>
+                                    {{ $kelas->nama_kelas }}
+                                </option>
+                            @endforeach
+                        </optgroup>
+                    @endif
+                @endforeach
             </select>
             
             <button type="submit" class="btn btn-primary btn-sm" style="height: 38px; padding: 0 16px;">
                 <i class="fas fa-search"></i> Cari
             </button>
             
-            @if(request('search') || request('status') || request('kelas'))
+            @if(request('search') || request('status') || request('id_kelas'))
                 <a href="{{ route('admin.santri.index') }}" class="btn btn-secondary btn-sm" style="height: 38px; padding: 0 16px; display: inline-flex; align-items: center;">
                     <i class="fas fa-redo"></i> Reset
                 </a>
@@ -60,7 +68,6 @@
                 <th>NIS</th>
                 <th>Nama Lengkap</th>
                 <th>Jenis Kelamin</th>
-                <th>Kelas</th>
                 <th>Status</th>
                 <th>Aksi</th>
             </tr>
@@ -86,7 +93,6 @@
                 <td>{{ $santri->nis ?? '-' }}</td>
                 <td>{{ $santri->nama_lengkap }}</td>
                 <td>{{ $santri->jenis_kelamin }}</td>
-                <td><strong>{{ $santri->kelas }}</strong></td>
                 <td>
                     @if($santri->status == 'Aktif')
                         <span style="padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; background: linear-gradient(135deg, #E8F7F2 0%, #D4F1E3 100%); color: #2C5F4F; display: inline-block;">
@@ -118,9 +124,9 @@
             </tr>
             @empty
             <tr>
-                <td colspan="9" class="text-center" style="padding: 40px;">
+                <td colspan="8" class="text-center" style="padding: 40px;">
                     <i class="fas fa-inbox" style="font-size: 3rem; color: #ccc; margin-bottom: 15px; display: block;"></i>
-                    @if(request('search') || request('status') || request('kelas'))
+                    @if(request('search') || request('status') || request('id_kelas'))
                         <strong>Data tidak ditemukan.</strong><br>
                         <small>Coba ubah kata kunci pencarian atau filter yang digunakan.</small>
                     @else
@@ -138,7 +144,7 @@
             <p style="color: #7F8C8D; font-size: 0.9rem;">
                 <i class="fas fa-info-circle"></i> 
                 Menampilkan <strong>{{ $santris->count() }}</strong> dari <strong>{{ $santris->total() }}</strong> data santri
-                @if(request('search') || request('status') || request('kelas'))
+                @if(request('search') || request('status') || request('id_kelas'))
                     (hasil pencarian/filter)
                 @endif
             </p>

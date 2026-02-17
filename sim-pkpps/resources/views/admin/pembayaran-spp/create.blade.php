@@ -31,7 +31,7 @@
             <select name="id_santri" class="form-control @error('id_santri') is-invalid @enderror" required>
                 <option value="">-- Pilih Santri --</option>
                 @foreach($santris as $santri)
-                    <option value="{{ $santri->id_santri }}" {{ old('id_santri') == $santri->id_santri ? 'selected' : '' }}>
+                    <option value="{{ $santri->id_santri }}" {{ old('id_santri', request('id_santri')) == $santri->id_santri ? 'selected' : '' }}>
                         {{ $santri->id_santri }} - {{ $santri->nama_lengkap }} ({{ $santri->kelas }})
                     </option>
                 @endforeach
@@ -48,7 +48,7 @@
                 <select name="bulan" class="form-control @error('bulan') is-invalid @enderror" required>
                     <option value="">-- Pilih Bulan --</option>
                     @for($i = 1; $i <= 12; $i++)
-                        <option value="{{ $i }}" {{ old('bulan', date('n')) == $i ? 'selected' : '' }}>
+                        <option value="{{ $i }}" {{ old('bulan', request('bulan', date('n'))) == $i ? 'selected' : '' }}>
                             {{ DateTime::createFromFormat('!m', $i)->format('F') }}
                         </option>
                     @endfor
@@ -64,7 +64,7 @@
                 <input type="number" 
                        name="tahun" 
                        class="form-control @error('tahun') is-invalid @enderror" 
-                       value="{{ old('tahun', date('Y')) }}" 
+                       value="{{ old('tahun', request('tahun', date('Y'))) }}" 
                        min="2020" 
                        max="2100"
                        required>

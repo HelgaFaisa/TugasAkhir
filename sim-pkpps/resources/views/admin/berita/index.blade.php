@@ -29,7 +29,6 @@
                 <option value="">Semua Target</option>
                 <option value="semua" {{ request('target') == 'semua' ? 'selected' : '' }}>Semua Santri</option>
                 <option value="kelas_tertentu" {{ request('target') == 'kelas_tertentu' ? 'selected' : '' }}>Kelas Tertentu</option>
-                <option value="santri_tertentu" {{ request('target') == 'santri_tertentu' ? 'selected' : '' }}>Santri Tertentu</option>
             </select>
             
             <button type="submit" class="btn btn-primary">
@@ -108,7 +107,6 @@
                             $badgeClass = match($item->target_berita) {
                                 'semua' => 'badge-primary',
                                 'kelas_tertentu' => 'badge-info',
-                                'santri_tertentu' => 'badge-warning',
                                 default => 'badge-secondary'
                             };
                         @endphp

@@ -30,14 +30,16 @@
                 @enderror
             </div>
 
-            {{-- Kelas --}}
+            {{-- Kelas (Dynamic dari tabel kelas) --}}
             <div class="form-group">
                 <label><i class="fas fa-users form-icon"></i> Kelas <span style="color: red;">*</span></label>
                 <select name="kelas" class="form-control @error('kelas') is-invalid @enderror" required>
                     <option value="">-- Pilih Kelas --</option>
-                    <option value="Lambatan" {{ old('kelas') == 'Lambatan' ? 'selected' : '' }}>Lambatan</option>
-                    <option value="Cepatan" {{ old('kelas') == 'Cepatan' ? 'selected' : '' }}>Cepatan</option>
-                    <option value="PB" {{ old('kelas') == 'PB' ? 'selected' : '' }}>PB (Pembinaan)</option>
+                    @foreach($kelasList as $kls)
+                        <option value="{{ $kls->nama_kelas }}" {{ old('kelas') == $kls->nama_kelas ? 'selected' : '' }}>
+                            {{ $kls->nama_kelas }}
+                        </option>
+                    @endforeach
                 </select>
                 @error('kelas')
                     <span class="invalid-feedback">{{ $message }}</span>

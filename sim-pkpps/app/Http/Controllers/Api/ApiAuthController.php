@@ -67,15 +67,16 @@ class ApiAuthController extends Controller
             ],
         ];
 
-        // Jika santri, sertakan data santri
-        if ($user->role === 'santri') {
-            $santri = Santri::where('id_santri', $user->role_id)
+        // Jika santri atau wali, sertakan data santri
+        // Untuk wali, role_id menyimpan id_santri yang diwali (anaknya)
+        if (in_array($user->role, ['santri', 'wali'])) {
+            $santri = Santri::with(['kelasSantri.kelas.kelompok', 'kelasPrimary.kelas'])
+                ->where('id_santri', $user->role_id)
                 ->select([
                     'id_santri',
                     'nis',
                     'nama_lengkap',
                     'jenis_kelamin',
-                    'kelas',
                     'status',
                     'alamat_santri',
                     'daerah_asal',
@@ -85,7 +86,36 @@ class ApiAuthController extends Controller
                 ])
                 ->first();
 
-            $responseData['santri'] = $santri;
+            if ($santri) {
+                // Build kelas_list grouped by kelompok
+                $kelasList = $this->buildKelasListGrouped($santri);
+
+                // Get primary kelas name for backward compatibility
+                $kelasName = 'Belum Ada Kelas';
+                if ($santri->kelasPrimary && $santri->kelasPrimary->kelas) {
+                    $kelasName = $santri->kelasPrimary->kelas->nama_kelas;
+                } elseif ($santri->kelasSantri->isNotEmpty() && $santri->kelasSantri->first()->kelas) {
+                    $kelasName = $santri->kelasSantri->first()->kelas->nama_kelas;
+                }
+
+                $responseData['santri'] = [
+                    'id_santri' => $santri->id_santri,
+                    'nis' => $santri->nis,
+                    'nama_lengkap' => $santri->nama_lengkap,
+                    'jenis_kelamin' => $santri->jenis_kelamin,
+                    'status' => $santri->status,
+                    'alamat_santri' => $santri->alamat_santri,
+                    'daerah_asal' => $santri->daerah_asal,
+                    'nama_orang_tua' => $santri->nama_orang_tua,
+                    'nomor_hp_ortu' => $santri->nomor_hp_ortu,
+                    'foto' => $santri->foto,
+                    'foto_url' => $santri->foto_url,
+                    'kelas' => $kelasName, // Backward compatibility
+                    'kelas_list' => $kelasList, // NEW: Multiple kelas grouped
+                ];
+            } else {
+                $responseData['santri'] = null;
+            }
         }
 
         return response()->json($responseData, 200);
@@ -107,25 +137,29 @@ class ApiAuthController extends Controller
 
     /**
      * Get Profile Santri yang sedang login
+     * Untuk role santri: tampilkan data diri sendiri
+     * Untuk role wali: tampilkan data santri yang diwali (anaknya)
      */
     public function profile(Request $request)
     {
         $user = $request->user();
 
-        if ($user->role !== 'santri') {
+        // Hanya santri dan wali yang bisa akses profil
+        if (!in_array($user->role, ['santri', 'wali'])) {
             return response()->json([
                 'success' => false,
-                'message' => 'Hanya santri yang bisa mengakses profil.',
+                'message' => 'Hanya santri/wali yang bisa mengakses profil.',
             ], 403);
         }
 
-        $santri = Santri::where('id_santri', $user->role_id)
+        // Untuk santri dan wali, role_id menyimpan id_santri
+        $santri = Santri::with(['kelasSantri.kelas.kelompok', 'kelasPrimary.kelas'])
+            ->where('id_santri', $user->role_id)
             ->select([
                 'id_santri',
                 'nis',
                 'nama_lengkap',
                 'jenis_kelamin',
-                'kelas',
                 'status',
                 'alamat_santri',
                 'daerah_asal',
@@ -143,6 +177,17 @@ class ApiAuthController extends Controller
             ], 404);
         }
 
+        // Build kelas_list grouped by kelompok
+        $kelasList = $this->buildKelasListGrouped($santri);
+
+        // Get primary kelas name for backward compatibility
+        $kelasName = 'Belum Ada Kelas';
+        if ($santri->kelasPrimary && $santri->kelasPrimary->kelas) {
+            $kelasName = $santri->kelasPrimary->kelas->nama_kelas;
+        } elseif ($santri->kelasSantri->isNotEmpty() && $santri->kelasSantri->first()->kelas) {
+            $kelasName = $santri->kelasSantri->first()->kelas->nama_kelas;
+        }
+
         return response()->json([
             'success' => true,
             'data' => [
@@ -150,7 +195,6 @@ class ApiAuthController extends Controller
                 'nis' => $santri->nis,
                 'nama_lengkap' => $santri->nama_lengkap,
                 'jenis_kelamin' => $santri->jenis_kelamin,
-                'kelas' => $santri->kelas,
                 'status' => $santri->status,
                 'alamat_santri' => $santri->alamat_santri,
                 'daerah_asal' => $santri->daerah_asal,
@@ -158,7 +202,59 @@ class ApiAuthController extends Controller
                 'nomor_hp_ortu' => $santri->nomor_hp_ortu,
                 'foto_url' => $santri->foto_url, // Accessor dari Model Santri
                 'bergabung_sejak' => $santri->created_at->format('d F Y'),
+                'kelas' => $kelasName, // Backward compatibility
+                'kelas_list' => $kelasList, // NEW: Multiple kelas grouped
             ]
         ], 200);
+    }
+
+    /**
+     * Build kelas list grouped by kelompok
+     * 
+     * @param \App\Models\Santri $santri
+     * @return array
+     */
+    private function buildKelasListGrouped($santri)
+    {
+        $kelasList = [];
+
+        if ($santri->kelasSantri->isEmpty()) {
+            return $kelasList;
+        }
+
+        // Group kelas by kelompok
+        $grouped = $santri->kelasSantri->groupBy(function ($santriKelas) {
+            return $santriKelas->kelas?->kelompok?->id_kelompok ?? 'unknown';
+        });
+
+        foreach ($grouped as $kelompokId => $santriKelasItems) {
+            // Skip if kelompok not found
+            if ($kelompokId === 'unknown') {
+                continue;
+            }
+
+            $firstItem = $santriKelasItems->first();
+            $kelompok = $firstItem->kelas?->kelompok;
+
+            if (!$kelompok) {
+                continue;
+            }
+
+            $kelasList[] = [
+                'kelompok_id' => $kelompok->id_kelompok,
+                'kelompok_name' => $kelompok->nama_kelompok,
+                'kelas' => $santriKelasItems->map(function ($santriKelas) {
+                    $kelas = $santriKelas->kelas;
+                    return [
+                        'id_kelas' => $kelas->id,
+                        'kode_kelas' => $kelas->kode_kelas,
+                        'nama_kelas' => $kelas->nama_kelas,
+                        'is_primary' => $santriKelas->is_primary,
+                    ];
+                })->sortByDesc('is_primary')->values()->toArray(),
+            ];
+        }
+
+        return $kelasList;
     }
 }
