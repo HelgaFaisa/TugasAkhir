@@ -8,50 +8,117 @@ use App\Models\Santri;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Carbon\Carbon;
 
 class UangSakuController extends Controller
 {
     /**
-     * Tampilkan daftar transaksi uang saku
+     * Tampilkan daftar uang saku — Grouped per Santri
      */
     public function index(Request $request)
     {
-        $query = UangSaku::with('santri:id_santri,nama_lengkap');
+        $search = $request->get('search');
 
-        // Search
-        if ($request->filled('search')) {
-            $query->search($request->search);
+        // Query santri aktif yang punya transaksi (atau semua jika tidak ada filter)
+        $santriQuery = Santri::aktif()
+            ->select('id_santri', 'nama_lengkap')
+            ->withCount(['uangSaku as transaksi_bulan_ini' => function ($q) {
+                $q->whereMonth('tanggal_transaksi', now()->month)
+                  ->whereYear('tanggal_transaksi', now()->year);
+            }])
+            ->has('uangSaku');
+
+        if ($search) {
+            $santriQuery->where(function ($q) use ($search) {
+                $q->where('nama_lengkap', 'like', "%{$search}%")
+                  ->orWhere('id_santri', 'like', "%{$search}%");
+            });
         }
 
-        // Filter berdasarkan santri
-        if ($request->filled('id_santri')) {
-            $query->bySantri($request->id_santri);
-        }
-
-        // Filter berdasarkan jenis transaksi
-        if ($request->filled('jenis_transaksi')) {
-            $query->byJenis($request->jenis_transaksi);
-        }
-
-        // Filter berdasarkan tanggal
-        if ($request->filled('tanggal_dari') && $request->filled('tanggal_sampai')) {
-            $query->byDateRange($request->tanggal_dari, $request->tanggal_sampai);
-        }
-
-        $transaksi = $query->orderBy('tanggal_transaksi', 'desc')
-            ->orderBy('created_at', 'desc')
+        $santriList = $santriQuery->orderBy('nama_lengkap')
             ->paginate(20)
             ->appends(request()->query());
 
-        // Cache santri list untuk dropdown
-        $santriList = Cache::remember('santri_aktif_uang_saku', 300, function () {
-            return Santri::where('status', 'Aktif')
-                ->select('id_santri', 'nama_lengkap')
-                ->orderBy('nama_lengkap')
-                ->get();
+        // Ambil saldo terakhir & transaksi terbaru per santri (batch)
+        $ids = $santriList->pluck('id_santri');
+
+        // Saldo terakhir per santri (dari transaksi terbaru)
+        $saldoMap = UangSaku::whereIn('id_santri', $ids)
+            ->select('id_santri', 'saldo_sesudah')
+            ->orderByDesc('tanggal_transaksi')
+            ->orderByDesc('created_at')
+            ->get()
+            ->unique('id_santri')
+            ->keyBy('id_santri');
+
+        // Transaksi terbaru per santri (max 5)
+        $transaksiMap = UangSaku::whereIn('id_santri', $ids)
+            ->orderByDesc('tanggal_transaksi')
+            ->orderByDesc('created_at')
+            ->get()
+            ->groupBy('id_santri')
+            ->map(fn ($group) => $group->take(5));
+
+        // Attach ke santri objects
+        $santriList->getCollection()->each(function ($santri) use ($saldoMap, $transaksiMap) {
+            $santri->saldo_terakhir = $saldoMap[$santri->id_santri]->saldo_sesudah ?? 0;
+            $santri->transaksi_terbaru = $transaksiMap[$santri->id_santri] ?? collect();
         });
 
-        return view('admin.uang-saku.index', compact('transaksi', 'santriList'));
+        return view('admin.uang-saku.index', compact('santriList'));
+    }
+
+    /**
+     * AJAX: Info santri untuk form create/edit
+     */
+    public function santriInfo($id_santri)
+    {
+        $santri = Santri::where('id_santri', $id_santri)->firstOrFail();
+
+        $bulanIni = now();
+
+        // Saldo terakhir
+        $lastTx = UangSaku::where('id_santri', $id_santri)
+            ->orderByDesc('tanggal_transaksi')
+            ->orderByDesc('created_at')
+            ->first();
+
+        $saldo = $lastTx ? $lastTx->saldo_sesudah : 0;
+
+        // Total pemasukan & pengeluaran bulan ini
+        $pemasukanBulanIni = UangSaku::where('id_santri', $id_santri)
+            ->where('jenis_transaksi', 'pemasukan')
+            ->whereMonth('tanggal_transaksi', $bulanIni->month)
+            ->whereYear('tanggal_transaksi', $bulanIni->year)
+            ->sum('nominal');
+
+        $pengeluaranBulanIni = UangSaku::where('id_santri', $id_santri)
+            ->where('jenis_transaksi', 'pengeluaran')
+            ->whereMonth('tanggal_transaksi', $bulanIni->month)
+            ->whereYear('tanggal_transaksi', $bulanIni->year)
+            ->sum('nominal');
+
+        // 3 transaksi terakhir
+        $transaksiTerakhir = UangSaku::where('id_santri', $id_santri)
+            ->orderByDesc('tanggal_transaksi')
+            ->orderByDesc('created_at')
+            ->limit(3)
+            ->get()
+            ->map(fn ($t) => [
+                'tanggal'    => $t->tanggal_transaksi->format('d/m/Y'),
+                'jenis'      => $t->jenis_transaksi,
+                'nominal'    => number_format($t->nominal, 0, ',', '.'),
+                'keterangan' => $t->keterangan ?? '-',
+            ]);
+
+        return response()->json([
+            'nama'                     => $santri->nama_lengkap,
+            'saldo_terakhir'           => number_format($saldo, 0, ',', '.'),
+            'saldo_raw'                => $saldo,
+            'total_pemasukan_bulan_ini' => number_format($pemasukanBulanIni, 0, ',', '.'),
+            'total_pengeluaran_bulan_ini' => number_format($pengeluaranBulanIni, 0, ',', '.'),
+            'transaksi_terakhir'       => $transaksiTerakhir,
+        ]);
     }
 
     /**

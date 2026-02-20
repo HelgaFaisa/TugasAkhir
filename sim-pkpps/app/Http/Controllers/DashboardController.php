@@ -3,13 +3,20 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use App\Models\Santri;
 use App\Models\User;
+use App\Models\Kegiatan;
+use App\Models\AbsensiKegiatan;
+use App\Models\KategoriKegiatan;
 use App\Models\RiwayatPelanggaran;
 use App\Models\Berita;
 use App\Models\KesehatanSantri;
 use App\Models\Kepulangan;
+use App\Models\PengajuanKepulangan;
+use App\Models\PembayaranSpp;
+use App\Models\UangSaku;
 use App\Models\Capaian;
 use App\Models\Semester;
 use Carbon\Carbon;
@@ -17,23 +24,246 @@ use Carbon\Carbon;
 class DashboardController extends Controller
 {
     /**
+     * Mapping hari Carbon (English) → DB enum (Indonesia)
+     */
+    private function hariIndonesia(): array
+    {
+        return [
+            'Monday' => 'Senin', 'Tuesday' => 'Selasa', 'Wednesday' => 'Rabu',
+            'Thursday' => 'Kamis', 'Friday' => 'Jumat', 'Saturday' => 'Sabtu',
+            'Sunday' => 'Ahad',
+        ];
+    }
+
+    /**
      * Dashboard Admin
      */
     public function admin()
     {
         try {
-            $data = [
-                'total_santri' => Santri::count(),
-                'total_wali' => User::where('role', 'wali')->count(),
-                'kegiatan_hari_ini' => 0,
-            ];
-            
-            return view('admin.dashboardAdmin', compact('data'));
-            
+            $today = Carbon::today();
+            $now = Carbon::now();
+            $hariIni = $this->hariIndonesia()[$today->format('l')];
+            $bulanIni = (int) $today->format('m');
+            $tahunIni = (int) $today->format('Y');
+
+            // ────────────────────────── KPI CARDS ──────────────────────────
+            $totalSantriAktif = Cache::remember('dash_santri_aktif', 300, fn () => Santri::aktif()->count());
+
+            // Kegiatan hari ini + status absensi
+            $kegiatanHariIni = Kegiatan::with(['kategori', 'absensis' => fn ($q) => $q->whereDate('tanggal', $today)])
+                ->where('hari', $hariIni)
+                ->orderBy('waktu_mulai')
+                ->get();
+
+            $totalKegiatan = $kegiatanHariIni->count();
+            $sudahAbsensi = $kegiatanHariIni->filter(fn ($k) => $k->absensis->isNotEmpty())->count();
+            $belumAbsensi = $totalKegiatan - $sudahAbsensi;
+
+            // Santri di UKP (sedang dirawat)
+            $santriSakit = KesehatanSantri::dirawat()->count();
+
+            // Pengajuan kepulangan menunggu approval
+            $kepulanganMenunggu = PengajuanKepulangan::where('status', 'Menunggu')->count();
+
+            // Santri aktif yang belum punya akun wali
+            $santriTanpaWali = Santri::aktif()
+                ->whereDoesntHave('waliUser')
+                ->count();
+
+            $kpiCards = compact(
+                'totalSantriAktif', 'totalKegiatan', 'sudahAbsensi',
+                'belumAbsensi', 'santriSakit', 'kepulanganMenunggu', 'santriTanpaWali'
+            );
+
+            // ──────────────────── JADWAL KEGIATAN HARI INI ────────────────────
+            $kegiatanHariIni->each(function ($kegiatan) use ($now, $today, $totalSantriAktif) {
+                $waktuMulaiStr = is_string($kegiatan->waktu_mulai) ? $kegiatan->waktu_mulai : $kegiatan->waktu_mulai->format('H:i');
+                $waktuSelesaiStr = is_string($kegiatan->waktu_selesai) ? $kegiatan->waktu_selesai : $kegiatan->waktu_selesai->format('H:i');
+
+                $mulai = Carbon::parse($today->format('Y-m-d') . ' ' . $waktuMulaiStr);
+                $selesai = Carbon::parse($today->format('Y-m-d') . ' ' . $waktuSelesaiStr);
+
+                $kegiatan->status_kegiatan = $now->lt($mulai) ? 'belum'
+                    : ($now->between($mulai, $selesai) ? 'berlangsung' : 'selesai');
+
+                $totalAbsen = $kegiatan->absensis->count();
+                $hadir = $kegiatan->absensis->where('status', 'Hadir')->count();
+                $kegiatan->persen_kehadiran = $totalAbsen > 0 ? round(($hadir / $totalAbsen) * 100) : 0;
+                $kegiatan->total_absensi = $totalAbsen;
+                $kegiatan->belum_input = $kegiatan->status_kegiatan === 'selesai' && $totalAbsen === 0;
+            });
+
+            // ────────────────────────── ALERT PANEL ──────────────────────────
+            // 1) Santri alpa beruntun (≥3 hari berturut-turut dalam 7 hari terakhir)
+            $santriAlpaBeruntun = $this->getSantriAlpaBeruntun();
+
+            // 2) SPP jatuh tempo (belum lunas & batas_bayar sudah lewat)
+            $sppJatuhTempo = PembayaranSpp::telat()
+                ->with('santri:id_santri,nama_lengkap')
+                ->select('id_pembayaran', 'id_santri', 'bulan', 'tahun', 'nominal', 'batas_bayar')
+                ->orderBy('batas_bayar')
+                ->limit(10)
+                ->get();
+
+            // 3) Pengajuan kepulangan menunggu review
+            $kepulanganPending = PengajuanKepulangan::where('status', 'Menunggu')
+                ->with('santri:id_santri,nama_lengkap')
+                ->select('id_pengajuan', 'id_santri', 'tanggal_pulang', 'tanggal_kembali', 'alasan')
+                ->orderBy('created_at')
+                ->limit(5)
+                ->get();
+
+            $alerts = compact('santriAlpaBeruntun', 'sppJatuhTempo', 'kepulanganPending');
+
+            // ──────────────── GRAFIK TREN KEHADIRAN (4 MINGGU) ────────────────
+            $trenKehadiran = $this->getTrenKehadiran($today);
+
+            // ──────────────── RINGKASAN SPP BULAN INI ────────────────
+            $sppBulanIni = Cache::remember("dash_spp_{$bulanIni}_{$tahunIni}", 300, function () use ($bulanIni, $tahunIni) {
+                $lunas = PembayaranSpp::where('bulan', $bulanIni)->where('tahun', $tahunIni)->lunas()->count();
+                $belum = PembayaranSpp::where('bulan', $bulanIni)->where('tahun', $tahunIni)->belumLunas()->count();
+                $terkumpul = PembayaranSpp::where('bulan', $bulanIni)->where('tahun', $tahunIni)->lunas()->sum('nominal');
+                $totalTagihan = PembayaranSpp::where('bulan', $bulanIni)->where('tahun', $tahunIni)->sum('nominal');
+
+                return compact('lunas', 'belum', 'terkumpul', 'totalTagihan');
+            });
+
+            // ──────────────── FEED AKTIVITAS TERBARU ────────────────
+            $feedAktivitas = $this->getFeedAktivitas($today);
+
+            return view('admin.dashboardAdmin', compact(
+                'kpiCards', 'kegiatanHariIni', 'alerts',
+                'trenKehadiran', 'sppBulanIni', 'feedAktivitas',
+                'hariIni', 'today'
+            ));
+
         } catch (\Exception $e) {
-            Log::error('Error di Dashboard Admin: ' . $e->getMessage());
-            abort(500, 'Terjadi kesalahan saat memuat dashboard Admin: ' . $e->getMessage());
+            Log::error('Error di Dashboard Admin: ' . $e->getMessage() . ' | ' . $e->getFile() . ':' . $e->getLine());
+            if (config('app.debug')) {
+                abort(500, 'Error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            }
+            abort(500, 'Terjadi kesalahan saat memuat dashboard Admin.');
         }
+    }
+
+    // ══════════════════ HELPER METHODS ══════════════════
+
+    /**
+     * Santri dengan alpa ≥ 3x beruntun dalam 7 hari terakhir
+     */
+    private function getSantriAlpaBeruntun(int $threshold = 3): \Illuminate\Support\Collection
+    {
+        $weekAgo = Carbon::today()->subDays(7);
+
+        // Ambil data alpa per santri 7 hari terakhir
+        $alpaData = AbsensiKegiatan::where('status', 'Alpa')
+            ->whereDate('tanggal', '>=', $weekAgo)
+            ->select('id_santri')
+            ->selectRaw('COUNT(*) as total_alpa')
+            ->groupBy('id_santri')
+            ->having('total_alpa', '>=', $threshold)
+            ->pluck('total_alpa', 'id_santri');
+
+        if ($alpaData->isEmpty()) {
+            return collect([]);
+        }
+
+        return Santri::aktif()
+            ->whereIn('id_santri', $alpaData->keys())
+            ->select('id_santri', 'nama_lengkap')
+            ->get()
+            ->map(fn ($s) => (object) [
+                'nama' => $s->nama_lengkap,
+                'id_santri' => $s->id_santri,
+                'total_alpa' => $alpaData[$s->id_santri],
+            ]);
+    }
+
+    /**
+     * Tren kehadiran 4 minggu terakhir, dikelompokkan per kategori kegiatan
+     */
+    private function getTrenKehadiran(Carbon $today): array
+    {
+        $labels = [];
+        $series = [];
+
+        $kategoris = KategoriKegiatan::select('kategori_id', 'nama_kategori')->get();
+
+        // 4 minggu terakhir → label "Mg 1" s.d "Mg 4"
+        for ($i = 3; $i >= 0; $i--) {
+            $start = $today->copy()->subWeeks($i)->startOfWeek(Carbon::MONDAY);
+            $end = $start->copy()->endOfWeek(Carbon::SUNDAY);
+            $labels[] = 'Mg ' . (4 - $i);
+
+            foreach ($kategoris as $kat) {
+                $kegiatanIds = Kegiatan::where('kategori_id', $kat->kategori_id)
+                    ->pluck('kegiatan_id');
+
+                $totalAbsen = AbsensiKegiatan::whereIn('kegiatan_id', $kegiatanIds)
+                    ->dateRange($start, $end)
+                    ->count();
+                $hadir = AbsensiKegiatan::whereIn('kegiatan_id', $kegiatanIds)
+                    ->dateRange($start, $end)
+                    ->where('status', 'Hadir')
+                    ->count();
+
+                $series[$kat->nama_kategori][] = $totalAbsen > 0 ? round(($hadir / $totalAbsen) * 100, 1) : 0;
+            }
+        }
+
+        return compact('labels', 'series');
+    }
+
+    /**
+     * Feed aktivitas terbaru: absensi, pelanggaran, pembayaran SPP, transaksi uang saku
+     */
+    private function getFeedAktivitas(Carbon $today): \Illuminate\Support\Collection
+    {
+        $items = collect();
+
+        // Absensi terbaru
+        AbsensiKegiatan::with(['santri:id_santri,nama_lengkap', 'kegiatan:kegiatan_id,nama_kegiatan'])
+            ->whereDate('tanggal', $today)
+            ->orderByDesc('created_at')
+            ->limit(5)
+            ->get()
+            ->each(fn ($a) => $items->push((object) [
+                'icon' => 'fa-clipboard-check',
+                'color' => 'success',
+                'text' => ($a->santri->nama_lengkap ?? '-') . ' — ' . $a->status . ' di ' . ($a->kegiatan->nama_kegiatan ?? '-'),
+                'time' => $a->created_at,
+            ]));
+
+        // Pelanggaran terbaru (7 hari)
+        RiwayatPelanggaran::with(['santri:id_santri,nama_lengkap', 'kategori:id_kategori,nama_pelanggaran'])
+            ->whereDate('tanggal', '>=', $today->copy()->subDays(7))
+            ->terbaru()
+            ->limit(5)
+            ->get()
+            ->each(fn ($p) => $items->push((object) [
+                'icon' => 'fa-exclamation-triangle',
+                'color' => 'danger',
+                'text' => ($p->santri->nama_lengkap ?? '-') . ' — ' . ($p->kategori->nama_pelanggaran ?? '-') . ' (' . $p->poin . ' poin)',
+                'time' => $p->created_at,
+            ]));
+
+        // Pembayaran SPP terbaru (7 hari)
+        PembayaranSpp::with('santri:id_santri,nama_lengkap')
+            ->lunas()
+            ->whereNotNull('tanggal_bayar')
+            ->whereDate('tanggal_bayar', '>=', $today->copy()->subDays(7))
+            ->orderByDesc('tanggal_bayar')
+            ->limit(5)
+            ->get()
+            ->each(fn ($s) => $items->push((object) [
+                'icon' => 'fa-money-bill-wave',
+                'color' => 'info',
+                'text' => ($s->santri->nama_lengkap ?? '-') . ' — SPP ' . $s->bulan_nama . '/' . $s->tahun . ' (Rp ' . number_format($s->nominal, 0, ',', '.') . ')',
+                'time' => $s->created_at,
+            ]));
+
+        return $items->sortByDesc('time')->take(10)->values();
     }
 
     /**

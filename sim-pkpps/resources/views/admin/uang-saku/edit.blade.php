@@ -19,6 +19,27 @@
             <small class="form-text">Santri tidak dapat diubah</small>
         </div>
 
+        {{-- Info Card Santri (AJAX on page load) --}}
+        <div id="santri-info" style="display:none; margin-bottom:20px;">
+            <div class="content-box" style="padding:16px; background:var(--primary-light);">
+                <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin-bottom:12px;">
+                    <div>
+                        <small class="text-muted">Saldo Terakhir</small>
+                        <div id="info-saldo" style="font-weight:700; font-size:1.1rem;"></div>
+                    </div>
+                    <div>
+                        <small class="text-muted">Pemasukan Bln Ini</small>
+                        <div id="info-masuk" style="font-weight:600; color:#6FBA9D;"></div>
+                    </div>
+                    <div>
+                        <small class="text-muted">Pengeluaran Bln Ini</small>
+                        <div id="info-keluar" style="font-weight:600; color:#FF8B94;"></div>
+                    </div>
+                </div>
+                <div id="info-riwayat"></div>
+            </div>
+        </div>
+
         <div class="form-group">
             <label for="jenis_transaksi">
                 <i class="fas fa-exchange-alt form-icon"></i>
@@ -87,15 +108,31 @@
 </div>
 
 <script>
-    // Validasi form sebelum submit
-    document.getElementById('transaksiForm').addEventListener('submit', function(e) {
-        const nominal = document.getElementById('nominal').value;
-        
-        if (nominal && parseInt(nominal) < 1) {
-            e.preventDefault();
-            alert('Nominal harus lebih dari 0');
-            return false;
-        }
-    });
+(function() {
+    var idSantri = '{{ $transaksi->santri->id_santri }}';
+    fetch('{{ url("admin/uang-saku/santri-info") }}/' + idSantri)
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+            var saldoColor = d.saldo_raw >= 0 ? '#6FBA9D' : '#FF8B94';
+            document.getElementById('info-saldo').innerHTML = '<span style="color:' + saldoColor + '">Rp ' + d.saldo_terakhir + '</span>';
+            document.getElementById('info-masuk').textContent = 'Rp ' + d.total_pemasukan_bulan_ini;
+            document.getElementById('info-keluar').textContent = 'Rp ' + d.total_pengeluaran_bulan_ini;
+
+            var html = '';
+            if (d.transaksi_terakhir.length > 0) {
+                html = '<small class="text-muted">3 Transaksi Terakhir:</small><table class="data-table" style="margin-top:6px;font-size:.85rem;"><thead><tr><th>Tanggal</th><th>Jenis</th><th>Nominal</th><th>Ket</th></tr></thead><tbody>';
+                d.transaksi_terakhir.forEach(function(t) {
+                    var badge = t.jenis === 'pemasukan'
+                        ? '<span class="badge badge-success">Masuk</span>'
+                        : '<span class="badge badge-danger">Keluar</span>';
+                    html += '<tr><td>' + t.tanggal + '</td><td>' + badge + '</td><td>Rp ' + t.nominal + '</td><td>' + t.keterangan + '</td></tr>';
+                });
+                html += '</tbody></table>';
+            }
+            document.getElementById('info-riwayat').innerHTML = html;
+            document.getElementById('santri-info').style.display = 'block';
+        })
+        .catch(function() {});
+})();
 </script>
 @endsection

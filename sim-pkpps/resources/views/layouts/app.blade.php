@@ -6,6 +6,10 @@
     <title>@yield('title', 'SIM Santri')</title>
     <!-- Link ke Font Awesome untuk ikon -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font Cinzel untuk splash screen -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <!-- Link ke file CSS utama -->
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <!-- Tambahkan CSS untuk memastikan smooth transition -->
@@ -21,8 +25,8 @@
     <!-- 1. SPLASH SCREEN -->
     <div id="splash-screen" class="splash-screen">
         <div class="splash-content">
-            <h1>SIM Santri</h1>
-            <p>Monitoring Santri Berbasis Web</p>
+            <img src="{{ asset('images/logo.png') }}" alt="Logo PKPPS Riyadlul Jannah" class="splash-logo">
+            <p class="splash-title">PKPPS RIYADLUL JANNAH</p>
             <div class="spinner"></div>
         </div>
     </div>

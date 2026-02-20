@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\PembinaanSanksiController; // Tambahkan ini
 use App\Http\Controllers\Admin\PembayaranSppController;
 use App\Http\Controllers\Admin\UangSakuController;
 use App\Http\Controllers\Admin\KategoriKegiatanController;
+use App\Http\Controllers\Admin\KeuanganController;
 use App\Http\Controllers\Admin\KegiatanController;
 use App\Http\Controllers\Admin\AbsensiKegiatanController;
 use App\Http\Controllers\Admin\KartuRfidController;
@@ -239,11 +240,24 @@ Route::prefix('admin')
         Route::get('/', [UangSakuController::class, 'index'])->name('index');
         Route::get('/create', [UangSakuController::class, 'create'])->name('create');
         Route::post('/', [UangSakuController::class, 'store'])->name('store');
+        Route::get('/santri-info/{id_santri}', [UangSakuController::class, 'santriInfo'])->name('santri-info');
         Route::get('/riwayat/{id_santri}', [UangSakuController::class, 'riwayat'])->name('riwayat');
         Route::get('/{uangSaku}', [UangSakuController::class, 'show'])->name('show');
         Route::get('/{uangSaku}/edit', [UangSakuController::class, 'edit'])->name('edit');
         Route::put('/{uangSaku}', [UangSakuController::class, 'update'])->name('update');
         Route::delete('/{uangSaku}', [UangSakuController::class, 'destroy'])->name('destroy');
+    });
+
+    // 10b. KAS & KEUANGAN PONDOK
+    Route::prefix('keuangan')->name('keuangan.')->group(function () {
+        Route::get('/laporan', [KeuanganController::class, 'laporan'])->name('laporan');
+        Route::get('/', [KeuanganController::class, 'index'])->name('index');
+        Route::get('/create', [KeuanganController::class, 'create'])->name('create');
+        Route::post('/', [KeuanganController::class, 'store'])->name('store');
+        Route::get('/{keuangan}', [KeuanganController::class, 'show'])->name('show');
+        Route::get('/{keuangan}/edit', [KeuanganController::class, 'edit'])->name('edit');
+        Route::put('/{keuangan}', [KeuanganController::class, 'update'])->name('update');
+        Route::delete('/{keuangan}', [KeuanganController::class, 'destroy'])->name('destroy');
     });
 
     // 11. KATEGORI KEGIATAN

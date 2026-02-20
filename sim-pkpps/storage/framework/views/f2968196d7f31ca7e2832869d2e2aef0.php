@@ -119,7 +119,7 @@
 </li>
 
 <!-- ADMINISTRASI -->
-<li class="menu-toggle <?php echo e(Request::is('admin/pembayaran-spp*') || Request::is('admin/uang-saku*') ? 'active' : ''); ?>">
+<li class="menu-toggle <?php echo e(Request::is('admin/pembayaran-spp*') || Request::is('admin/uang-saku*') || Request::is('admin/keuangan*') ? 'active' : ''); ?>">
     <a href="javascript:void(0)" class="menu-parent">
         <i class="fas fa-money-bill-wave"></i><span>Administrasi</span>
         <i class="fas fa-chevron-down toggle-icon"></i>
@@ -129,6 +129,12 @@
             <a href="<?php echo e(route('admin.pembayaran-spp.index')); ?>"
                 class="<?php echo e(Request::is('admin/pembayaran-spp*') ? 'active' : ''); ?>">
                 <i class="fas fa-file-invoice-dollar"></i><span>Pembayaran SPP</span>
+            </a>
+        </li>
+        <li>
+            <a href="<?php echo e(route('admin.keuangan.index')); ?>"
+                class="<?php echo e(Request::is('admin/keuangan*') ? 'active' : ''); ?>">
+                <i class="fas fa-cash-register"></i><span>Kas & Keuangan</span>
             </a>
         </li>
         <li>
