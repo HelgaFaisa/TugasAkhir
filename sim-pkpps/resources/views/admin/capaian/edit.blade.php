@@ -52,7 +52,7 @@
             <h4><i class="fas fa-keyboard"></i> Update Halaman yang Sudah Selesai</h4>
             
             {{-- Tab Metode Input --}}
-            <div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--primary-light); padding-bottom: 10px;">
+            <div style="display: flex; gap: 10px; margin-bottom: 14px; border-bottom: 2px solid var(--primary-light); padding-bottom: 10px;">
                 <button type="button" class="btn btn-sm btn-primary" id="btnMetode1" onclick="switchMetode(1)">
                     <i class="fas fa-keyboard"></i> Metode 1: Input Range Text
                 </button>
@@ -116,7 +116,7 @@
             <div id="metode3" class="metode-input" style="display: none;">
                 <div class="form-group">
                     <label><i class="fas fa-sliders-h form-icon"></i> Pilih Halaman Sampai</label>
-                    <div style="display: flex; align-items: center; gap: 15px;">
+                    <div style="display: flex; align-items: center; gap: 11px;">
                         <span>Halaman {{ $capaian->materi->halaman_mulai }} sampai</span>
                         <input type="number" id="quickInputValue" class="form-control" 
                                style="width: 150px;" 
@@ -141,12 +141,12 @@
             </div>
 
             {{-- Preview Result --}}
-            <div id="previewResult" style="margin-top: 20px;">
+            <div id="previewResult" style="margin-top: 14px;">
                 <div class="info-box" style="background: linear-gradient(135deg, #E8F7F2 0%, #D4F1E3 100%);">
                     <h4 style="margin: 0 0 10px 0; color: var(--primary-dark);">
                         <i class="fas fa-chart-pie"></i> Preview Capaian
                     </h4>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 15px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 11px; margin-top: 15px;">
                         <div style="text-align: center; padding: 15px; background: white; border-radius: 8px;">
                             <p style="margin: 0; color: var(--text-light); font-size: 0.9rem;">Halaman Selesai</p>
                             <h3 style="margin: 5px 0; color: var(--primary-color);" id="previewJumlah">{{ $capaian->jumlah_halaman_selesai }}</h3>

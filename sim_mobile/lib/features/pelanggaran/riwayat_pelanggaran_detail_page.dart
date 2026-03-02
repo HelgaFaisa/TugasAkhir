@@ -1,4 +1,4 @@
-// lib/features/pelanggaran/riwayat_pelanggaran_detail_page.dart
+﻿// lib/features/pelanggaran/riwayat_pelanggaran_detail_page.dart
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -68,7 +68,7 @@ class _RiwayatPelanggaranDetailPageState
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: const Text('Detail Pelanggaran'),
-        backgroundColor: const Color(0xFF7C3AED),
+        backgroundColor: const Color(0xFF6FBA9D),
         foregroundColor: Colors.white,
         elevation: 0,
       ),
@@ -88,7 +88,7 @@ class _RiwayatPelanggaranDetailPageState
                         if (_riwayat!['keterangan'] != null)
                           _buildKeteranganSection(),
                         _buildPublishInfo(),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 15),
                       ],
                     ),
                   ),
@@ -104,14 +104,14 @@ class _RiwayatPelanggaranDetailPageState
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            const Color(0xFF7C3AED),
-            const Color(0xFF7C3AED).withValues(alpha: 0.8),
+            const Color(0xFF6FBA9D),
+            const Color(0xFF6FBA9D).withValues(alpha: 0.8),
           ],
         ),
       ),
@@ -119,28 +119,28 @@ class _RiwayatPelanggaranDetailPageState
         children: [
           // ID Badge
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(15),
             ),
             child: Text(
               idRiwayat,
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 14,
+                fontSize: 11,
                 fontWeight: FontWeight.w600,
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
 
           // Poin Display
           Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(15),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.1),
@@ -154,20 +154,20 @@ class _RiwayatPelanggaranDetailPageState
                 const Text(
                   'Poin Pelanggaran',
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 11,
                     color: Colors.grey,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 7),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.star, color: Colors.red, size: 32),
-                    const SizedBox(width: 8),
+                    const Icon(Icons.star, color: Colors.red, size: 24),
+                    const SizedBox(width: 7),
                     Text(
                       '$poin',
                       style: const TextStyle(
-                        fontSize: 36,
+                        fontSize: 27,
                         fontWeight: FontWeight.bold,
                         color: Colors.red,
                       ),
@@ -175,27 +175,27 @@ class _RiwayatPelanggaranDetailPageState
                   ],
                 ),
                 if (isKafarohSelesai && poinAsli != poin) ...[
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 2),
                   Text(
                     'Poin asli: $poinAsli (Dilebur)',
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 9,
                       color: Colors.grey[600],
                       decoration: TextDecoration.lineThrough,
                     ),
                   ),
                 ],
-                const SizedBox(height: 12),
+                const SizedBox(height: 9),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
+                    horizontal: 9,
+                    vertical: 5,
                   ),
                   decoration: BoxDecoration(
                     color: isKafarohSelesai
                         ? Colors.green[100]
                         : Colors.orange[100],
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(15),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -204,18 +204,18 @@ class _RiwayatPelanggaranDetailPageState
                         isKafarohSelesai
                             ? Icons.check_circle
                             : Icons.pending,
-                        size: 16,
+                        size: 12,
                         color: isKafarohSelesai
                             ? Colors.green[800]
                             : Colors.orange[800],
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 5),
                       Text(
                         isKafarohSelesai
                             ? 'Kafaroh Selesai'
                             : 'Kafaroh Belum Selesai',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 9,
                           fontWeight: FontWeight.bold,
                           color: isKafarohSelesai
                               ? Colors.green[800]
@@ -249,14 +249,14 @@ class _RiwayatPelanggaranDetailPageState
     }
 
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       child: Card(
         elevation: 2,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(9),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -264,25 +264,25 @@ class _RiwayatPelanggaranDetailPageState
                 children: [
                   const Icon(
                     Icons.info_outline,
-                    color: Color(0xFF7C3AED),
-                    size: 20,
+                    color: Color(0xFF6FBA9D),
+                    size: 15,
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 7),
                   const Text(
                     'Informasi Pelanggaran',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 12,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF7C3AED),
+                      color: Color(0xFF6FBA9D),
                     ),
                   ),
                 ],
               ),
-              const Divider(height: 24),
+              const Divider(height: 19),
               _buildInfoRow('Pelanggaran', namaPelanggaran),
-              const SizedBox(height: 12),
+              const SizedBox(height: 9),
               _buildInfoRow('Klasifikasi', namaKlasifikasi),
-              const SizedBox(height: 12),
+              const SizedBox(height: 9),
               _buildInfoRow('Tanggal', tanggalFormat),
             ],
           ),
@@ -310,14 +310,14 @@ class _RiwayatPelanggaranDetailPageState
     }
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Card(
         elevation: 2,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(9),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -326,32 +326,32 @@ class _RiwayatPelanggaranDetailPageState
                   Icon(
                     Icons.info_outline,
                     color: isKafarohSelesai ? Colors.green : Colors.orange,
-                    size: 20,
+                    size: 15,
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 7),
                   Text(
                     'Kafaroh / Taqorrub',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 12,
                       fontWeight: FontWeight.bold,
                       color: isKafarohSelesai ? Colors.green : Colors.orange,
                     ),
                   ),
                 ],
               ),
-              const Divider(height: 24),
+              const Divider(height: 19),
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(9),
                 decoration: BoxDecoration(
                   color: Colors.orange[50],
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(7),
                   border: Border.all(color: Colors.orange[200]!),
                 ),
                 child: Text(
                   kafaroh,
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: 11,
                     color: Colors.grey[800],
                     height: 1.5,
                   ),
@@ -359,13 +359,13 @@ class _RiwayatPelanggaranDetailPageState
               ),
               
               if (isKafarohSelesai) ...[
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(9),
                   decoration: BoxDecoration(
                     color: Colors.green[50],
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(7),
                     border: Border.all(color: Colors.green[200]!),
                   ),
                   child: Column(
@@ -373,53 +373,53 @@ class _RiwayatPelanggaranDetailPageState
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.check_circle, size: 16, color: Colors.green[700]),
-                          const SizedBox(width: 6),
+                          Icon(Icons.check_circle, size: 12, color: Colors.green[700]),
+                          const SizedBox(width: 5),
                           Text(
                             'Kafaroh Telah Diselesaikan',
                             style: TextStyle(
-                              fontSize: 13,
+                              fontSize: 11,
                               fontWeight: FontWeight.bold,
                               color: Colors.green[800],
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 7),
                       Text(
                         'Tanggal: $tanggalSelesaiFormat',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 9,
                           color: Colors.grey[700],
                         ),
                       ),
                       if (adminKafaroh != null) ...[
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 2),
                         Text(
                           'Oleh: ${adminKafaroh['name']}',
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 9,
                             color: Colors.grey[700],
                           ),
                         ),
                       ],
                       if (catatanKafaroh != null && catatanKafaroh.toString().isNotEmpty) ...[
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 7),
                         const Divider(),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 7),
                         Text(
                           'Catatan:',
                           style: TextStyle(
-                            fontSize: 11,
+                            fontSize: 8,
                             fontWeight: FontWeight.w600,
                             color: Colors.grey[600],
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 2),
                         Text(
                           catatanKafaroh,
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 9,
                             color: Colors.grey[700],
                             fontStyle: FontStyle.italic,
                           ),
@@ -440,14 +440,14 @@ class _RiwayatPelanggaranDetailPageState
     final keterangan = _riwayat!['keterangan'];
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
       child: Card(
         elevation: 2,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(9),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -456,24 +456,24 @@ class _RiwayatPelanggaranDetailPageState
                   Icon(
                     Icons.note_outlined,
                     color: Colors.grey[600],
-                    size: 20,
+                    size: 15,
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 7),
                   Text(
                     'Keterangan',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 12,
                       fontWeight: FontWeight.bold,
                       color: Colors.grey[800],
                     ),
                   ),
                 ],
               ),
-              const Divider(height: 24),
+              const Divider(height: 19),
               Text(
                 keterangan,
                 style: TextStyle(
-                  fontSize: 13,
+                  fontSize: 11,
                   color: Colors.grey[700],
                   height: 1.5,
                 ),
@@ -499,24 +499,24 @@ class _RiwayatPelanggaranDetailPageState
     }
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(9),
         decoration: BoxDecoration(
           color: Colors.blue[50],
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(7),
           border: Border.all(color: Colors.blue[200]!),
         ),
         child: Row(
           children: [
-            Icon(Icons.info, size: 16, color: Colors.blue[700]),
-            const SizedBox(width: 8),
+            Icon(Icons.info, size: 12, color: Colors.blue[700]),
+            const SizedBox(width: 7),
             Expanded(
               child: Text(
                 'Dikirim ke wali santri: $tanggalPublishedFormat',
                 style: TextStyle(
-                  fontSize: 11,
+                  fontSize: 8,
                   color: Colors.blue[900],
                 ),
               ),
@@ -528,30 +528,35 @@ class _RiwayatPelanggaranDetailPageState
   }
 
   Widget _buildInfoRow(String label, String value) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          width: 110,
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 13,
-              color: Colors.grey[600],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final labelWidth = constraints.maxWidth * 0.35;
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: labelWidth,
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: Colors.grey[600],
+                ),
+              ),
             ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            value,
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
+            const SizedBox(width: 7),
+            Expanded(
+              child: Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
-          ),
-        ),
-      ],
+          ],
+        );
+      },
     );
   }
 
@@ -562,24 +567,24 @@ class _RiwayatPelanggaranDetailPageState
         children: [
           Icon(
             Icons.error_outline,
-            size: 80,
+            size: 60,
             color: Colors.grey[400],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           Text(
             'Gagal memuat data',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 12,
               color: Colors.grey[600],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           ElevatedButton.icon(
             onPressed: _loadDetail,
             icon: const Icon(Icons.refresh),
             label: const Text('Coba Lagi'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF7C3AED),
+              backgroundColor: const Color(0xFF6FBA9D),
               foregroundColor: Colors.white,
             ),
           ),

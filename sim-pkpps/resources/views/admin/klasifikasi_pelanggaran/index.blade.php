@@ -20,13 +20,13 @@
 @endif
 
 <div class="content-box">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
         <h3 style="margin: 0; color: var(--primary-color);">
             <i class="fas fa-list"></i> Daftar Klasifikasi
         </h3>
         <div style="display: flex; gap: 10px;">
             <a href="{{ route('admin.kategori-pelanggaran.index') }}" class="btn btn-info">
-                <i class="fas fa-list-ul"></i> Master Pelanggaran
+                <i class="fas fa-list-ul"></i> Kategori Pelanggaran
             </a>
             <a href="{{ route('admin.klasifikasi-pelanggaran.create') }}" class="btn btn-primary">
                 <i class="fas fa-plus-circle"></i> Tambah Klasifikasi

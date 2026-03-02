@@ -1,4 +1,4 @@
-// lib/features/berita/berita_page.dart
+﻿// lib/features/berita/berita_page.dart
 
 import 'package:flutter/material.dart';
 import '../../core/api/api_service.dart';
@@ -73,7 +73,7 @@ class _BeritaPageState extends State<BeritaPage> {
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: const Text('Berita'),
-        backgroundColor: const Color(0xFF7C3AED),
+        backgroundColor: const Color(0xFF6FBA9D),
         foregroundColor: Colors.white,
         actions: [
           IconButton(
@@ -89,7 +89,7 @@ class _BeritaPageState extends State<BeritaPage> {
             : _beritaList.isEmpty
                 ? _buildEmptyState()
                 : ListView.builder(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(12),
                     itemCount: _beritaList.length + (_currentPage < _lastPage ? 1 : 0),
                     itemBuilder: (context, index) {
                       if (index == _beritaList.length) {
@@ -109,8 +109,8 @@ class _BeritaPageState extends State<BeritaPage> {
     final tanggal = berita['tanggal'] ?? '';
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      margin: const EdgeInsets.only(bottom: 9),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
       child: InkWell(
         onTap: () async {
           await Navigator.push(
@@ -120,20 +120,20 @@ class _BeritaPageState extends State<BeritaPage> {
             ),
           );
         },
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(9),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Gambar
             BeritaImage(
               imageUrl: berita['gambar_url'],
-              height: 180,
+              height: MediaQuery.of(context).size.height * 0.22,
               borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
             ),
 
             // Content
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -141,51 +141,51 @@ class _BeritaPageState extends State<BeritaPage> {
                   Row(
                     children: [
                       const Spacer(),
-                      Icon(Icons.access_time, size: 14, color: Colors.grey[600]),
-                      const SizedBox(width: 4),
+                      Icon(Icons.access_time, size: 11, color: Colors.grey[600]),
+                      const SizedBox(width: 2),
                       Flexible(
                         child: Text(
                           tanggal,
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                          style: TextStyle(fontSize: 9, color: Colors.grey[600]),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 9),
 
                   // Judul
                   Text(
                     judul,
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: 12,
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 7),
 
                   // Konten Preview (stripped HTML)
                   Text(
                     konten,
-                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                    style: TextStyle(fontSize: 11, color: Colors.grey[600]),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 9),
 
                   // Penulis
                   Row(
                     children: [
-                      Icon(Icons.person_outline, size: 14, color: Colors.grey[600]),
-                      const SizedBox(width: 4),
+                      Icon(Icons.person_outline, size: 11, color: Colors.grey[600]),
+                      const SizedBox(width: 2),
                       Expanded(
                         child: Text(
                           penulis,
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                          style: TextStyle(fontSize: 9, color: Colors.grey[600]),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -203,7 +203,7 @@ class _BeritaPageState extends State<BeritaPage> {
 
   Widget _buildLoadMoreButton() {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16),
+      padding: const EdgeInsets.symmetric(vertical: 12),
       child: Center(
         child: ElevatedButton(
           onPressed: () {
@@ -221,11 +221,11 @@ class _BeritaPageState extends State<BeritaPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.article_outlined, size: 80, color: Colors.grey[400]),
-          const SizedBox(height: 16),
+          Icon(Icons.article_outlined, size: 60, color: Colors.grey[400]),
+          const SizedBox(height: 12),
           Text(
             'Belum ada berita',
-            style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
           ),
         ],
       ),

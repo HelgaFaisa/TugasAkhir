@@ -9,7 +9,7 @@
 </div>
 
 <!-- Breadcrumb -->
-<div style="margin-bottom: 20px;">
+<div style="margin-bottom: 14px;">
     <nav style="display: flex; align-items: center; gap: 8px; color: var(--text-light); font-size: 0.9em;">
         <a href="{{ route('admin.santri.index') }}" style="color: var(--primary-color); text-decoration: none;">
             <i class="fas fa-users"></i> Data Santri
@@ -53,7 +53,7 @@
 
 <!-- Tabel Riwayat -->
 <div class="content-box">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
         <h3 style="margin: 0; color: var(--primary-color);">
             <i class="fas fa-history"></i> Daftar Riwayat Pelanggaran
         </h3>
@@ -147,7 +147,7 @@
         </table>
 
         <!-- Pagination -->
-        <div style="margin-top: 20px;">
+        <div style="margin-top: 14px;">
             {{ $riwayat->links() }}
         </div>
     @else
@@ -164,13 +164,13 @@
 
 <!-- Info Box -->
 @if($totalPoin > 0)
-<div class="content-box" style="margin-top: 30px;">
+<div class="content-box" style="margin-top: 22px;">
     <h3 style="margin-bottom: 15px; color: var(--primary-color);">
         <i class="fas fa-chart-line"></i> Analisis Pelanggaran
     </h3>
     
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
-        <div style="background: var(--primary-light); padding: 20px; border-radius: var(--border-radius-sm); text-align: center;">
+        <div style="background: var(--primary-light); padding: 14px; border-radius: var(--border-radius-sm); text-align: center;">
             <i class="fas fa-calculator" style="font-size: 2em; color: var(--primary-color); margin-bottom: 10px;"></i>
             <div style="font-size: 1.5em; font-weight: 700; color: var(--primary-dark);">
                 {{ $totalPelanggaran > 0 ? number_format($totalPoin / $totalPelanggaran, 1) : 0 }}
@@ -178,7 +178,7 @@
             <p style="margin: 5px 0 0 0; color: var(--text-light);">Rata-rata Poin/Pelanggaran</p>
         </div>
         
-        <div style="background: var(--warning-color); padding: 20px; border-radius: var(--border-radius-sm); text-align: center;">
+        <div style="background: var(--warning-color); padding: 14px; border-radius: var(--border-radius-sm); text-align: center;">
             <i class="fas fa-exclamation-triangle" style="font-size: 2em; color: #856404; margin-bottom: 10px;"></i>
             <div style="font-size: 1.5em; font-weight: 700; color: #856404;">
                 @if($totalPoin >= 50)
@@ -192,7 +192,7 @@
             <p style="margin: 5px 0 0 0; color: #856404;">Kategori Pelanggaran</p>
         </div>
         
-        <div style="background: var(--danger-color); padding: 20px; border-radius: var(--border-radius-sm); text-align: center;">
+        <div style="background: var(--danger-color); padding: 14px; border-radius: var(--border-radius-sm); text-align: center;">
             <i class="fas fa-calendar-alt" style="font-size: 2em; color: white; margin-bottom: 10px;"></i>
             <div style="font-size: 1.5em; font-weight: 700; color: white;">
                 {{ $riwayat->first() ? \Carbon\Carbon::parse($riwayat->first()->tanggal)->format('d M Y') : '-' }}

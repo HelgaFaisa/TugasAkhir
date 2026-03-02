@@ -42,16 +42,14 @@
                 </button>
             </div>
             <ul class="sidebar-menu">
-                <!-- Logika penentuan sidebar berdasarkan status login dan role -->
-                @auth
-                    @if(Auth::user()->role === 'admin')
+                {{-- Sidebar berdasarkan guard yang aktif --}}
+                @if(auth()->check())
+                    @if(auth()->user()->isAdmin())
                         @include('layouts.admin-sidebar')
-                    @else
-                        @include('layouts.santri-wali-sidebar')
                     @endif
-                @else
-                    <!-- Jika belum login, tampilkan menu minimal atau kosong -->
-                @endauth
+                @elseif(auth('santri')->check())
+                    @include('layouts.santri-wali-sidebar')
+                @endif
             </ul>
         </aside>
         <!-- END SIDEBAR -->
@@ -64,12 +62,24 @@
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="user-info">
-                    @auth
+                    @if(auth()->check())
                         <li class="logout-item">
-                            <form method="POST" action="{{ Auth::user()->role === 'admin' ? route('admin.logout') : route('santri.logout') }}" style="display: inline;">
+                            <form method="POST" action="{{ route('admin.logout') }}" style="display: inline;">
                                 @csrf
                                 <button type="submit" 
-                                        style="border: none; background: none; color: #6FBA9D; cursor: pointer; padding: 8px 12px; font-size: 16px; display: flex; align-items: center; gap: 8px; text-decoration: none; font-weight: 500;"
+                                        style="border: none; background: none; color: #6FBA9D; cursor: pointer; padding: 4px 8px; font-size: 0.82rem; display: flex; align-items: center; gap: 6px; text-decoration: none; font-weight: 500;"
+                                        title="Logout">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    <span>Logout</span>
+                                </button>
+                            </form>
+                        </li>
+                    @elseif(auth('santri')->check())
+                        <li class="logout-item">
+                            <form method="POST" action="{{ route('santri.logout') }}" style="display: inline;">
+                                @csrf
+                                <button type="submit" 
+                                        style="border: none; background: none; color: #6FBA9D; cursor: pointer; padding: 4px 8px; font-size: 0.82rem; display: flex; align-items: center; gap: 6px; text-decoration: none; font-weight: 500;"
                                         title="Logout">
                                     <i class="fas fa-sign-out-alt"></i>
                                     <span>Logout</span>
@@ -78,7 +88,7 @@
                         </li>
                     @else
                         <span>Selamat Datang!</span>
-                    @endauth
+                    @endif
                 </div>
             </header>
             <!-- END HEADER/NAVBAR -->

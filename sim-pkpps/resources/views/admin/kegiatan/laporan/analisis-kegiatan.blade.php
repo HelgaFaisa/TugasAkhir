@@ -2,9 +2,9 @@
 
 @section('content')
 <style>
-.chart-box { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 20px; }
+.chart-box { background: #fff; border-radius: 12px; padding: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 14px; }
 .chart-box h4 { margin: 0 0 16px; color: var(--primary-dark); font-size: 1rem; }
-.mini-kpi { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.mini-kpi { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 14px; }
 .mini-kpi-card { padding: 16px; border-radius: 10px; text-align: center; }
 .mini-kpi-card.hadir { background: #ECFDF5; color: #065F46; }
 .mini-kpi-card.izin { background: #FFFBEB; color: #92400E; }
@@ -35,7 +35,7 @@
 </div>
 
 {{-- Header Kegiatan --}}
-<div class="content-box" style="margin-bottom:20px;">
+<div class="content-box" style="margin-bottom: 14px;">
     <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
         <div>
             <h3 style="margin:0 0 6px; color:var(--primary-dark);">{{ $kegiatan->nama_kegiatan }}</h3>
@@ -82,11 +82,12 @@
 </div>
 
 {{-- Overall Progress --}}
-<div class="content-box" style="margin-bottom:20px;">
+<div class="content-box" style="margin-bottom: 14px;">
     <h4 style="margin:0 0 8px;"><i class="fas fa-percentage"></i> Rata-rata Kehadiran</h4>
+    @php $statsPersen = $stats->persen ?? 0; @endphp
     <div class="progress-bar-lg">
-        <div class="fill" style="width:{{ $stats->persen }}%; background:{{ $stats->persen >= 85 ? '#10B981' : ($stats->persen >= 70 ? '#FBBF24' : '#EF4444') }};">
-            {{ $stats->persen }}%
+        <div class="fill" style="width:{{ $statsPersen }}%; background:{{ $statsPersen >= 85 ? '#10B981' : ($statsPersen >= 70 ? '#FBBF24' : '#EF4444') }};">
+            {{ $statsPersen }}%
         </div>
     </div>
 </div>

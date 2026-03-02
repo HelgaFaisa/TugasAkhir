@@ -101,7 +101,7 @@ class PelanggaranApiController extends Controller
         try {
             // Ambil id_santri dari user yang login
             $user = $request->user();
-            $idSantri = $user->role_id; // role_id menyimpan id_santri
+            $idSantri = $user->id_santri; // id_santri dari santri_accounts
 
             // Query dengan pagination
             $perPage = $request->input('per_page', 10);
@@ -168,7 +168,7 @@ class PelanggaranApiController extends Controller
     {
         try {
             $user = $request->user();
-            $idSantri = $user->role_id;
+            $idSantri = $user->id_santri;
 
             // Hanya hitung yang sudah dipublish
             $totalPelanggaran = RiwayatPelanggaran::where('id_santri', $idSantri)
@@ -221,7 +221,7 @@ class PelanggaranApiController extends Controller
     {
         try {
             $user = $request->user();
-            $idSantri = $user->role_id;
+            $idSantri = $user->id_santri;
 
             $riwayat = RiwayatPelanggaran::with([
                     'kategori:id_kategori,nama_pelanggaran,poin,kafaroh,id_klasifikasi',

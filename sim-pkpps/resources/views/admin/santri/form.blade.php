@@ -80,63 +80,54 @@
         @error('jenis_kelamin')<div class="invalid-feedback">{{ $message }}</div>@enderror
     </div>
 
-    {{-- ═══════════════════════════════════════ --}}
-    {{-- KELAS PER KELOMPOK (checkbox list per kelompok) --}}
-    {{-- ═══════════════════════════════════════ --}}
     <hr>
     <h4><i class="fas fa-layer-group"></i> Kelas Santri</h4>
-    <small class="form-text text-muted" style="margin-bottom: 15px; display: block;">
-        <i class="fas fa-info-circle"></i> Pilih kelas untuk setiap kelompok. Santri bisa mengikuti beberapa kelas dalam 1 kelompok.
+    <small class="form-text text-muted kelas-hint">
+        <i class="fas fa-info-circle"></i> Pilih kelas untuk setiap kelompok. Bisa pilih lebih dari 1 kelas.
     </small>
     @error('kelas_ids')
-        <div class="alert alert-danger" style="padding: 8px 12px; font-size: 0.9rem;">
+        <div class="alert alert-danger kelas-error">
             <i class="fas fa-exclamation-triangle"></i> {{ $message }}
         </div>
     @enderror
 
+    @if($kelompokKelas->isEmpty())
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-circle"></i> Belum ada data kelompok kelas. Silakan tambahkan melalui menu <strong>Kelompok Kelas</strong> terlebih dahulu.
+        </div>
+    @endif
+
     @foreach($kelompokKelas as $index => $kelompok)
         @php
-            $existingKelasIds = [];
-            if ($isEdit && $santri->kelasSantri) {
-                $existingKelasIds = $santri->kelasSantri
-                    ->filter(fn($sk) => $sk->kelas && $sk->kelas->id_kelompok === $kelompok->id_kelompok)
-                    ->pluck('id_kelas')
-                    ->toArray();
-            }
-            // Support old() untuk setiap kelompok
-            $selectedIds = old('kelas_ids.' . $kelompok->id_kelompok, $existingKelasIds);
-            if (!is_array($selectedIds)) {
-                $selectedIds = $selectedIds ? [$selectedIds] : [];
-            }
+            $existingKelasIds = ($isEdit && $santri->kelasSantri)
+                ? $santri->kelasSantri->filter(fn($sk) => $sk->kelas && $sk->kelas->id_kelompok === $kelompok->id_kelompok)->pluck('id_kelas')->toArray()
+                : [];
+            $selectedIds = (array) old('kelas_ids.' . $kelompok->id_kelompok, $existingKelasIds);
         @endphp
-        <div class="form-group" style="padding: 15px; border-left: 4px solid {{ $index === 0 ? '#6FBA9D' : '#81C6E8' }}; background: {{ $index % 2 === 0 ? '#FAFFFE' : '#F8FBFD' }}; border-radius: 0 8px 8px 0; margin-bottom: 15px;">
-            <label style="font-weight: 600; margin-bottom: 10px; display: block;">
-                <i class="fas fa-bookmark" style="color: {{ $index === 0 ? '#6FBA9D' : '#81C6E8' }};"></i>
+        <div class="kelompok-box {{ $index % 2 === 0 ? 'kelompok-even' : 'kelompok-odd' }}">
+            <label class="kelompok-label">
+                <i class="fas fa-bookmark"></i>
                 {{ $kelompok->nama_kelompok }}
                 @if($kelompok->deskripsi)
-                    <small style="font-weight: normal; color: #7F8C8D; display: block; margin-top: 3px;">{{ $kelompok->deskripsi }}</small>
+                    <small>{{ $kelompok->deskripsi }}</small>
                 @endif
             </label>
-            
-            @if($kelompok->kelas && $kelompok->kelas->count() > 0)
-                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px;">
+
+            @if($kelompok->kelas->isNotEmpty())
+                <div class="kelas-grid">
                     @foreach($kelompok->kelas as $kelas)
-                        <label style="display: flex; align-items: center; padding: 8px 12px; background: white; border: 2px solid {{ in_array($kelas->id, $selectedIds) ? '#6FBA9D' : '#E8ECF0' }}; border-radius: 6px; cursor: pointer; transition: all 0.2s; margin: 0;">
-                            <input type="checkbox" 
-                                   name="kelas_ids[{{ $kelompok->id_kelompok }}][]" 
+                        <label class="kelas-item {{ in_array($kelas->id, $selectedIds) ? 'checked' : '' }}">
+                            <input type="checkbox"
+                                   name="kelas_ids[{{ $kelompok->id_kelompok }}][]"
                                    value="{{ $kelas->id }}"
                                    {{ in_array($kelas->id, $selectedIds) ? 'checked' : '' }}
-                                   style="margin-right: 8px; width: 18px; height: 18px; cursor: pointer;"
-                                   onchange="this.parentElement.style.borderColor = this.checked ? '#6FBA9D' : '#E8ECF0';">
-                            <span style="font-size: 0.9rem; flex: 1;">{{ $kelas->nama_kelas }}</span>
+                                   onchange="this.parentElement.classList.toggle('checked', this.checked)">
+                            <span>{{ $kelas->nama_kelas }}</span>
                         </label>
                     @endforeach
                 </div>
-                <small class="form-text text-muted" style="margin-top: 8px; display: block;">
-                    <i class="fas fa-hand-pointer"></i> Klik untuk memilih. Bisa pilih lebih dari 1 kelas.
-                </small>
             @else
-                <p style="color: #7F8C8D; font-style: italic; margin: 0;">Belum ada kelas tersedia di kelompok ini.</p>
+                <p class="text-muted" style="font-style: italic; margin: 0;">Belum ada kelas di kelompok ini.</p>
             @endif
         </div>
     @endforeach
@@ -160,7 +151,7 @@
 
     <div class="form-group">
         <label for="daerah_asal">Daerah Asal</label>
-        <input type="text" id="daerah_asal" name="daerah_asal" value="{{ old('daerah_asal', $isEdit ? $santri->daerah_asal : '') }}" class="form-control @error('daerah_asal') is-invalid @enderror" placeholder="Contoh: Yogyakarta">
+        <input type="text" id="daerah_asal" name="daerah_asal" value="{{ old('daerah_asal', $isEdit ? $santri->daerah_asal : '') }}" class="form-control @error('daerah_asal') is-invalid @enderror" placeholder="Masukkan Daerah Asal">
         @error('daerah_asal')<div class="invalid-feedback">{{ $message }}</div>@enderror
     </div>
 
@@ -175,11 +166,11 @@
 
     <div class="form-group">
         <label for="nomor_hp_ortu">Nomor HP Orang Tua</label>
-        <input type="text" id="nomor_hp_ortu" name="nomor_hp_ortu" value="{{ old('nomor_hp_ortu', $isEdit ? $santri->nomor_hp_ortu : '') }}" class="form-control @error('nomor_hp_ortu') is-invalid @enderror" placeholder="Contoh: 08123456789">
+        <input type="text" id="nomor_hp_ortu" name="nomor_hp_ortu" value="{{ old('nomor_hp_ortu', $isEdit ? $santri->nomor_hp_ortu : '') }}" class="form-control @error('nomor_hp_ortu') is-invalid @enderror" placeholder="Contoh: +6285182261234">
         @error('nomor_hp_ortu')<div class="invalid-feedback">{{ $message }}</div>@enderror
     </div>
 
-    <div style="margin-top: 30px; display: flex; gap: 10px;">
+    <div style="margin-top: 22px; display: flex; gap: 10px;">
         <button type="submit" class="btn btn-success">
             <i class="fas fa-save"></i> {{ $isEdit ? 'Update Data' : 'Simpan Santri' }}
         </button>
@@ -224,3 +215,18 @@ function previewImage(event) {
     }
 }
 </script>
+
+<style>
+.kelas-hint { margin-bottom: 15px; display: block; }
+.kelas-error { padding: 8px 12px; font-size: 0.9rem; }
+.kelompok-box { padding: 15px; border-radius: 0 8px 8px 0; margin-bottom: 15px; border-left: 4px solid #6FBA9D; }
+.kelompok-even { background: #FAFFFE; border-left-color: #6FBA9D; }
+.kelompok-odd  { background: #F8FBFD; border-left-color: #81C6E8; }
+.kelompok-label { font-weight: 600; margin-bottom: 10px; display: block; }
+.kelompok-label small { font-weight: normal; color: #7F8C8D; display: block; margin-top: 3px; }
+.kelas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.kelas-item { display: flex; align-items: center; padding: 8px 12px; background: #fff; border: 2px solid #E8ECF0; border-radius: 6px; cursor: pointer; transition: border-color .2s; margin: 0; }
+.kelas-item.checked { border-color: #6FBA9D; }
+.kelas-item input[type="checkbox"] { margin-right: 8px; width: 18px; height: 18px; cursor: pointer; }
+.kelas-item span { font-size: 0.9rem; flex: 1; }
+</style>

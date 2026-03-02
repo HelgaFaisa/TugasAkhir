@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/api/api_service.dart';
 
@@ -31,7 +32,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (!mounted) return;
 
-    // Tidak ada token → Login
+    // Tidak ada token â†’ Login
     if (token == null) {
       Navigator.pushReplacementNamed(context, '/login');
       return;
@@ -68,61 +69,41 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF7C3AED),
-              Color(0xFF5B21B6),
-            ],
-          ),
-        ),
-        child: const Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Logo
-              Icon(
-                Icons.school_rounded,
-                size: 80,
-                color: Colors.white,
+      backgroundColor: Colors.white,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Logo
+            Image.asset(
+              'assets/images/logo.png',
+              width: 120,
+              height: 120,
+            ),
+            const SizedBox(height: 20),
+
+            // App Name
+            Text(
+              'PKPPS RIYADLUL JANNAH',
+              style: GoogleFonts.cinzel(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: const Color(0xFF2C3E50),
+                letterSpacing: 2.5,
               ),
-              SizedBox(height: 20),
-              
-              // App Name
-              Text(
-                'SIM-PKPPS',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  letterSpacing: 2,
-                ),
+            ),
+            const SizedBox(height: 30),
+
+            // Loading indicator
+            const SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6FBA9D)),
+                strokeWidth: 3,
               ),
-              SizedBox(height: 8),
-              Text(
-                'Mobile',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.white70,
-                  letterSpacing: 1,
-                ),
-              ),
-              SizedBox(height: 40),
-              
-              // Loading indicator
-              SizedBox(
-                width: 30,
-                height: 30,
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                  strokeWidth: 3,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

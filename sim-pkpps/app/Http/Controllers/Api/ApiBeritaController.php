@@ -15,7 +15,7 @@ class ApiBeritaController extends Controller
     public function index(Request $request)
     {
         try {
-            $idSantri = $request->user()->role_id;
+            $idSantri = $request->user()->id_santri;
 
             $santri = Santri::with('kelasPrimary.kelas')->where('id_santri', $idSantri)->first();
 
@@ -82,7 +82,7 @@ class ApiBeritaController extends Controller
     public function show(Request $request, $idBerita)
     {
         try {
-            $idSantri = $request->user()->role_id;
+            $idSantri = $request->user()->id_santri;
 
             $berita = Berita::where('id_berita', $idBerita)
                 ->where('status', 'published')

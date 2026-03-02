@@ -1,4 +1,4 @@
-// lib/features/uang_saku/uang_saku_page.dart
+﻿// lib/features/uang_saku/uang_saku_page.dart
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -163,7 +163,7 @@ class _UangSakuPageState extends State<UangSakuPage> {
                         const Text(
                           'Filter Transaksi',
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 15,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -174,17 +174,17 @@ class _UangSakuPageState extends State<UangSakuPage> {
                       ],
                     ),
                     const Divider(),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
 
                     // Periode Filter
                     const Text(
                       'Periode',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 11,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 7),
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
@@ -215,19 +215,19 @@ class _UangSakuPageState extends State<UangSakuPage> {
 
                     // Custom Date Range (if selected)
                     if (_selectedPeriode == 'custom') ...[
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 12),
                       Row(
                         children: [
                           Expanded(
                             child: OutlinedButton.icon(
-                              icon: const Icon(Icons.calendar_today, size: 16),
+                              icon: const Icon(Icons.calendar_today, size: 12),
                               label: Text(
                                 _customTanggalDari != null
                                     ? DateFormat(
                                       'dd/MM/yyyy',
                                     ).format(_customTanggalDari!)
                                     : 'Dari Tanggal',
-                                style: const TextStyle(fontSize: 12),
+                                style: const TextStyle(fontSize: 9),
                               ),
                               onPressed: () async {
                                 final date = await showDatePicker(
@@ -245,17 +245,17 @@ class _UangSakuPageState extends State<UangSakuPage> {
                               },
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: 7),
                           Expanded(
                             child: OutlinedButton.icon(
-                              icon: const Icon(Icons.calendar_today, size: 16),
+                              icon: const Icon(Icons.calendar_today, size: 12),
                               label: Text(
                                 _customTanggalSampai != null
                                     ? DateFormat(
                                       'dd/MM/yyyy',
                                     ).format(_customTanggalSampai!)
                                     : 'Sampai Tanggal',
-                                style: const TextStyle(fontSize: 12),
+                                style: const TextStyle(fontSize: 9),
                               ),
                               onPressed: () async {
                                 final date = await showDatePicker(
@@ -278,17 +278,17 @@ class _UangSakuPageState extends State<UangSakuPage> {
                       ),
                     ],
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 19),
 
                     // Jenis Transaksi Filter
                     const Text(
                       'Jenis Transaksi',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 11,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 7),
                     Wrap(
                       spacing: 8,
                       children: [
@@ -306,18 +306,18 @@ class _UangSakuPageState extends State<UangSakuPage> {
                       ],
                     ),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 19),
 
                     // Apply Button
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF7C3AED),
+                          backgroundColor: const Color(0xFF6FBA9D),
                           foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          padding: const EdgeInsets.symmetric(vertical: 11),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(9),
                           ),
                         ),
                         onPressed: () {
@@ -331,13 +331,13 @@ class _UangSakuPageState extends State<UangSakuPage> {
                         child: const Text(
                           'Terapkan Filter',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 12,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
                   ],
                 ),
               );
@@ -358,10 +358,10 @@ class _UangSakuPageState extends State<UangSakuPage> {
       onSelected: (selected) {
         setModalState(() => _selectedPeriode = value);
       },
-      selectedColor: const Color(0xFF7C3AED).withValues(alpha: 0.2),
-      checkmarkColor: const Color(0xFF7C3AED),
+      selectedColor: const Color(0xFF6FBA9D).withValues(alpha: 0.2),
+      checkmarkColor: const Color(0xFF6FBA9D),
       labelStyle: TextStyle(
-        color: isSelected ? const Color(0xFF7C3AED) : Colors.grey[700],
+        color: isSelected ? const Color(0xFF6FBA9D) : Colors.grey[700],
         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
       ),
     );
@@ -379,10 +379,10 @@ class _UangSakuPageState extends State<UangSakuPage> {
       onSelected: (selected) {
         setModalState(() => _selectedJenis = value);
       },
-      selectedColor: const Color(0xFF7C3AED).withValues(alpha: 0.2),
-      checkmarkColor: const Color(0xFF7C3AED),
+      selectedColor: const Color(0xFF6FBA9D).withValues(alpha: 0.2),
+      checkmarkColor: const Color(0xFF6FBA9D),
       labelStyle: TextStyle(
-        color: isSelected ? const Color(0xFF7C3AED) : Colors.grey[700],
+        color: isSelected ? const Color(0xFF6FBA9D) : Colors.grey[700],
         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
       ),
     );
@@ -398,7 +398,7 @@ class _UangSakuPageState extends State<UangSakuPage> {
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: const Text('Uang Saku'),
-        backgroundColor: const Color(0xFF7C3AED),
+        backgroundColor: const Color(0xFF6FBA9D),
         foregroundColor: Colors.white,
         actions: [
           IconButton(
@@ -414,22 +414,22 @@ class _UangSakuPageState extends State<UangSakuPage> {
       body: RefreshIndicator(
         onRefresh: () => _loadTransaksi(isRefresh: true),
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(12),
           children: [
             // Filter Info Badge
             _buildFilterInfoBadge(),
-            const SizedBox(height: 12),
+            const SizedBox(height: 9),
 
             // Card Saldo
             _buildSaldoCard(),
-            const SizedBox(height: 24),
+            const SizedBox(height: 19),
 
             // Title Riwayat
             const Text(
               'Riwayat Transaksi',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 9),
 
             // List Transaksi
             if (_isLoadingTransaksi && _transaksiList.isEmpty)
@@ -444,7 +444,7 @@ class _UangSakuPageState extends State<UangSakuPage> {
             // Load More Button
             if (_currentPage < _lastPage)
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                padding: const EdgeInsets.symmetric(vertical: 12),
                 child: ElevatedButton(
                   onPressed: () {
                     setState(() => _currentPage++);
@@ -498,22 +498,22 @@ class _UangSakuPageState extends State<UangSakuPage> {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 7),
       decoration: BoxDecoration(
-        color: const Color(0xFF7C3AED).withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFF7C3AED).withValues(alpha: 0.3)),
+        color: const Color(0xFF6FBA9D).withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(7),
+        border: Border.all(color: const Color(0xFF6FBA9D).withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
-          const Icon(Icons.info_outline, size: 16, color: Color(0xFF7C3AED)),
-          const SizedBox(width: 8),
+          const Icon(Icons.info_outline, size: 12, color: Color(0xFF6FBA9D)),
+          const SizedBox(width: 7),
           Expanded(
             child: Text(
-              'Filter: $periodeText • $jenisText',
+              'Filter: $periodeText â€¢ $jenisText',
               style: const TextStyle(
-                fontSize: 12,
-                color: Color(0xFF7C3AED),
+                fontSize: 9,
+                color: Color(0xFF6FBA9D),
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -527,7 +527,7 @@ class _UangSakuPageState extends State<UangSakuPage> {
     if (_isLoadingSaldo) {
       return const Card(
         child: Padding(
-          padding: EdgeInsets.all(24),
+          padding: EdgeInsets.all(19),
           child: Center(child: CircularProgressIndicator()),
         ),
       );
@@ -540,56 +540,56 @@ class _UangSakuPageState extends State<UangSakuPage> {
     return Container(
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF7C3AED), Color(0xFF5B21B6)],
+          colors: [Color(0xFF6FBA9D), Color(0xFF4D987B)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF7C3AED).withValues(alpha: 0.3),
+            color: const Color(0xFF6FBA9D).withValues(alpha: 0.3),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
         ],
       ),
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(19),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(9),
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(9),
                 ),
                 child: const Icon(
                   Icons.account_balance_wallet,
                   color: Colors.white,
-                  size: 24,
+                  size: 19,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 9),
               const Text(
                 'Saldo Saat Ini',
-                style: TextStyle(color: Colors.white70, fontSize: 14),
+                style: TextStyle(color: Colors.white70, fontSize: 11),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
 
           // Saldo Besar
           Text(
             _formatRupiah(saldo),
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 32,
+              fontSize: 24,
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 15),
 
           // Info Pemasukan & Pengeluaran
           Row(
@@ -600,14 +600,14 @@ class _UangSakuPageState extends State<UangSakuPage> {
                   children: [
                     const Text(
                       'Total Pemasukan',
-                      style: TextStyle(color: Colors.white70, fontSize: 12),
+                      style: TextStyle(color: Colors.white70, fontSize: 9),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 2),
                     Text(
                       _formatRupiah(pemasukan),
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 14,
+                        fontSize: 11,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -620,14 +620,14 @@ class _UangSakuPageState extends State<UangSakuPage> {
                   children: [
                     const Text(
                       'Total Pengeluaran',
-                      style: TextStyle(color: Colors.white70, fontSize: 12),
+                      style: TextStyle(color: Colors.white70, fontSize: 9),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 2),
                     Text(
                       _formatRupiah(pengeluaran),
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 14,
+                        fontSize: 11,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -652,10 +652,10 @@ class _UangSakuPageState extends State<UangSakuPage> {
     final isPemasukan = jenis == 'pemasukan';
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      margin: const EdgeInsets.only(bottom: 9),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -664,17 +664,17 @@ class _UangSakuPageState extends State<UangSakuPage> {
                 // Badge Jenis Transaksi
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 4,
+                    horizontal: 9,
+                    vertical: 2,
                   ),
                   decoration: BoxDecoration(
                     color: isPemasukan ? Colors.green[100] : Colors.red[100],
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(9),
                   ),
                   child: Text(
                     isPemasukan ? 'Pemasukan' : 'Pengeluaran',
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 9,
                       fontWeight: FontWeight.bold,
                       color: isPemasukan ? Colors.green[800] : Colors.red[800],
                     ),
@@ -685,46 +685,46 @@ class _UangSakuPageState extends State<UangSakuPage> {
                 // Tanggal
                 Text(
                   tanggal,
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: 9, color: Colors.grey[600]),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 9),
 
             // Nominal
             Text(
               _formatRupiah(nominal),
               style: TextStyle(
-                fontSize: 20,
+                fontSize: 15,
                 fontWeight: FontWeight.bold,
                 color: isPemasukan ? Colors.green[700] : Colors.red[700],
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 7),
 
             // Keterangan
             Text(
               keterangan,
-              style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+              style: TextStyle(fontSize: 11, color: Colors.grey[700]),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 9),
 
-            // Saldo Sebelum → Sesudah
+            // Saldo Sebelum â†’ Sesudah
             Row(
               children: [
                 Flexible(
                   child: Text(
                     _formatRupiah(saldoSebelum),
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    style: const TextStyle(fontSize: 9, color: Colors.grey),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 6),
+                  padding: EdgeInsets.symmetric(horizontal: 5),
                   child: Icon(
                     Icons.arrow_forward,
-                    size: 12,
+                    size: 9,
                     color: Colors.grey,
                   ),
                 ),
@@ -732,7 +732,7 @@ class _UangSakuPageState extends State<UangSakuPage> {
                   child: Text(
                     _formatRupiah(saldoSesudah),
                     style: const TextStyle(
-                      fontSize: 12,
+                      fontSize: 9,
                       fontWeight: FontWeight.bold,
                     ),
                     maxLines: 1,
@@ -750,18 +750,18 @@ class _UangSakuPageState extends State<UangSakuPage> {
   Widget _buildEmptyState() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(24),
         child: Column(
           children: [
             Icon(
               Icons.receipt_long_outlined,
-              size: 64,
+              size: 48,
               color: Colors.grey[400],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             Text(
               'Belum ada transaksi',
-              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
             ),
           ],
         ),

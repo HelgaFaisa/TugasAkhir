@@ -1,4 +1,5 @@
 <?php
+// app/Http/Controllers/Santri/SantriKepulanganController.php
 
 namespace App\Http\Controllers\Santri;
 
@@ -6,123 +7,138 @@ use App\Http\Controllers\Controller;
 use App\Models\Kepulangan;
 use App\Models\Santri;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
 class SantriKepulanganController extends Controller
 {
+    // -- Helper: Ambil id_santri dari akun yang login --
+    private function getSantriId()
+    {
+        return auth('santri')->user()->id_santri;
+    }
+
     /**
      * Tampilkan riwayat kepulangan santri yang sedang login
      */
     public function index(Request $request)
     {
-        $user = Auth::user();
-        
-        // Ambil data santri
-        $santri = Santri::where('id_santri', $user->role_id)
-            ->select('id_santri', 'nama_lengkap', 'kelas')
-            ->firstOrFail();
-        
-        // Tahun untuk filter
+        $idSantri = $this->getSantriId();
+
+        // -- Ambil data santri (tanpa kolom 'kelas' yang mungkin tidak ada) --
+        $santri = Santri::where('id_santri', $idSantri)->firstOrFail();
+
+        // -- Tahun untuk filter --
         $tahunSekarang = $request->filled('tahun') ? $request->tahun : Carbon::now()->year;
-        
-        // Query riwayat kepulangan
+
+        // -- Query riwayat kepulangan --
         $query = Kepulangan::query()
-            ->select([
-                'id',
-                'id_kepulangan',
-                'id_santri',
-                'tanggal_izin',
-                'tanggal_pulang',
-                'tanggal_kembali',
-                'durasi_izin',
-                'alasan',
-                'status',
-                'approved_at',
-                'created_at'
-            ])
             ->where('id_santri', $santri->id_santri)
             ->whereYear('tanggal_pulang', $tahunSekarang);
-        
-        // Filter status jika ada
+
+        // -- Filter status jika ada --
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
-        
-        // Urutkan terbaru dan paginate
+
+        // -- Urutkan terbaru dan paginate --
         $riwayatKepulangan = $query->orderBy('tanggal_pulang', 'desc')
             ->paginate(10)
             ->appends($request->all());
-        
-        // Hitung statistik tahun ini
+
+        // -- Hitung statistik tahun ini --
+        $allKepulanganTahunIni = Kepulangan::where('id_santri', $santri->id_santri)
+            ->whereYear('tanggal_pulang', $tahunSekarang)
+            ->get();
+
         $statistik = [
-            'total_izin' => Kepulangan::where('id_santri', $santri->id_santri)
-                ->whereYear('tanggal_pulang', $tahunSekarang)
-                ->count(),
-            'disetujui' => Kepulangan::where('id_santri', $santri->id_santri)
-                ->where('status', 'Disetujui')
-                ->whereYear('tanggal_pulang', $tahunSekarang)
-                ->count(),
-            'total_hari' => Kepulangan::where('id_santri', $santri->id_santri)
-                ->where('status', 'Disetujui')
-                ->whereYear('tanggal_pulang', $tahunSekarang)
-                ->sum('durasi_izin'),
-            'menunggu' => Kepulangan::where('id_santri', $santri->id_santri)
-                ->where('status', 'Menunggu')
-                ->whereYear('tanggal_pulang', $tahunSekarang)
-                ->count(),
+            'total_izin'   => $allKepulanganTahunIni->count(),
+            'disetujui'    => $allKepulanganTahunIni->where('status', 'Disetujui')->count(),
+            'ditolak'      => $allKepulanganTahunIni->where('status', 'Ditolak')->count(),
+            'menunggu'     => $allKepulanganTahunIni->where('status', 'Menunggu')->count(),
+            'selesai'      => $allKepulanganTahunIni->where('status', 'Selesai')->count(),
+            'total_hari'   => $allKepulanganTahunIni->whereIn('status', ['Disetujui', 'Selesai'])->sum('durasi_izin'),
         ];
-        
-        // Hitung sisa kuota (maksimal 12 hari/tahun)
+
         $statistik['sisa_kuota'] = max(0, 12 - $statistik['total_hari']);
         $statistik['over_limit'] = $statistik['total_hari'] > 12;
-        
-        // Data untuk filter
+        $statistik['persen_kuota'] = min(100, round(($statistik['total_hari'] / 12) * 100));
+
+        // -- Cek apakah sedang aktif pulang --
+        $sedangPulang = Kepulangan::where('id_santri', $santri->id_santri)
+            ->where('status', 'Disetujui')
+            ->whereDate('tanggal_pulang', '<=', Carbon::today())
+            ->whereDate('tanggal_kembali', '>=', Carbon::today())
+            ->first();
+
+        // -- Cek apakah ada yang terlambat --
+        $terlambat = Kepulangan::where('id_santri', $santri->id_santri)
+            ->where('status', 'Disetujui')
+            ->whereDate('tanggal_kembali', '<', Carbon::today())
+            ->first();
+
+        // -- Data untuk filter --
         $statusOptions = [
             'Menunggu' => 'Menunggu Approval',
             'Disetujui' => 'Disetujui',
             'Ditolak' => 'Ditolak',
             'Selesai' => 'Selesai'
         ];
-        
-        // Tahun options (5 tahun terakhir)
+
+        // -- Tahun options (5 tahun terakhir) --
         $tahunOptions = range(Carbon::now()->year, Carbon::now()->year - 4);
-        
+
         return view('santri.kepulangan.index', compact(
             'riwayatKepulangan',
             'santri',
             'statistik',
             'statusOptions',
             'tahunOptions',
-            'tahunSekarang'
+            'tahunSekarang',
+            'sedangPulang',
+            'terlambat'
         ));
     }
-    
+
     /**
      * Tampilkan detail kepulangan
      */
     public function show($id_kepulangan)
     {
-        $user = Auth::user();
-        
-        $santri = Santri::where('id_santri', $user->role_id)
-            ->select('id_santri', 'nama_lengkap', 'kelas')
-            ->firstOrFail();
-        
-        // Ambil data kepulangan dengan validasi kepemilikan
+        $idSantri = $this->getSantriId();
+
+        $santri = Santri::where('id_santri', $idSantri)->firstOrFail();
+
+        // -- Ambil data kepulangan dengan validasi kepemilikan --
         $kepulangan = Kepulangan::where('id_kepulangan', $id_kepulangan)
             ->where('id_santri', $santri->id_santri)
             ->firstOrFail();
-        
-        // Hitung total hari izin tahun ini
+
+        // -- Hitung total hari izin tahun ini --
         $tahunSekarang = Carbon::now()->year;
         $totalHariTahunIni = Kepulangan::where('id_santri', $santri->id_santri)
-            ->where('status', 'Disetujui')
+            ->whereIn('status', ['Disetujui', 'Selesai'])
             ->whereYear('tanggal_pulang', $tahunSekarang)
             ->sum('durasi_izin');
-        
+
         $sisaKuota = max(0, 12 - $totalHariTahunIni);
-        
-        return view('santri.kepulangan.show', compact('kepulangan', 'santri', 'totalHariTahunIni', 'sisaKuota'));
+        $persenKuota = min(100, round(($totalHariTahunIni / 12) * 100));
+
+        // -- Riwayat kepulangan lain tahun ini --
+        $riwayatLain = Kepulangan::where('id_santri', $santri->id_santri)
+            ->where('id_kepulangan', '!=', $id_kepulangan)
+            ->whereYear('tanggal_pulang', $tahunSekarang)
+            ->whereIn('status', ['Disetujui', 'Selesai'])
+            ->orderBy('tanggal_pulang', 'desc')
+            ->limit(5)
+            ->get();
+
+        return view('santri.kepulangan.show', compact(
+            'kepulangan',
+            'santri',
+            'totalHariTahunIni',
+            'sisaKuota',
+            'persenKuota',
+            'riwayatLain'
+        ));
     }
 }

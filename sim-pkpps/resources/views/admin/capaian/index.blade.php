@@ -19,14 +19,19 @@
 @endif
 
 {{-- Action Button --}}
-<div class="content-box" style="margin-bottom: 20px;">
-    <a href="{{ route('admin.capaian.create') }}" class="btn btn-success" style="padding: 12px 24px;">
-        <i class="fas fa-plus"></i> Input Capaian
-    </a>
+<div class="content-box" style="margin-bottom: 14px;">
+    <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+        <a href="{{ route('admin.capaian.create') }}" class="btn btn-success" style="padding: 9px 18px;">
+            <i class="fas fa-plus"></i> Input Capaian
+        </a>
+        <a href="{{ route('admin.capaian.akses-santri') }}" class="btn btn-primary" style="padding: 9px 18px;">
+            <i class="fas fa-unlock-alt"></i> Kelola Akses Input Santri
+        </a>
+    </div>
 </div>
 
 {{-- Filter Section --}}
-<div class="content-box" style="margin-bottom: 20px;">
+<div class="content-box" style="margin-bottom: 14px;">
     <form method="GET" action="{{ route('admin.capaian.index') }}" class="filter-form-inline">
         <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
             {{-- Filter Kelas (Dropdown dynamic dari database) --}}

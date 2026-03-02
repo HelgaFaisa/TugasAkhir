@@ -1,4 +1,4 @@
-// lib/features/kepulangan/presentation/pages/kepulangan_page.dart
+﻿// lib/features/kepulangan/presentation/pages/kepulangan_page.dart
 
 import 'package:flutter/material.dart';
 import '../../data/models/kepulangan_model.dart';
@@ -26,7 +26,7 @@ class _KepulanganPageState extends State<KepulanganPage> {
       appBar: AppBar(
         title: const Text('Kepulangan Santri'),
         elevation: 0,
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: const Color(0xFF6FBA9D),
         foregroundColor: Colors.white,
         actions: [
           // Filter Status
@@ -58,7 +58,7 @@ class _KepulanganPageState extends State<KepulanganPage> {
           ),
         ],
       ),
-      // ⭐⭐⭐ TAMBAHKAN INI (Floating Action Button) ⭐⭐⭐
+      // â­â­â­ TAMBAHKAN INI (Floating Action Button) â­â­â­
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
           final result = await Navigator.pushNamed(
@@ -75,7 +75,7 @@ class _KepulanganPageState extends State<KepulanganPage> {
         },
         icon: const Icon(Icons.add),
         label: const Text('Ajukan Izin'),
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: const Color(0xFF6FBA9D),
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -130,7 +130,7 @@ class _KepulanganPageState extends State<KepulanganPage> {
                 // Kuota Indicator
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(12),
                     child: KuotaIndicator(kuotaInfo: kuotaInfo),
                   ),
                 ),
@@ -139,21 +139,21 @@ class _KepulanganPageState extends State<KepulanganPage> {
                 if (_selectedStatus != null)
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
                       child: Container(
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(9),
                         decoration: BoxDecoration(
                           color: Colors.blue.shade50,
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(7),
                         ),
                         child: Row(
                           children: [
                             Icon(
                               Icons.filter_alt,
-                              size: 16,
+                              size: 12,
                               color: Colors.blue.shade700,
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: 7),
                             Text(
                               'Filter: $_selectedStatus',
                               style: TextStyle(
@@ -171,7 +171,7 @@ class _KepulanganPageState extends State<KepulanganPage> {
                               },
                               child: Icon(
                                 Icons.close,
-                                size: 18,
+                                size: 15,
                                 color: Colors.blue.shade700,
                               ),
                             ),
@@ -181,7 +181,7 @@ class _KepulanganPageState extends State<KepulanganPage> {
                     ),
                   ),
 
-                const SliverToBoxAdapter(child: SizedBox(height: 8)),
+                const SliverToBoxAdapter(child: SizedBox(height: 7)),
 
                 // List Kepulangan
                 SliverList(
@@ -206,13 +206,13 @@ class _KepulanganPageState extends State<KepulanganPage> {
                 // Pagination info
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(12),
                     child: Text(
                       'Menampilkan ${pagination.from ?? 0} - ${pagination.to ?? 0} dari ${pagination.total} data',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.grey.shade600,
-                        fontSize: 12,
+                        fontSize: 9,
                       ),
                     ),
                   ),
@@ -223,8 +223,8 @@ class _KepulanganPageState extends State<KepulanganPage> {
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
+                        horizontal: 12,
+                        vertical: 7,
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -239,7 +239,7 @@ class _KepulanganPageState extends State<KepulanganPage> {
                               icon: const Icon(Icons.chevron_left),
                               label: const Text('Prev'),
                             ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: 7),
                           if (pagination.hasNextPage)
                             ElevatedButton.icon(
                               onPressed: () {
@@ -265,7 +265,7 @@ class _KepulanganPageState extends State<KepulanganPage> {
   Widget _buildErrorState(String message) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(12),
         child: Text(message),
       ),
     );
@@ -278,9 +278,9 @@ class _KepulanganPageState extends State<KepulanganPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Icon(Icons.inbox),
-          const SizedBox(height: 8),
+          const SizedBox(height: 7),
           const Text('Tidak ada data kepulangan.'),
-          const SizedBox(height: 8),
+          const SizedBox(height: 7),
           // Opsional: tampilkan info kuota
           KuotaIndicator(kuotaInfo: kuotaInfo),
         ],

@@ -1,7 +1,3 @@
-
-
-
-
 <?php $__env->startSection('title', 'Kelola Kelas Santri'); ?>
 
 <?php $__env->startSection('content'); ?>
@@ -31,8 +27,8 @@
 <?php endif; ?>
 
 <!-- Quick Navigation Menu -->
-<div class="content-box" style="margin-bottom: 20px; background: linear-gradient(135deg, #E8F7F2 0%, #D4F1E3 100%); border: 2px solid var(--primary-color);">
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+<div class="content-box" style="margin-bottom: 14px; background: linear-gradient(135deg, #E8F7F2 0%, #D4F1E3 100%); border: 2px solid var(--primary-color);">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 11px;">
         <div>
             <h4 style="margin: 0; color: var(--primary-dark); display: flex; align-items: center; gap: 10px;">
                 <i class="fas fa-layer-group"></i>
@@ -46,9 +42,6 @@
             <a href="<?php echo e(route('admin.kelas.kelompok.index')); ?>" class="btn btn-info">
                 <i class="fas fa-folder"></i> Kelompok Kelas
             </a>
-            <a href="<?php echo e(route('admin.kelas.index')); ?>" class="btn btn-primary">
-                <i class="fas fa-chalkboard"></i> Daftar Kelas
-            </a>
             <a href="<?php echo e(route('admin.kelas.kenaikan.index')); ?>" class="btn btn-success">
                 <i class="fas fa-graduation-cap"></i> Kenaikan Kelas
             </a>
@@ -57,8 +50,8 @@
 </div>
 
 <!-- Header Actions -->
-<div class="content-box" style="margin-bottom: 20px;">
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+<div class="content-box" style="margin-bottom: 14px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 11px;">
         <!-- Search & Filter Form -->
         <form method="GET" action="<?php echo e(route('admin.kelas.index')); ?>" style="display: flex; gap: 10px; flex-wrap: wrap; flex-grow: 1;">
             <input type="text" 
@@ -144,6 +137,11 @@
                             </td>
                             <td>
                                 <div style="display: flex; gap: 5px;">
+                                    <a href="<?php echo e(route('admin.kelas.show', $item->id)); ?>" 
+                                       class="btn btn-sm btn-info"
+                                       title="Lihat Detail">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
                                     <a href="<?php echo e(route('admin.kelas.edit', $item->id)); ?>" 
                                        class="btn btn-sm btn-warning"
                                        title="Edit">
@@ -170,7 +168,7 @@
 
         <!-- Pagination -->
         <?php if($kelas->hasPages()): ?>
-            <div style="margin-top: 20px;">
+            <div style="margin-top: 14px;">
                 <?php echo e($kelas->links('vendor.pagination.custom')); ?>
 
             </div>

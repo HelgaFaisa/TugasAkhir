@@ -3,13 +3,16 @@
 @section('title', 'Tambah Data Kesehatan Santri')
 
 @section('content')
+{{-- Select2 CSS --}}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+
 <div class="page-header">
     <h2><i class="fas fa-plus-circle"></i> Tambah Data Kesehatan Santri</h2>
 </div>
 
 <!-- Content Box -->
 <div class="content-box">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
         <h3 style="margin: 0; color: var(--primary-color);">
             <i class="fas fa-file-medical"></i> Form Data Kesehatan
         </h3>
@@ -115,7 +118,7 @@
         </div>
 
         <!-- Buttons -->
-        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 30px;">
+        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 22px;">
             <a href="{{ route('admin.kesehatan-santri.index') }}" class="btn btn-secondary">
                 <i class="fas fa-times"></i> Batal
             </a>
@@ -126,8 +129,21 @@
     </form>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Inisialisasi Select2
+    $('#id_santri').select2({
+        placeholder: '-- Pilih Santri --',
+        allowClear: true,
+        width: '100%'
+    });
+    $('#status').select2({
+        placeholder: '-- Pilih Status --',
+        allowClear: false,
+        width: '100%'
+    });
     const statusSelect = document.getElementById('status');
     const tanggalKeluarGroup = document.getElementById('tanggal_keluar_group');
     const tanggalKeluarInput = document.getElementById('tanggal_keluar');
@@ -154,8 +170,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Event listeners
-    statusSelect.addEventListener('change', toggleTanggalKeluar);
+    // Event listeners – jQuery .on agar kompatibel dengan Select2
+    $('#status').on('change', function() { toggleTanggalKeluar(); });
     tanggalMasukInput.addEventListener('change', setMinTanggalKeluar);
     
     // Initialize on page load

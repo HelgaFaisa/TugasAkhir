@@ -52,20 +52,28 @@ class Santri extends Model
     }
 
     /**
-     * Relasi: Santri memiliki satu User Account (hasOne)
+     * Relasi: Santri memiliki banyak akun (santri_accounts)
      */
-    public function user()
+    public function santriAccount()
     {
-        return $this->hasOne(User::class, 'role_id', 'id_santri')
-                    ->where('role', 'santri'); 
+        return $this->hasMany(SantriAccount::class, 'id_santri', 'id_santri');
     }
 
     /**
-     * Relasi: Santri memiliki satu akun Wali (orang tua)
+     * Relasi: Santri memiliki satu User Account (hasOne) - LEGACY
+     */
+    public function user()
+    {
+        return $this->hasOne(SantriAccount::class, 'id_santri', 'id_santri')
+                    ->where('role', 'santri');
+    }
+
+    /**
+     * Relasi: Santri memiliki satu akun Wali (orang tua) - LEGACY
      */
     public function waliUser()
     {
-        return $this->hasOne(User::class, 'role_id', 'id_santri')
+        return $this->hasOne(SantriAccount::class, 'id_santri', 'id_santri')
                     ->where('role', 'wali');
     }
 

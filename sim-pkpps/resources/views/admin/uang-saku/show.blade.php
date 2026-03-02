@@ -110,7 +110,7 @@
     </div>
 
     {{-- Action Buttons Bottom --}}
-    <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; flex-wrap: wrap;">
+    <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px; flex-wrap: wrap;">
         <a href="{{ route('admin.uang-saku.riwayat', $transaksi->id_santri) }}" class="btn btn-primary">
             <i class="fas fa-history"></i> Lihat Riwayat
         </a>

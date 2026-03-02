@@ -1,4 +1,4 @@
-// lib/features/pelanggaran/riwayat_pelanggaran_tab.dart
+﻿// lib/features/pelanggaran/riwayat_pelanggaran_tab.dart
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -141,13 +141,13 @@ class _RiwayatPelanggaranTabState extends State<RiwayatPelanggaranTab> {
                     ? _buildEmptyState()
                     : ListView.builder(
                         controller: _scrollController,
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(12),
                         itemCount: _riwayatList.length + (_isLoadingMore ? 1 : 0),
                         itemBuilder: (context, index) {
                           if (index == _riwayatList.length) {
                             return const Center(
                               child: Padding(
-                                padding: EdgeInsets.all(16),
+                                padding: EdgeInsets.all(12),
                                 child: CircularProgressIndicator(),
                               ),
                             );
@@ -163,7 +163,7 @@ class _RiwayatPelanggaranTabState extends State<RiwayatPelanggaranTab> {
     );
   }
 
-  // ✅ FIX: Responsive padding untuk statistik header
+  // âœ… FIX: Responsive padding untuk statistik header
   Widget _buildStatistikHeader() {
     final total = _statistik?['total_pelanggaran'] ?? 0;
     final poin = _statistik?['total_poin'] ?? 0;
@@ -172,8 +172,8 @@ class _RiwayatPelanggaranTabState extends State<RiwayatPelanggaranTab> {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12), // ✅ Kurangi horizontal padding
-      color: const Color(0xFF7C3AED).withValues(alpha: 0.05),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 9), // âœ… Kurangi horizontal padding
+      color: const Color(0xFF6FBA9D).withValues(alpha: 0.05),
       child: Row(
         children: [
           Expanded(
@@ -213,7 +213,7 @@ class _RiwayatPelanggaranTabState extends State<RiwayatPelanggaranTab> {
     );
   }
 
-  // ✅ FIX: Kurangi padding dan ukuran font untuk fit di layar kecil
+  // âœ… FIX: Kurangi padding dan ukuran font untuk fit di layar kecil
   Widget _buildStatItem({
     required IconData icon,
     required String label,
@@ -221,50 +221,50 @@ class _RiwayatPelanggaranTabState extends State<RiwayatPelanggaranTab> {
     required Color color,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 2), // ✅ Kurangi horizontal padding
+      padding: const EdgeInsets.symmetric(horizontal: 2), // âœ… Kurangi horizontal padding
       child: Column(
-        mainAxisSize: MainAxisSize.min, // ✅ Tambahkan ini
+        mainAxisSize: MainAxisSize.min, // âœ… Tambahkan ini
         children: [
-          Icon(icon, size: 18, color: color), // ✅ Kurangi dari 20 ke 18
-          const SizedBox(height: 4),
+          Icon(icon, size: 15, color: color), // âœ… Kurangi dari 20 ke 18
+          const SizedBox(height: 2),
           Text(
             value,
             style: TextStyle(
-              fontSize: 15, // ✅ Kurangi dari 16 ke 15
+              fontSize: 11, // âœ… Kurangi dari 16 ke 15
               fontWeight: FontWeight.bold,
               color: color,
             ),
-            maxLines: 1, // ✅ Tambahkan ini
-            overflow: TextOverflow.ellipsis, // ✅ Tambahkan ini
+            maxLines: 1, // âœ… Tambahkan ini
+            overflow: TextOverflow.ellipsis, // âœ… Tambahkan ini
           ),
           Text(
             label,
             style: TextStyle(
-              fontSize: 10, // ✅ Kurangi dari 11 ke 10
+              fontSize: 8, // âœ… Kurangi dari 11 ke 10
               color: Colors.grey[600],
             ),
-            maxLines: 1, // ✅ Tambahkan ini
-            overflow: TextOverflow.ellipsis, // ✅ Tambahkan ini
+            maxLines: 1, // âœ… Tambahkan ini
+            overflow: TextOverflow.ellipsis, // âœ… Tambahkan ini
           ),
         ],
       ),
     );
   }
 
-  // ✅ FIX: Buat filter chips scrollable
+  // âœ… FIX: Buat filter chips scrollable
   Widget _buildFilterChips() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 12),
       color: Colors.white,
-      child: SingleChildScrollView( // ✅ Wrap dengan SingleChildScrollView
+      child: SingleChildScrollView( // âœ… Wrap dengan SingleChildScrollView
         scrollDirection: Axis.horizontal,
         child: Row(
           children: [
             _buildFilterChip('Semua', 'semua'),
-            const SizedBox(width: 8),
+            const SizedBox(width: 7),
             _buildFilterChip('Selesai', 'selesai'),
-            const SizedBox(width: 8),
+            const SizedBox(width: 7),
             _buildFilterChip('Belum Selesai', 'belum'),
           ],
         ),
@@ -281,8 +281,8 @@ class _RiwayatPelanggaranTabState extends State<RiwayatPelanggaranTab> {
       onSelected: (selected) {
         if (selected) _changeFilter(value);
       },
-      selectedColor: const Color(0xFF7C3AED).withValues(alpha: 0.2),
-      checkmarkColor: const Color(0xFF7C3AED),
+      selectedColor: const Color(0xFF6FBA9D).withValues(alpha: 0.2),
+      checkmarkColor: const Color(0xFF6FBA9D),
     );
   }
 
@@ -309,10 +309,10 @@ class _RiwayatPelanggaranTabState extends State<RiwayatPelanggaranTab> {
     }
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 9),
       elevation: 2,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(9),
         side: BorderSide(
           color: isKafarohSelesai 
               ? Colors.green.withValues(alpha: 0.3) 
@@ -321,10 +321,10 @@ class _RiwayatPelanggaranTabState extends State<RiwayatPelanggaranTab> {
         ),
       ),
       child: InkWell(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(9),
         onTap: () => _showDetail(riwayat),
         child: Padding(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(11),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -332,11 +332,11 @@ class _RiwayatPelanggaranTabState extends State<RiwayatPelanggaranTab> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Flexible( // ✅ Wrap dengan Flexible
+                  Flexible( // âœ… Wrap dengan Flexible
                     child: Text(
                       idRiwayat,
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 9,
                         color: Colors.grey[600],
                         fontWeight: FontWeight.w500,
                       ),
@@ -344,17 +344,17 @@ class _RiwayatPelanggaranTabState extends State<RiwayatPelanggaranTab> {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  const SizedBox(width: 8), // ✅ Tambahkan spacing
+                  const SizedBox(width: 7), // âœ… Tambahkan spacing
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
+                      horizontal: 7,
+                      vertical: 2,
                     ),
                     decoration: BoxDecoration(
                       color: isKafarohSelesai
                           ? Colors.green[100]
                           : Colors.orange[100],
-                      borderRadius: BorderRadius.circular(6),
+                      borderRadius: BorderRadius.circular(5),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -363,16 +363,16 @@ class _RiwayatPelanggaranTabState extends State<RiwayatPelanggaranTab> {
                           isKafarohSelesai
                               ? Icons.check_circle
                               : Icons.pending,
-                          size: 12,
+                          size: 9,
                           color: isKafarohSelesai
                               ? Colors.green[800]
                               : Colors.orange[800],
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: 2),
                         Text(
                           isKafarohSelesai ? 'Selesai' : 'Belum',
                           style: TextStyle(
-                            fontSize: 10,
+                            fontSize: 8,
                             fontWeight: FontWeight.w600,
                             color: isKafarohSelesai
                                 ? Colors.green[800]
@@ -384,13 +384,13 @@ class _RiwayatPelanggaranTabState extends State<RiwayatPelanggaranTab> {
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 8),
 
               // Nama Pelanggaran
               Text(
                 namaPelanggaran,
                 style: const TextStyle(
-                  fontSize: 15,
+                  fontSize: 11,
                   fontWeight: FontWeight.bold,
                 ),
                 maxLines: 2,
@@ -399,61 +399,61 @@ class _RiwayatPelanggaranTabState extends State<RiwayatPelanggaranTab> {
 
               // Klasifikasi
               if (namaKlasifikasi.isNotEmpty) ...[
-                const SizedBox(height: 6),
+                const SizedBox(height: 5),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF7C3AED).withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(4),
+                    color: const Color(0xFF6FBA9D).withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(2),
                   ),
                   child: Text(
                     namaKlasifikasi,
                     style: const TextStyle(
-                      fontSize: 11,
-                      color: Color(0xFF7C3AED),
+                      fontSize: 8,
+                      color: Color(0xFF6FBA9D),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
               ],
 
-              const SizedBox(height: 10),
+              const SizedBox(height: 8),
 
               // Info Row: Tanggal + Poin
               Row(
                 children: [
-                  Icon(Icons.calendar_today, size: 14, color: Colors.grey[600]),
-                  const SizedBox(width: 4),
-                  Flexible( // ✅ Wrap dengan Flexible
+                  Icon(Icons.calendar_today, size: 11, color: Colors.grey[600]),
+                  const SizedBox(width: 2),
+                  Flexible( // âœ… Wrap dengan Flexible
                     child: Text(
                       tanggalFormat,
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 9,
                         color: Colors.grey[600],
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  const SizedBox(width: 8), // ✅ Tambahkan spacing
+                  const SizedBox(width: 7), // âœ… Tambahkan spacing
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
+                      horizontal: 7,
+                      vertical: 2,
                     ),
                     decoration: BoxDecoration(
                       color: Colors.red[100],
-                      borderRadius: BorderRadius.circular(6),
+                      borderRadius: BorderRadius.circular(5),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.star, size: 12, color: Colors.red),
-                        const SizedBox(width: 4),
+                        const Icon(Icons.star, size: 9, color: Colors.red),
+                        const SizedBox(width: 2),
                         Text(
                           '$poin',
                           style: const TextStyle(
-                            fontSize: 12,
+                            fontSize: 9,
                             fontWeight: FontWeight.bold,
                             color: Colors.red,
                           ),
@@ -462,7 +462,7 @@ class _RiwayatPelanggaranTabState extends State<RiwayatPelanggaranTab> {
                           Text(
                             ' ($poinAsli)',
                             style: TextStyle(
-                              fontSize: 10,
+                              fontSize: 8,
                               color: Colors.grey[600],
                               decoration: TextDecoration.lineThrough,
                             ),
@@ -476,11 +476,11 @@ class _RiwayatPelanggaranTabState extends State<RiwayatPelanggaranTab> {
 
               // Keterangan (jika ada)
               if (keterangan != null && keterangan.toString().isNotEmpty) ...[
-                const SizedBox(height: 8),
+                const SizedBox(height: 7),
                 Text(
                   keterangan,
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: 9,
                     color: Colors.grey[600],
                     fontStyle: FontStyle.italic,
                   ),
@@ -513,10 +513,10 @@ class _RiwayatPelanggaranTabState extends State<RiwayatPelanggaranTab> {
         children: [
           Icon(
             Icons.check_circle_outline,
-            size: 80,
+            size: 60,
             color: Colors.grey[400],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           Text(
             _filterStatus == 'semua'
                 ? 'Tidak ada riwayat pelanggaran'
@@ -524,16 +524,16 @@ class _RiwayatPelanggaranTabState extends State<RiwayatPelanggaranTab> {
                     ? 'Tidak ada kafaroh yang diselesaikan'
                     : 'Tidak ada kafaroh yang belum selesai',
             style: TextStyle(
-              fontSize: 15,
+              fontSize: 11,
               color: Colors.grey[600],
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 7),
           Text(
             'Tarik ke bawah untuk refresh',
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 9,
               color: Colors.grey[500],
             ),
           ),

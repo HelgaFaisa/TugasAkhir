@@ -107,7 +107,7 @@
             </div>
         </div>
 
-        <div class="btn-group" style="margin-top: 30px;">
+        <div class="btn-group" style="margin-top: 22px;">
             <button type="submit" class="btn btn-primary">
                 <i class="fas fa-save"></i> Update
             </button>

@@ -69,8 +69,7 @@
         <tr>
             <th>Jumlah Santri Aktif</th>
             <td>
-                <strong>{{ $santriCount }}</strong> santri 
-                <span class="text-muted">(Tahun Ajaran: {{ $tahunAjaranAktif }})</span>
+                <strong>{{ $santriCount }}</strong> santri
             </td>
         </tr>
         <tr>
@@ -85,10 +84,17 @@
 </div>
 
 <!-- Santri List in This Kelas -->
-@if ($kela->santriKelas->count() > 0)
-<div class="content-box" style="margin-top: 20px;">
+@php
+    $santriList = $kela->santriKelas
+        ->filter(fn($sk) => $sk->santri && $sk->santri->status === 'Aktif')
+        ->sortBy(fn($sk) => $sk->santri->nama_lengkap);
+@endphp
+
+@if ($santriList->count() > 0)
+<div class="content-box" style="margin-top: 14px;">
     <h3 style="margin-bottom: 15px;">
-        <i class="fas fa-users"></i> Daftar Santri ({{ $tahunAjaranAktif }})
+        <i class="fas fa-users"></i> Daftar Santri Aktif
+        <span class="badge badge-info">{{ $santriList->count() }} santri</span>
     </h3>
     
     <table class="data-table">
@@ -97,23 +103,18 @@
                 <th style="width: 50px;">No</th>
                 <th>ID Santri</th>
                 <th>Nama Lengkap</th>
+                <th>Tahun Ajaran</th>
                 <th>Status</th>
                 <th style="width: 150px;">Aksi</th>
             </tr>
         </thead>
         <tbody>
-            @php
-                $santriList = $kela->santriKelas
-                    ->where('tahun_ajaran', $tahunAjaranAktif)
-                    ->filter(function($sk) {
-                        return $sk->santri && $sk->santri->status === 'Aktif';
-                    });
-            @endphp
             @foreach ($santriList as $index => $santriKelas)
                 <tr>
-                    <td>{{ $index + 1 }}</td>
+                    <td>{{ $loop->iteration }}</td>
                     <td><strong>{{ $santriKelas->santri->id_santri }}</strong></td>
                     <td>{{ $santriKelas->santri->nama_lengkap }}</td>
+                    <td><span class="badge badge-secondary">{{ $santriKelas->tahun_ajaran }}</span></td>
                     <td>
                         <span class="badge badge-success">
                             <i class="fas fa-check-circle"></i> {{ $santriKelas->santri->status }}
@@ -132,11 +133,11 @@
     </table>
 </div>
 @else
-<div class="content-box" style="margin-top: 20px;">
+<div class="content-box" style="margin-top: 14px;">
     <div class="text-center py-5">
         <i class="fas fa-users fa-3x text-muted mb-3"></i>
         <h5 class="text-muted">Belum ada santri di kelas ini</h5>
-        <p class="text-muted">Kelas ini belum memiliki santri untuk tahun ajaran {{ $tahunAjaranAktif }}.</p>
+        <p class="text-muted">Kelas ini belum memiliki santri aktif.</p>
     </div>
 </div>
 @endif

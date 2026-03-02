@@ -1,3 +1,4 @@
+{{-- views/admin/kegiatan/data/create.blade.php --}}
 @extends('layouts.app')
 
 @section('content')
@@ -19,7 +20,7 @@
                     <i class="fas fa-trash"></i> Hapus
                 </button>
             </form>
-            <a href="{{ route('admin.kegiatan.index') }}" class="btn btn-secondary">
+            <a href="{{ route('admin.kegiatan.jadwal') }}" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Kembali
             </a>
         </div>

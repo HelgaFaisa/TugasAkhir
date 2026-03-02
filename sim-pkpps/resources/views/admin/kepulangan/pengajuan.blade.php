@@ -11,8 +11,8 @@
 </div>
 
 {{-- Info Banner --}}
-<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
-    <div style="display: flex; align-items: center; gap: 15px;">
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 14px; border-radius: 12px; margin-bottom: 14px;">
+    <div style="display: flex; align-items: center; gap: 11px;">
         <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 12px;">
             <i class="fas fa-info-circle" style="font-size: 2rem;"></i>
         </div>
@@ -66,8 +66,8 @@
 {{-- Main Content --}}
 <div class="content-box">
     {{-- Filter Section --}}
-    <form method="GET" action="{{ route('admin.kepulangan.pengajuan') }}" id="filterForm" style="margin-bottom: 20px;">
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; align-items: end;">
+    <form method="GET" action="{{ route('admin.kepulangan.pengajuan') }}" id="filterForm" style="margin-bottom: 14px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 11px; align-items: end;">
             <div class="form-group" style="margin-bottom: 0;">
                 <input type="text" 
                        name="search" 
@@ -189,8 +189,8 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" style="text-align: center; padding: 40px;">
-                            <i class="fas fa-inbox" style="font-size: 3rem; color: #ccc; margin-bottom: 15px;"></i>
+                        <td colspan="8" style="text-align: center; padding: 22px;">
+                            <i class="fas fa-inbox" style="font-size: 2.2rem; color: #ccc; margin-bottom: 15px;"></i>
                             <p style="color: #7F8C8D;">Tidak ada pengajuan kepulangan dari mobile</p>
                         </td>
                     </tr>
@@ -201,7 +201,7 @@
 
     {{-- Pagination --}}
     @if($pengajuan->hasPages())
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; flex-wrap: wrap; gap: 15px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; flex-wrap: wrap; gap: 11px;">
             <div>
                 Menampilkan {{ $pengajuan->firstItem() ?? 0 }} - {{ $pengajuan->lastItem() ?? 0 }} 
                 dari {{ $pengajuan->total() }} data
@@ -216,10 +216,10 @@
 {{-- Modal Approve --}}
 <div class="modal fade" id="approveModal" tabindex="-1" style="display: none;">
     <div class="modal-dialog">
-        <div class="modal-content" style="background: white; border-radius: 12px; padding: 20px;">
+        <div class="modal-content" style="background: white; border-radius: 12px; padding: 14px;">
             <form id="approveForm">
                 @csrf
-                <div style="margin-bottom: 20px;">
+                <div style="margin-bottom: 14px;">
                     <h3 style="margin: 0; color: #2C3E50;">
                         <i class="fas fa-check-circle" style="color: #28a745;"></i> 
                         Setujui Pengajuan
@@ -231,7 +231,7 @@
                     <textarea name="catatan_review" class="form-control" rows="3" 
                               placeholder="Tambahkan catatan untuk persetujuan ini..."></textarea>
                 </div>
-                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px;">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('approveModal')">Batal</button>
                     <button type="submit" class="btn btn-success">
                         <i class="fas fa-check"></i> Setujui Pengajuan
@@ -245,10 +245,10 @@
 {{-- Modal Reject --}}
 <div class="modal fade" id="rejectModal" tabindex="-1" style="display: none;">
     <div class="modal-dialog">
-        <div class="modal-content" style="background: white; border-radius: 12px; padding: 20px;">
+        <div class="modal-content" style="background: white; border-radius: 12px; padding: 14px;">
             <form id="rejectForm">
                 @csrf
-                <div style="margin-bottom: 20px;">
+                <div style="margin-bottom: 14px;">
                     <h3 style="margin: 0; color: #2C3E50;">
                         <i class="fas fa-times-circle" style="color: #dc3545;"></i> 
                         Tolak Pengajuan
@@ -260,7 +260,7 @@
                     <textarea name="catatan_review" class="form-control" rows="3" 
                               placeholder="Jelaskan alasan penolakan..." required></textarea>
                 </div>
-                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px;">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('rejectModal')">Batal</button>
                     <button type="submit" class="btn btn-danger">
                         <i class="fas fa-times"></i> Tolak Pengajuan

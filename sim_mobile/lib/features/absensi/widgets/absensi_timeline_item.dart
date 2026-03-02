@@ -1,4 +1,4 @@
-// lib/features/absensi/widgets/absensi_timeline_item.dart
+﻿// lib/features/absensi/widgets/absensi_timeline_item.dart
 
 import 'package:flutter/material.dart';
 import '../models/absensi_kegiatan_model.dart';
@@ -23,8 +23,8 @@ class AbsensiTimelineItem extends StatelessWidget {
           Column(
             children: [
               Container(
-                width: 12,
-                height: 12,
+                width: 9,
+                height: 9,
                 decoration: BoxDecoration(
                   color: _getStatusColor(absensi.status),
                   shape: BoxShape.circle,
@@ -50,17 +50,17 @@ class AbsensiTimelineItem extends StatelessWidget {
                 ),
             ],
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 9),
 
           // Card Content
           Expanded(
             child: Padding(
-              padding: EdgeInsets.only(bottom: isLast ? 0 : 16),
+              padding: EdgeInsets.only(bottom: isLast ? 0 : 12),
               child: Card(
                 elevation: 1,
                 margin: EdgeInsets.zero,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(9),
                   side: BorderSide(
                     color: Color(
                       int.parse(
@@ -71,7 +71,7 @@ class AbsensiTimelineItem extends StatelessWidget {
                   ),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(14),
+                  padding: const EdgeInsets.all(11),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -81,8 +81,8 @@ class AbsensiTimelineItem extends StatelessWidget {
                         children: [
                           // Icon Kategori
                           Container(
-                            width: 40,
-                            height: 40,
+                            width: 31,
+                            height: 31,
                             decoration: BoxDecoration(
                               color: Color(
                                 int.parse(
@@ -92,7 +92,7 @@ class AbsensiTimelineItem extends StatelessWidget {
                                   ),
                                 ),
                               ).withOpacity(0.15),
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(7),
                             ),
                             child: Icon(
                               _getIconFromString(absensi.kategori.icon),
@@ -104,10 +104,10 @@ class AbsensiTimelineItem extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              size: 20,
+                              size: 15,
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: 9),
 
                           // Nama Kegiatan
                           Expanded(
@@ -117,17 +117,17 @@ class AbsensiTimelineItem extends StatelessWidget {
                                 Text(
                                   absensi.namaKegiatan,
                                   style: const TextStyle(
-                                    fontSize: 15,
+                                    fontSize: 11,
                                     fontWeight: FontWeight.bold,
                                   ),
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                                const SizedBox(height: 4),
+                                const SizedBox(height: 2),
                                 Text(
                                   absensi.kategori.nama,
                                   style: TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 9,
                                     color: Colors.grey[600],
                                   ),
                                 ),
@@ -138,20 +138,20 @@ class AbsensiTimelineItem extends StatelessWidget {
                           // Status Badge
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 4,
+                              horizontal: 8,
+                              vertical: 2,
                             ),
                             decoration: BoxDecoration(
                               color: _getStatusColor(absensi.status)
                                   .withOpacity(0.15),
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(9),
                             ),
                             child: Text(
                               _getStatusEmoji(absensi.status) +
                                   ' ' +
                                   absensi.status,
                               style: TextStyle(
-                                fontSize: 11,
+                                fontSize: 8,
                                 fontWeight: FontWeight.w600,
                                 color: _getStatusColor(absensi.status),
                               ),
@@ -159,7 +159,7 @@ class AbsensiTimelineItem extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 9),
 
                       // Info Row
                       Row(
@@ -167,29 +167,29 @@ class AbsensiTimelineItem extends StatelessWidget {
                           // Waktu Kegiatan
                           Icon(
                             Icons.access_time,
-                            size: 14,
+                            size: 11,
                             color: Colors.grey[600],
                           ),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: 2),
                           Text(
                             '${absensi.waktuMulai} - ${absensi.waktuSelesai}',
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: 9,
                               color: Colors.grey[700],
                             ),
                           ),
                           if (absensi.waktuAbsen != null) ...[
-                            const SizedBox(width: 12),
+                            const SizedBox(width: 9),
                             Icon(
                               Icons.check_circle_outline,
-                              size: 14,
+                              size: 11,
                               color: Colors.grey[600],
                             ),
-                            const SizedBox(width: 4),
+                            const SizedBox(width: 2),
                             Text(
                               absensi.waktuAbsen!,
                               style: TextStyle(
-                                fontSize: 12,
+                                fontSize: 9,
                                 color: Colors.grey[700],
                               ),
                             ),
@@ -199,17 +199,17 @@ class AbsensiTimelineItem extends StatelessWidget {
 
                       // Metode Absen
                       if (absensi.metodeAbsen.isNotEmpty) ...[
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 7),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
+                            horizontal: 7,
+                            vertical: 2,
                           ),
                           decoration: BoxDecoration(
                             color: absensi.metodeAbsen == 'RFID'
-                                ? const Color(0xFF7C3AED).withOpacity(0.1)
+                                ? const Color(0xFF6FBA9D).withOpacity(0.1)
                                 : Colors.grey[200],
-                            borderRadius: BorderRadius.circular(6),
+                            borderRadius: BorderRadius.circular(5),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -218,19 +218,19 @@ class AbsensiTimelineItem extends StatelessWidget {
                                 absensi.metodeAbsen == 'RFID'
                                     ? Icons.credit_card
                                     : Icons.touch_app,
-                                size: 12,
+                                size: 9,
                                 color: absensi.metodeAbsen == 'RFID'
-                                    ? const Color(0xFF7C3AED)
+                                    ? const Color(0xFF6FBA9D)
                                     : Colors.grey[700],
                               ),
-                              const SizedBox(width: 4),
+                              const SizedBox(width: 2),
                               Text(
                                 absensi.metodeAbsen,
                                 style: TextStyle(
-                                  fontSize: 11,
+                                  fontSize: 8,
                                   fontWeight: FontWeight.w500,
                                   color: absensi.metodeAbsen == 'RFID'
-                                      ? const Color(0xFF7C3AED)
+                                      ? const Color(0xFF6FBA9D)
                                       : Colors.grey[700],
                                 ),
                               ),
@@ -241,17 +241,17 @@ class AbsensiTimelineItem extends StatelessWidget {
 
                       // Punctuality (jika ada)
                       if (absensi.punctuality != null) ...[
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 7),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
+                            horizontal: 7,
+                            vertical: 2,
                           ),
                           decoration: BoxDecoration(
                             color: absensi.punctuality!.contains('Tepat')
                                 ? Colors.green[50]
                                 : Colors.orange[50],
-                            borderRadius: BorderRadius.circular(6),
+                            borderRadius: BorderRadius.circular(5),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -260,16 +260,16 @@ class AbsensiTimelineItem extends StatelessWidget {
                                 absensi.punctuality!.contains('Tepat')
                                     ? Icons.access_time
                                     : Icons.schedule,
-                                size: 12,
+                                size: 9,
                                 color: absensi.punctuality!.contains('Tepat')
                                     ? Colors.green[700]
                                     : Colors.orange[700],
                               ),
-                              const SizedBox(width: 4),
+                              const SizedBox(width: 2),
                               Text(
                                 absensi.punctuality!,
                                 style: TextStyle(
-                                  fontSize: 11,
+                                  fontSize: 8,
                                   fontWeight: FontWeight.w500,
                                   color: absensi.punctuality!.contains('Tepat')
                                       ? Colors.green[700]
@@ -284,26 +284,26 @@ class AbsensiTimelineItem extends StatelessWidget {
                       // Keterangan (jika ada)
                       if (absensi.keterangan != null &&
                           absensi.keterangan!.isNotEmpty) ...[
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 7),
                         Container(
-                          padding: const EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(7),
                           decoration: BoxDecoration(
                             color: Colors.blue[50],
-                            borderRadius: BorderRadius.circular(6),
+                            borderRadius: BorderRadius.circular(5),
                           ),
                           child: Row(
                             children: [
                               Icon(
                                 Icons.info_outline,
-                                size: 14,
+                                size: 11,
                                 color: Colors.blue[700],
                               ),
-                              const SizedBox(width: 6),
+                              const SizedBox(width: 5),
                               Expanded(
                                 child: Text(
                                   absensi.keterangan!,
                                   style: TextStyle(
-                                    fontSize: 11,
+                                    fontSize: 8,
                                     color: Colors.blue[900],
                                   ),
                                   maxLines: 2,
@@ -343,15 +343,15 @@ class AbsensiTimelineItem extends StatelessWidget {
   String _getStatusEmoji(String status) {
     switch (status) {
       case 'Hadir':
-        return '✅';
+        return 'âœ…';
       case 'Izin':
-        return '⚠️';
+        return 'âš ï¸';
       case 'Sakit':
-        return '💊';
+        return 'ðŸ’Š';
       case 'Alpa':
-        return '❌';
+        return 'âŒ';
       default:
-        return '⚪';
+        return 'âšª';
     }
   }
 

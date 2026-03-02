@@ -6,183 +6,363 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Santri;
+use App\Models\SantriAccount;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
+    // ══════════════════ AKUN SANTRI (WEB) ══════════════════
+
     /**
-     * Tampilkan daftar akun Santri.
+     * Daftar akun santri
      */
     public function santriAccounts()
     {
-        $users = User::where('role', 'santri')->with('santri')->get();
-        $santris_tanpa_akun = Santri::whereDoesntHave('user', function($query) {
-            $query->where('role', 'santri');
+        $users = SantriAccount::where('role', 'santri')->with('santri')->get();
+
+        $santris_tanpa_akun = Santri::whereDoesntHave('santriAccount', function ($q) {
+            $q->where('role', 'santri');
         })->get();
 
         return view('admin.users.santri_accounts', compact('users', 'santris_tanpa_akun'));
     }
 
     /**
-     * Tampilkan daftar akun Wali Santri.
+     * Buat akun santri untuk satu santri langsung (1 klik)
+     */
+    public function buatAkunSantri(Request $request, string $idSantri)
+    {
+        $santri = Santri::where('id_santri', $idSantri)->firstOrFail();
+
+        if (!$santri->nis) {
+            return redirect()->back()
+                ->with('error', 'Santri ' . $santri->nama_lengkap . ' belum memiliki NIS.');
+        }
+
+        $sudahAda = SantriAccount::where('role', 'santri')
+            ->where('id_santri', $idSantri)->exists();
+
+        if ($sudahAda) {
+            return redirect()->back()
+                ->with('error', 'Santri ' . $santri->nama_lengkap . ' sudah memiliki akun.');
+        }
+
+        SantriAccount::create([
+            'id_santri' => $santri->id_santri,
+            'username'  => $santri->nama_lengkap,
+            'password'  => Hash::make($santri->nis),
+            'role'      => 'santri',
+        ]);
+
+        return redirect()->back()
+            ->with('success', 'Akun santri ' . $santri->nama_lengkap . ' berhasil dibuat. Username: ' . $santri->nama_lengkap . ' | Password: ' . $santri->nis);
+    }
+
+    /**
+     * Buat akun santri untuk semua santri yang belum punya akun (1 klik massal)
+     */
+    public function buatSemuaAkunSantri(Request $request)
+    {
+        $santriList = Santri::whereDoesntHave('santriAccount', function ($q) {
+            $q->where('role', 'santri');
+        })->whereNotNull('nis')->get();
+
+        if ($santriList->isEmpty()) {
+            return redirect()->back()
+                ->with('info', 'Semua santri sudah memiliki akun.');
+        }
+
+        $berhasil = 0;
+
+        foreach ($santriList as $santri) {
+            SantriAccount::create([
+                'id_santri' => $santri->id_santri,
+                'username'  => $santri->nama_lengkap,
+                'password'  => Hash::make($santri->nis),
+                'role'      => 'santri',
+            ]);
+            $berhasil++;
+        }
+
+        return redirect()->back()
+            ->with('success', $berhasil . ' akun santri berhasil dibuat sekaligus.');
+    }
+
+    /**
+     * Hapus akun santri
+     */
+    public function destroySantriAccount(string $id)
+    {
+        $account = SantriAccount::where('role', 'santri')->findOrFail($id);
+        $nama = $account->santri ? $account->santri->nama_lengkap : $account->username;
+        $account->delete();
+
+        return redirect()->back()
+            ->with('success', 'Akun santri ' . $nama . ' berhasil dihapus.');
+    }
+
+    // ══════════════════ AKUN WALI (MOBILE) ══════════════════
+
+    /**
+     * Daftar akun wali
      */
     public function waliAccounts()
     {
-        $users = User::where('role', 'wali')->with('santri')->get();
-        
-        $santris_tanpa_wali = Santri::whereDoesntHave('waliUser')->get();
+        $users = SantriAccount::where('role', 'wali')->with('santri')->get();
+
+        $santris_tanpa_wali = Santri::whereDoesntHave('santriAccount', function ($q) {
+            $q->where('role', 'wali');
+        })->get();
 
         return view('admin.users.wali_accounts', compact('users', 'santris_tanpa_wali'));
     }
 
     /**
-     * Tampilkan form untuk membuat akun baru.
+     * Resolve username untuk akun wali.
+     *
+     * Aturan:
+     * - Default  : nama_orang_tua  (sama seperti sebelumnya, username = nama ortu)
+     * - Fallback : "nama_orang_tua - nama_santri"
+     *              → hanya dipakai jika nama_orang_tua sudah dipakai
+     *                akun wali lain (cek DB + array in-memory untuk proses massal).
+     *
+     * @param  Santri  $santri
+     * @param  array   $usernameYangSudahDipakai  username yang sudah dibuat dalam iterasi massal saat ini
      */
-    public function createAccount(string $role)
+    private function resolveUsernameWali(Santri $santri, array $usernameYangSudahDipakai = []): string
     {
-        if (!in_array($role, ['santri', 'wali'])) {
-            abort(404);
+        $usernameDefault = $santri->nama_orang_tua;
+
+        // Cek di database: apakah nama ortu ini sudah jadi username wali lain?
+        $sudahDiDbOlehLain = SantriAccount::where('role', 'wali')
+            ->where('username', $usernameDefault)
+            ->where('id_santri', '!=', $santri->id_santri)
+            ->exists();
+
+        // Cek di array in-memory (untuk proses massal dalam 1 request)
+        $sudahDiMemoriOlehLain = in_array($usernameDefault, $usernameYangSudahDipakai);
+
+        if ($sudahDiDbOlehLain || $sudahDiMemoriOlehLain) {
+            // Fallback: tambahkan nama santri agar unik
+            return $usernameDefault . ' - ' . $santri->nama_lengkap;
         }
 
-        if ($role === 'santri') {
-            $list_data = Santri::whereDoesntHave('user', function($query) {
-                $query->where('role', 'santri');
-            })->get();
-        } else {
-            // Wali: ambil santri yang belum punya akun wali
-            $list_data = Santri::whereDoesntHave('waliUser')->get();
-        }
-        
-        return view('admin.users.create_account', compact('role', 'list_data'));
+        // Normal: cukup nama orang tua saja
+        return $usernameDefault;
     }
 
     /**
-     * Simpan akun baru.
+     * Buat akun wali untuk satu santri langsung (1 klik)
      */
-    public function storeAccount(Request $request, string $role)
+    public function buatAkunWali(Request $request, string $idSantri)
     {
-        if (!in_array($role, ['santri', 'wali'])) {
-            abort(404);
+        $santri = Santri::where('id_santri', $idSantri)->firstOrFail();
+
+        if (!$santri->nis) {
+            return redirect()->back()
+                ->with('error', 'Santri ' . $santri->nama_lengkap . ' belum memiliki NIS.');
         }
 
-        // Validasi berbeda untuk santri dan wali
-        $rules = [
-            'role_id' => [
-                'required',
-                Rule::exists('santris', 'id_santri'),
-                function ($attribute, $value, $fail) use ($role) {
-                    $exists = User::where('role', $role)
-                        ->where('role_id', $value)
-                        ->exists();
-                    if ($exists) {
-                        $fail("Santri ini sudah memiliki akun {$role}.");
-                    }
-                },
-            ],
-            'username' => 'required|string|max:255|unique:users,username',
-        ];
-
-        // Untuk wali: password tidak perlu min karena otomatis dari NIS
-        // Untuk santri: password minimal 8 karakter
-        if ($role === 'wali') {
-            $rules['password'] = 'required|string|confirmed';
-        } else {
-            $rules['password'] = 'required|string|min:8|confirmed';
+        if (!$santri->nama_orang_tua) {
+            return redirect()->back()
+                ->with('error', 'Santri ' . $santri->nama_lengkap . ' belum memiliki data nama orang tua.');
         }
 
-        $messages = [
-            'role_id.required' => 'Wajib memilih santri.',
-            'role_id.exists' => 'Data santri tidak ditemukan.',
-            'username.unique' => 'Username sudah digunakan.',
-            'username.required' => 'Username wajib diisi.',
-            'password.required' => 'Password wajib diisi.',
-            'password.min' => 'Password minimal 8 karakter.',
-            'password.confirmed' => 'Konfirmasi password tidak cocok.',
-        ];
+        $sudahAda = SantriAccount::where('role', 'wali')
+            ->where('id_santri', $idSantri)->exists();
 
-        $validated = $request->validate($rules, $messages);
+        if ($sudahAda) {
+            return redirect()->back()
+                ->with('error', 'Wali santri ' . $santri->nama_lengkap . ' sudah memiliki akun.');
+        }
 
-        // Ambil data santri
-        $santri = Santri::where('id_santri', $validated['role_id'])->firstOrFail();
-        
-        // Untuk wali: name = nama orang tua (jika ada) atau nama santri
-        // Untuk santri: name = nama santri
-        $name = ($role === 'wali') 
-            ? ($santri->nama_orang_tua ?? $santri->nama_lengkap)
-            : $santri->nama_lengkap;
+        $username = $this->resolveUsernameWali($santri);
 
-        // Simpan User
-        User::create([
-            'name' => $name,
-            'username' => $validated['username'],
-            'password' => Hash::make($validated['password']),
-            'role' => $role,
-            'role_id' => $validated['role_id'],
+        SantriAccount::create([
+            'id_santri' => $santri->id_santri,
+            'username'  => $username,
+            'password'  => Hash::make($santri->nis),
+            'role'      => 'wali',
         ]);
 
-        $successMsg = $role === 'wali' 
-            ? "Akun wali untuk santri {$santri->nama_lengkap} berhasil dibuat. Login: Username={$validated['username']}, Password=NIS"
-            : "Akun santri {$santri->nama_lengkap} berhasil dibuat.";
-
-        return redirect()->route('admin.users.'.$role.'_accounts')
-            ->with('success', $successMsg);
+        return redirect()->back()
+            ->with('success', 'Akun wali untuk ' . $santri->nama_lengkap . ' berhasil dibuat. Username: ' . $username . ' | Password: ' . $santri->nis);
     }
 
     /**
-     * Hapus akun santri/wali.
+     * Buat akun wali untuk semua santri yang belum punya akun wali (1 klik massal)
      */
-    public function destroyAccount(string $role, string $userId)
+    public function buatSemuaAkunWali(Request $request)
     {
-        if (!in_array($role, ['santri', 'wali'])) {
-            abort(404);
+        $santriList = Santri::whereDoesntHave('santriAccount', function ($q) {
+            $q->where('role', 'wali');
+        })->whereNotNull('nis')->whereNotNull('nama_orang_tua')->get();
+
+        if ($santriList->isEmpty()) {
+            return redirect()->back()
+                ->with('info', 'Semua santri sudah memiliki akun wali.');
         }
 
-        // Cari user berdasarkan ID
-        $user = User::findOrFail($userId);
+        $berhasil = 0;
+        $gagal    = 0;
 
-        // Pastikan user yang akan dihapus adalah role yang sesuai
-        if ($user->role !== $role) {
-            return redirect()->back()->with('error', 'Akun tidak valid.');
+        // Lacak username yg dibuat dalam iterasi ini agar
+        // santri berikut dg nama ortu sama langsung dapat fallback
+        $usernameYangSudahDipakai = [];
+
+        foreach ($santriList as $santri) {
+            if (!$santri->nama_orang_tua) {
+                $gagal++;
+                continue;
+            }
+
+            $username = $this->resolveUsernameWali($santri, $usernameYangSudahDipakai);
+
+            SantriAccount::create([
+                'id_santri' => $santri->id_santri,
+                'username'  => $username,
+                'password'  => Hash::make($santri->nis),
+                'role'      => 'wali',
+            ]);
+
+            $usernameYangSudahDipakai[] = $username;
+            $berhasil++;
         }
 
-        $userName = $user->name;
-        $user->delete();
+        $pesan = $berhasil . ' akun wali berhasil dibuat.';
+        if ($gagal > 0) {
+            $pesan .= ' ' . $gagal . ' dilewati karena data orang tua tidak lengkap.';
+        }
 
-        return redirect()->route('admin.users.'.$role.'_accounts')
-            ->with('success', "Akun {$role} {$userName} berhasil dihapus.");
+        return redirect()->back()->with('success', $pesan);
     }
 
     /**
-     * Reset password akun santri/wali ke default (NIS).
+     * Hapus akun wali
      */
-    public function resetPassword(string $role, string $userId)
+    public function destroyWaliAccount(string $id)
     {
-        if (!in_array($role, ['santri', 'wali'])) {
-            abort(404);
+        $account = SantriAccount::where('role', 'wali')->findOrFail($id);
+        $nama = $account->santri ? $account->santri->nama_lengkap : $account->username;
+        $account->delete();
+
+        return redirect()->back()
+            ->with('success', 'Akun wali ' . $nama . ' berhasil dihapus.');
+    }
+
+    // ══════════════════ AKUN ADMIN ══════════════════
+
+    /**
+     * Daftar akun admin
+     */
+    public function adminAccounts()
+    {
+        $admins = User::whereIn('role', ['super_admin', 'akademik', 'pamong'])
+            ->orderByRaw("FIELD(role, 'super_admin', 'akademik', 'pamong')")
+            ->orderBy('name')
+            ->get();
+
+        return view('admin.users.admin_accounts', compact('admins'));
+    }
+
+    /**
+     * Form buat akun admin baru
+     */
+    public function createAdminAccount()
+    {
+        return view('admin.users.admin_form', [
+            'admin'  => null,
+            'action' => route('admin.users.admin_store'),
+            'method' => 'POST',
+        ]);
+    }
+
+    /**
+     * Simpan akun admin baru
+     */
+    public function storeAdminAccount(Request $request)
+    {
+        $validated = $request->validate([
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|unique:users,email',
+            'role'     => 'required|in:akademik,pamong',
+            'password' => 'required|string|min:8|confirmed',
+        ], [
+            'name.required'     => 'Nama wajib diisi.',
+            'email.required'    => 'Email wajib diisi.',
+            'email.unique'      => 'Email sudah digunakan.',
+            'role.required'     => 'Role wajib dipilih.',
+            'password.required' => 'Password wajib diisi.',
+            'password.min'      => 'Password minimal 8 karakter.',
+            'password.confirmed'=> 'Konfirmasi password tidak cocok.',
+        ]);
+
+        User::create([
+            'name'     => $validated['name'],
+            'email'    => $validated['email'],
+            'username' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'role'     => $validated['role'],
+        ]);
+
+        return redirect()->route('admin.users.admin_accounts')
+            ->with('success', 'Akun ' . $validated['role'] . ' untuk ' . $validated['name'] . ' berhasil dibuat.');
+    }
+
+    /**
+     * Form edit akun admin
+     */
+    public function editAdminAccount(string $userId)
+    {
+        $admin = User::whereIn('role', ['akademik', 'pamong'])->findOrFail($userId);
+
+        return view('admin.users.admin_form', [
+            'admin'  => $admin,
+            'action' => route('admin.users.admin_update', $userId),
+            'method' => 'PUT',
+        ]);
+    }
+
+    /**
+     * Update akun admin
+     */
+    public function updateAdminAccount(Request $request, string $userId)
+    {
+        $admin = User::whereIn('role', ['akademik', 'pamong'])->findOrFail($userId);
+
+        $validated = $request->validate([
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|unique:users,email,' . $userId,
+            'role'     => 'required|in:akademik,pamong',
+            'password' => 'nullable|string|min:8|confirmed',
+        ]);
+
+        $admin->name     = $validated['name'];
+        $admin->email    = $validated['email'];
+        $admin->username = $validated['email'];
+        $admin->role     = $validated['role'];
+
+        if (!empty($validated['password'])) {
+            $admin->password = Hash::make($validated['password']);
         }
 
-        // Cari user berdasarkan ID
-        $user = User::findOrFail($userId);
+        $admin->save();
 
-        // Pastikan user adalah role yang sesuai
-        if ($user->role !== $role) {
-            return redirect()->back()->with('error', 'Akun tidak valid.');
-        }
+        return redirect()->route('admin.users.admin_accounts')
+            ->with('success', 'Akun ' . $admin->name . ' berhasil diperbarui.');
+    }
 
-        // Ambil santri terkait
-        $santri = Santri::where('id_santri', $user->role_id)->first();
-        
-        if (!$santri || !$santri->nis) {
-            return redirect()->back()->with('error', 'NIS santri tidak ditemukan. Tidak dapat mereset password.');
-        }
+    /**
+     * Hapus akun admin
+     */
+    public function destroyAdminAccount(string $userId)
+    {
+        $admin = User::whereIn('role', ['akademik', 'pamong'])->findOrFail($userId);
+        $nama  = $admin->name;
+        $admin->delete();
 
-        // Reset password ke NIS
-        $user->password = Hash::make($santri->nis);
-        $user->save();
-
-        return redirect()->route('admin.users.'.$role.'_accounts')
-            ->with('success', "Password akun {$user->name} berhasil direset ke NIS: {$santri->nis}");
+        return redirect()->route('admin.users.admin_accounts')
+            ->with('success', 'Akun ' . $nama . ' berhasil dihapus.');
     }
 }

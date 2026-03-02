@@ -1,211 +1,245 @@
 @extends('layouts.app')
 
-@section('title', 'Detail Riwayat Kegiatan')
+@section('title', 'Detail Kegiatan: ' . $kegiatan->nama_kegiatan)
 
 @section('content')
-<div class="page-header">
-    <h2><i class="fas fa-clipboard-list"></i> Detail Riwayat Kegiatan</h2>
-    <p style="margin: 5px 0 0 0; color: var(--text-light);">
-        {{ $santri->nama_lengkap }}
-    </p>
-</div>
+<style>
+.kd-header {
+    background: linear-gradient(135deg, #0d3b2e 0%, #1a7a5e 60%, #2bbd8e 100%);
+    border-radius: 14px;
+    padding: 26px 28px;
+    color: white;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+}
+.kd-header::before { content:''; position:absolute; top:-50px; right:-50px; width:180px; height:180px; border-radius:50%; background:rgba(255,255,255,0.05); }
+.kd-header-top { display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px; margin-bottom:14px; }
+.kd-title { font-size:1.3rem; font-weight:800; margin:0 0 6px; }
+.kd-tags  { display:flex; gap:8px; flex-wrap:wrap; }
+.kd-tag { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.2); padding:4px 12px; border-radius:20px; font-size:0.79rem; font-weight:600; display:inline-flex; align-items:center; gap:5px; }
 
-{{-- ✅ INFO KEGIATAN --}}
-<div class="content-box" style="margin-bottom: 25px; background: linear-gradient(135deg, #FFFFFF 0%, #F8FBF9 100%); border: 2px solid var(--primary-light);">
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;">
+.kd-btn-back {
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.28);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 9px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+.kd-btn-back:hover { background:rgba(255,255,255,0.28); color:white; }
+
+.kd-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px; }
+.kd-stat { background:white; border-radius:12px; padding:15px; box-shadow:0 4px 20px rgba(0,0,0,0.07); text-align:center; border-top:3px solid transparent; }
+.kd-stat.green  { border-top-color:#2bbd8e; }
+.kd-stat.blue   { border-top-color:#3b82f6; }
+.kd-stat.orange { border-top-color:#f97316; }
+.kd-stat.red    { border-top-color:#e53e3e; }
+.kd-stat-icon { width:34px; height:34px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:0.88rem; margin:0 auto 7px; }
+.green  .kd-stat-icon { background:#d1fae5; color:#059669; }
+.blue   .kd-stat-icon { background:#dbeafe; color:#2563eb; }
+.orange .kd-stat-icon { background:#ffedd5; color:#ea580c; }
+.red    .kd-stat-icon { background:#fee2e2; color:#dc2626; }
+.kd-stat-value { font-size:1.9rem; font-weight:800; color:#1a2332; line-height:1; }
+.kd-stat-label { font-size:0.77rem; color:#6b7280; margin-top:4px; font-weight:500; }
+
+.kd-two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
+.kd-chart-box { background:white; border-radius:12px; padding:18px; box-shadow:0 4px 20px rgba(0,0,0,0.07); }
+.kd-chart-title { font-size:0.86rem; font-weight:700; color:#1a2332; margin-bottom:14px; display:flex; align-items:center; gap:6px; }
+
+.kd-pct-card { background:linear-gradient(135deg,#e8f7f2,#d4f1e3); padding:14px; border-radius:10px; text-align:center; margin-top:12px; }
+.kd-pct-label { font-size:0.79rem; color:#6b7280; margin-bottom:2px; }
+.kd-pct-val   { font-size:2.1rem; font-weight:800; line-height:1; }
+.kd-pct-sub   { font-size:0.76rem; color:#6b7280; }
+
+.kd-table-box { background:white; border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,0.07); overflow:hidden; }
+.kd-table-head { padding:13px 16px; border-bottom:1px solid #e2e8f0; font-size:0.86rem; font-weight:700; color:#1a2332; display:flex; align-items:center; gap:6px; }
+.kd-table { width:100%; border-collapse:collapse; }
+.kd-table thead tr { background:#f8fafb; }
+.kd-table th { padding:10px 13px; text-align:left; font-size:0.77rem; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:0.4px; border-bottom:1px solid #e2e8f0; }
+.kd-table td { padding:10px 13px; font-size:0.84rem; border-bottom:1px solid #f8fafc; color:#1a2332; }
+.kd-table tbody tr:last-child td { border-bottom:none; }
+.kd-table tbody tr:hover { background:#f8fafc; }
+.kd-pill { padding:3px 11px; border-radius:20px; font-size:0.77rem; font-weight:700; }
+.kd-pill.hadir  { background:#d1fae5; color:#065f46; }
+.kd-pill.izin   { background:#dbeafe; color:#1e40af; }
+.kd-pill.sakit  { background:#ede9fe; color:#5b21b6; }
+.kd-pill.alpa   { background:#fee2e2; color:#991b1b; }
+
+@media (max-width: 680px) {
+    .kd-stats    { grid-template-columns:repeat(2,1fr); }
+    .kd-two-col  { grid-template-columns:1fr; }
+}
+</style>
+
+{{-- HEADER --}}
+<div class="kd-header">
+    <div class="kd-header-top">
         <div>
-            <h3 style="margin: 0 0 8px 0; color: var(--primary-dark); font-size: 1.5rem;">
-                {{ $kegiatan->nama_kegiatan }}
-            </h3>
-            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-                <span class="badge badge-info badge-lg">
-                    <i class="fas fa-tag"></i> {{ $kegiatan->kategori->nama_kategori }}
-                </span>
-                <span class="badge badge-primary badge-lg">
-                    <i class="fas fa-calendar-day"></i> {{ $kegiatan->hari }}
-                </span>
-                <span class="badge badge-secondary badge-lg">
-                    <i class="fas fa-clock"></i> {{ date('H:i', strtotime($kegiatan->waktu_mulai)) }} - {{ date('H:i', strtotime($kegiatan->waktu_selesai)) }}
-                </span>
+            <h2 class="kd-title"><i class="fas fa-clipboard-check"></i> {{ $kegiatan->nama_kegiatan }}</h2>
+            <div class="kd-tags">
+                <span class="kd-tag"><i class="fas fa-tag"></i> {{ $kegiatan->kategori->nama_kategori }}</span>
+                <span class="kd-tag"><i class="fas fa-calendar-day"></i> {{ $kegiatan->hari }}</span>
+                <span class="kd-tag"><i class="fas fa-clock"></i> {{ date('H:i', strtotime($kegiatan->waktu_mulai)) }}–{{ date('H:i', strtotime($kegiatan->waktu_selesai)) }}</span>
             </div>
         </div>
-        <a href="{{ route('santri.kegiatan.index') }}" class="btn btn-secondary">
+        {{-- ✅ FIX: Tombol kembali pakai $fromTab agar kembali ke tab yang benar --}}
+        <a href="{{ route('santri.kegiatan.index') }}?tab={{ $fromTab ?? 'riwayat' }}" class="kd-btn-back">
             <i class="fas fa-arrow-left"></i> Kembali
         </a>
     </div>
-    
+
     @if($kegiatan->materi)
-    <div style="padding: 15px; background: var(--primary-light); border-radius: var(--border-radius-sm); margin-bottom: 15px;">
-        <strong><i class="fas fa-book"></i> Materi:</strong> {{ $kegiatan->materi }}
-    </div>
-    @endif
-    
-    @if($kegiatan->keterangan)
-    <div style="padding: 15px; background: #FFF8E1; border-radius: var(--border-radius-sm); border-left: 4px solid var(--warning-color);">
-        <strong><i class="fas fa-info-circle"></i> Keterangan:</strong><br>
-        {{ $kegiatan->keterangan }}
+    <div style="background:rgba(255,255,255,0.12);padding:9px 13px;border-radius:8px;font-size:0.83rem;border:1px solid rgba(255,255,255,0.15);">
+        <i class="fas fa-book"></i> <strong>Materi:</strong> {{ $kegiatan->materi }}
     </div>
     @endif
 </div>
 
-{{-- ✅ STATISTIK KEHADIRAN UNTUK KEGIATAN INI --}}
-<div class="row-cards" style="margin-bottom: 25px;">
-    <div class="card card-success">
-        <h3><i class="fas fa-check-circle"></i> Total Hadir</h3>
-        <div class="card-value">{{ $stats['Hadir'] ?? 0 }}</div>
-        <div class="card-icon"><i class="fas fa-check-circle"></i></div>
+{{-- STATS --}}
+<div class="kd-stats">
+    <div class="kd-stat green">
+        <div class="kd-stat-icon"><i class="fas fa-check-circle"></i></div>
+        <div class="kd-stat-value">{{ $stats['Hadir'] ?? 0 }}</div>
+        <div class="kd-stat-label">Hadir</div>
     </div>
-    
-    <div class="card card-info">
-        <h3><i class="fas fa-info-circle"></i> Izin</h3>
-        <div class="card-value">{{ $stats['Izin'] ?? 0 }}</div>
-        <div class="card-icon"><i class="fas fa-info-circle"></i></div>
+    <div class="kd-stat blue">
+        <div class="kd-stat-icon"><i class="fas fa-info-circle"></i></div>
+        <div class="kd-stat-value">{{ $stats['Izin'] ?? 0 }}</div>
+        <div class="kd-stat-label">Izin</div>
     </div>
-    
-    <div class="card card-warning">
-        <h3><i class="fas fa-heartbeat"></i> Sakit</h3>
-        <div class="card-value">{{ $stats['Sakit'] ?? 0 }}</div>
-        <div class="card-icon"><i class="fas fa-heartbeat"></i></div>
+    <div class="kd-stat orange">
+        <div class="kd-stat-icon"><i class="fas fa-heartbeat"></i></div>
+        <div class="kd-stat-value">{{ $stats['Sakit'] ?? 0 }}</div>
+        <div class="kd-stat-label">Sakit</div>
     </div>
-    
-    <div class="card card-danger">
-        <h3><i class="fas fa-times-circle"></i> Alpa</h3>
-        <div class="card-value">{{ $stats['Alpa'] ?? 0 }}</div>
-        <div class="card-icon"><i class="fas fa-times-circle"></i></div>
+    <div class="kd-stat red">
+        <div class="kd-stat-icon"><i class="fas fa-times-circle"></i></div>
+        <div class="kd-stat-value">{{ $stats['Alpa'] ?? 0 }}</div>
+        <div class="kd-stat-label">Alpa</div>
     </div>
 </div>
 
-{{-- ✅ GRAFIK PIE: Distribusi Status Kehadiran --}}
-<div class="content-box" style="margin-bottom: 25px;">
-    <h3 style="margin-bottom: 20px; color: var(--primary-dark); text-align: center;">
-        <i class="fas fa-chart-pie"></i> Distribusi Status Kehadiran
-    </h3>
-    
-    <div style="max-width: 400px; margin: 0 auto;">
-        <canvas id="chartDistribusiStatus" style="max-height: 350px;"></canvas>
+{{-- CHART + PERSENTASE --}}
+<div class="kd-two-col">
+    <div class="kd-chart-box">
+        <div class="kd-chart-title"><i class="fas fa-chart-line" style="color:#2bbd8e;"></i> Tren Kehadiran (6 Bulan)</div>
+        <canvas id="chartTren" style="max-height:220px;"></canvas>
     </div>
-    
-    <div style="margin-top: 25px; text-align: center; padding-top: 20px; border-top: 1px solid #f0f0f0;">
-        <div style="display: inline-block; padding: 15px 30px; background: linear-gradient(135deg, #E8F7F2 0%, #D4F1E3 100%); border-radius: var(--border-radius); box-shadow: var(--shadow-sm);">
-            <div style="font-size: 0.9rem; color: var(--text-light); margin-bottom: 5px;">Persentase Kehadiran</div>
-            <div style="font-size: 2.5rem; font-weight: 700; color: var(--success-color);">{{ $persentaseHadir }}%</div>
-            <div style="font-size: 0.85rem; color: var(--text-light); margin-top: 5px;">dari {{ $totalAbsensi }} total absensi</div>
+    <div class="kd-chart-box">
+        <div class="kd-chart-title"><i class="fas fa-chart-pie" style="color:#f5a623;"></i> Distribusi Kehadiran</div>
+        <canvas id="chartDonut" style="max-height:170px;"></canvas>
+        <div class="kd-pct-card">
+            <div class="kd-pct-label">Persentase Kehadiran</div>
+            <div class="kd-pct-val" style="color:{{ $persentaseHadir >= 85 ? '#059669' : ($persentaseHadir >= 70 ? '#d97706' : '#dc2626') }};">
+                {{ $persentaseHadir }}%
+            </div>
+            <div class="kd-pct-sub">dari {{ $totalAbsensi }} total absensi</div>
         </div>
     </div>
 </div>
 
-{{-- ✅ RIWAYAT ABSENSI LENGKAP --}}
-<div class="content-box">
-    <h3 style="margin-bottom: 20px; color: var(--text-color);">
-        <i class="fas fa-history"></i> Riwayat Absensi Lengkap
-    </h3>
-    
+{{-- RIWAYAT TABLE --}}
+<div class="kd-table-box">
+    <div class="kd-table-head">
+        <i class="fas fa-history" style="color:#2bbd8e;"></i> Riwayat Lengkap
+        <span style="margin-left:auto;background:#e8f7f2;color:#1a7a5e;padding:2px 8px;border-radius:8px;font-size:0.74rem;">{{ $riwayats->total() }} data</span>
+    </div>
     @if($riwayats->count() > 0)
-        <div class="table-container">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Tanggal</th>
-                        <th>Hari</th>
-                        <th>Waktu Absen</th>
-                        <th>Status</th>
-                        <th>Metode</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($riwayats as $index => $absensi)
-                    <tr>
-                        <td>{{ $riwayats->firstItem() + $index }}</td>
-                        <td>{{ $absensi->tanggal_formatted }}</td>
-                        <td>{{ \Carbon\Carbon::parse($absensi->tanggal)->locale('id')->dayName }}</td>
-                        <td>{{ $absensi->waktu_absen_formatted }}</td>
-                        <td>
-                            <span class="badge {{ $absensi->status_badge_class }}">
-                                <i class="fas fa-{{ $absensi->status == 'Hadir' ? 'check' : ($absensi->status == 'Izin' ? 'info-circle' : ($absensi->status == 'Sakit' ? 'heartbeat' : 'times')) }}-circle"></i>
-                                {{ $absensi->status }}
-                            </span>
-                        </td>
-                        <td><span class="badge badge-secondary">{{ $absensi->metode_absen }}</span></td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-        
-        {{-- Pagination --}}
-        <div style="margin-top: 20px;">
-            {{ $riwayats->links() }}
-        </div>
+        <table class="kd-table">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Tanggal</th>
+                    <th>Hari</th>
+                    <th>Waktu Absen</th>
+                    <th>Status</th>
+                    <th>Metode</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($riwayats as $idx => $absensi)
+                <tr>
+                    <td style="color:#9ca3af;font-size:0.77rem;">{{ $riwayats->firstItem() + $idx }}</td>
+                    <td style="font-weight:600;">{{ \Carbon\Carbon::parse($absensi->tanggal)->format('d M Y') }}</td>
+                    <td style="color:#6b7280;font-size:0.82rem;">{{ \Carbon\Carbon::parse($absensi->tanggal)->locale('id')->dayName }}</td>
+                    <td style="color:#6b7280;font-size:0.82rem;">
+                        {{ $absensi->waktu_absen ? \Carbon\Carbon::parse($absensi->waktu_absen)->format('H:i') : '-' }}
+                    </td>
+                    <td>
+                        <span class="kd-pill {{ strtolower($absensi->status) }}">{{ $absensi->status }}</span>
+                    </td>
+                    <td style="font-size:0.79rem;color:#6b7280;">
+                        <i class="fas fa-{{ ($absensi->metode_absen ?? '') === 'RFID' ? 'id-card' : 'hand-pointer' }}"></i>
+                        {{ $absensi->metode_absen ?? '-' }}
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+        <div style="padding:12px 16px;border-top:1px solid #f0f0f0;">{{ $riwayats->links() }}</div>
     @else
-        <div class="empty-state">
-            <i class="fas fa-inbox"></i>
-            <h3>Belum Ada Riwayat</h3>
-            <p>Anda belum pernah mengikuti kegiatan ini atau belum ada data absensi yang tercatat.</p>
+        <div style="text-align:center;padding:32px;color:#6b7280;font-size:0.85rem;">
+            <i class="fas fa-inbox" style="font-size:2.5rem;opacity:0.2;display:block;margin-bottom:10px;"></i>
+            Belum ada riwayat absensi untuk kegiatan ini.
         </div>
     @endif
 </div>
 
-{{-- Chart.js Script --}}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    
-    // ============================================
-    // GRAFIK PIE: Distribusi Status Kehadiran
-    // ============================================
-    const ctxPie = document.getElementById('chartDistribusiStatus');
-    if (ctxPie) {
-        new Chart(ctxPie.getContext('2d'), {
-            type: 'pie',
-            data: {
-                labels: ['Hadir', 'Izin', 'Sakit', 'Alpa'],
-                datasets: [{
-                    data: [
-                        {{ $stats['Hadir'] ?? 0 }},
-                        {{ $stats['Izin'] ?? 0 }},
-                        {{ $stats['Sakit'] ?? 0 }},
-                        {{ $stats['Alpa'] ?? 0 }}
-                    ],
-                    backgroundColor: [
-                        'rgba(111, 186, 157, 0.9)',
-                        'rgba(129, 198, 232, 0.9)',
-                        'rgba(255, 213, 107, 0.9)',
-                        'rgba(255, 139, 148, 0.9)',
-                    ],
-                    borderColor: '#fff',
-                    borderWidth: 3
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            padding: 20,
-                            font: {
-                                size: 13,
-                                weight: '600'
-                            }
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const label = context.label || '';
-                                const value = context.parsed || 0;
-                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-                                return label + ': ' + value + ' kali (' + percentage + '%)';
-                            }
-                        }
-                    }
-                }
+    new Chart(document.getElementById('chartTren'), {
+        type: 'line',
+        data: {
+            labels: @json(collect($trendBulanan)->pluck('bulan')),
+            datasets: [{
+                label: 'Hadir',
+                data: @json(collect($trendBulanan)->pluck('hadir')),
+                borderColor: '#2bbd8e', backgroundColor: 'rgba(43,189,142,0.12)',
+                borderWidth: 3, pointRadius: 5, pointBackgroundColor: '#2bbd8e',
+                tension: 0.4, fill: true
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: 'rgba(0,0,0,0.04)' } },
+                x: { grid: { display: false } }
             }
-        });
-    }
+        }
+    });
+
+    new Chart(document.getElementById('chartDonut'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Hadir','Izin','Sakit','Alpa'],
+            datasets: [{
+                data: [{{ $stats['Hadir'] ?? 0 }}, {{ $stats['Izin'] ?? 0 }}, {{ $stats['Sakit'] ?? 0 }}, {{ $stats['Alpa'] ?? 0 }}],
+                backgroundColor: ['#2bbd8e','#3b82f6','#f59e0b','#e53e3e'],
+                borderWidth: 3, borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: true, cutout: '60%',
+            plugins: {
+                legend: { position: 'bottom', labels: { padding: 12, font: { size: 11 } } },
+                tooltip: { callbacks: { label: function(ctx) {
+                    var total = {{ $totalAbsensi }};
+                    var pct = total > 0 ? ((ctx.parsed / total) * 100).toFixed(1) : 0;
+                    return ctx.label + ': ' + ctx.parsed + ' (' + pct + '%)';
+                }}}
+            }
+        }
+    });
 });
 </script>
 @endsection

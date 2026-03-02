@@ -10,11 +10,11 @@
 
 <!-- Info Santri -->
 <div class="content-box" style="margin-bottom: 25px;">
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 11px;">
         <div>
             <h3 style="margin: 0; color: var(--primary-color);">{{ $santri->nama_lengkap }}</h3>
             <p style="margin: 5px 0 0 0; color: var(--text-light);">
-                {{ $santri->id_santri }} • {{ $santri->nis ?? '-' }} • {{ $santri->kelas_lengkap }}
+                {{ $santri->id_santri }} - {{ $santri->nis ?? '-' }}  {{ $santri->kelas_lengkap }}
             </p>
         </div>
         <div>
@@ -51,7 +51,7 @@
 
 <!-- Tabel Riwayat -->
 <div class="content-box">
-    <h4 style="margin-bottom: 20px; color: var(--primary-dark);">
+    <h4 style="margin-bottom: 14px; color: var(--primary-dark);">
         <i class="fas fa-list"></i> Daftar Pembayaran
     </h4>
 
@@ -107,8 +107,8 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" class="text-center" style="padding: 40px;">
-                            <i class="fas fa-inbox" style="font-size: 3rem; color: #ccc; display: block; margin-bottom: 15px;"></i>
+                        <td colspan="8" class="text-center" style="padding: 22px;">
+                            <i class="fas fa-inbox" style="font-size: 2.2rem; color: #ccc; display: block; margin-bottom: 15px;"></i>
                             <p style="color: #999;">Belum ada riwayat pembayaran untuk santri ini.</p>
                         </td>
                     </tr>
@@ -119,7 +119,7 @@
 
     <!-- Pagination -->
     @if($pembayaranSpp->hasPages())
-        <div style="margin-top: 20px;">
+        <div style="margin-top: 14px;">
             {{ $pembayaranSpp->links() }}
         </div>
     @endif

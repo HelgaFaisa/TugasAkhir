@@ -8,10 +8,10 @@
 </div>
 
 <!-- Header Actions -->
-<div class="content-box" style="margin-bottom: 20px;">
+<div class="content-box" style="margin-bottom: 14px;">
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
         <div>
-            <span class="badge {{ $berita->status_badge }}" style="font-size: 1em; padding: 8px 15px;">
+            <span class="badge {{ $berita->status_badge }}" style="font-size: 1em; padding: 6px 11px;">
                 @if($berita->status === 'published')
                     <i class="fas fa-check-circle"></i> Published
                 @else
@@ -34,14 +34,14 @@
 <div class="content-box">
     <div style="padding: 10px;">
         <!-- Header Berita -->
-        <div style="border-bottom: 3px solid var(--primary-color); padding-bottom: 25px; margin-bottom: 30px;">
+        <div style="border-bottom: 3px solid var(--primary-color); padding-bottom: 25px; margin-bottom: 22px;">
             <div style="margin-bottom: 15px;">
                 <span style="background: var(--primary-light); color: var(--primary-dark); padding: 6px 12px; border-radius: var(--border-radius-sm); font-weight: 600; font-size: 0.9em;">
                     ID: {{ $berita->id_berita }}
                 </span>
             </div>
             
-            <h1 style="color: var(--primary-dark); margin-bottom: 20px; font-size: 2em; line-height: 1.3;">
+            <h1 style="color: var(--primary-dark); margin-bottom: 14px; font-size: 2em; line-height: 1.3;">
                 {{ $berita->judul }}
             </h1>
             
@@ -81,7 +81,7 @@
         <!-- Konten Berita -->
         <div class="detail-section">
             <h4><i class="fas fa-align-left"></i> Konten Berita</h4>
-            <div style="line-height: 1.9; font-size: 1.05em; color: var(--text-color); background: var(--primary-light); padding: 25px; border-radius: var(--border-radius-sm); border-left: 4px solid var(--primary-color);">
+            <div style="line-height: 1.9; font-size: 1.05em; color: var(--text-color); background: var(--primary-light); padding: 18px; border-radius: var(--border-radius-sm); border-left: 4px solid var(--primary-color);">
                 {!! $berita->konten !!}
             </div>
         </div>
@@ -93,7 +93,7 @@
                 <i class="fas fa-graduation-cap"></i> 
                 Target Kelas
             </h4>
-            <div style="background: linear-gradient(135deg, #E3F2FD 0%, #D1E9F9 100%); padding: 20px; border-radius: var(--border-radius-sm); border-left: 4px solid var(--info-color);">
+            <div style="background: linear-gradient(135deg, #E3F2FD 0%, #D1E9F9 100%); padding: 14px; border-radius: var(--border-radius-sm); border-left: 4px solid var(--info-color);">
                 <p style="margin: 0; color: var(--text-color); font-size: 1em;">
                     <i class="fas fa-info-circle"></i>
                     Berita ini ditujukan untuk: 

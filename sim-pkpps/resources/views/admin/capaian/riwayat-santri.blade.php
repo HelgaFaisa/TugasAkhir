@@ -6,7 +6,7 @@
 </div>
 
 {{-- Santri Info Card --}}
-<div class="content-box" style="margin-bottom: 20px;">
+<div class="content-box" style="margin-bottom: 14px;">
     <div style="display: flex; align-items: center; gap: 20px;">
         <div class="icon-wrapper icon-wrapper-lg">
             <i class="fas fa-user-graduate"></i>
@@ -58,7 +58,7 @@
 </div>
 
 {{-- Filter Section --}}
-<div class="content-box" style="margin-bottom: 20px;">
+<div class="content-box" style="margin-bottom: 14px;">
     <form method="GET" action="{{ route('admin.capaian.riwayat-santri', $santri->id_santri) }}" class="filter-form-inline">
         <select name="id_semester" class="form-control" style="width: 250px;">
             <option value="">Semua Semester</option>
@@ -100,7 +100,7 @@
 
         @foreach(['Al-Qur\'an', 'Hadist', 'Materi Tambahan'] as $kategori)
             @if(isset($groupedCapaians[$kategori]) && $groupedCapaians[$kategori]->count() > 0)
-                <div style="margin-bottom: 30px;">
+                <div style="margin-bottom: 22px;">
                     <h4 style="color: var(--primary-dark); margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid var(--primary-light);">
                         <i class="fas fa-{{ $kategori == 'Al-Qur\'an' ? 'book-quran' : ($kategori == 'Hadist' ? 'scroll' : 'book') }}"></i>
                         Kategori: {{ $kategori }}
@@ -162,7 +162,7 @@
         @endforeach
 
         {{-- Pagination --}}
-        <div style="margin-top: 20px;">
+        <div style="margin-top: 14px;">
             {{ $capaians->links() }}
         </div>
     @else

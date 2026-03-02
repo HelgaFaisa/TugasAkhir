@@ -1,4 +1,5 @@
 <?php
+// app/Http/Controllers/Santri/SantriCapaianController.php
 
 namespace App\Http\Controllers\Santri;
 
@@ -6,105 +7,135 @@ use App\Http\Controllers\Controller;
 use App\Models\Capaian;
 use App\Models\Santri;
 use App\Models\Semester;
+use App\Services\CapaianAccessService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 
 class SantriCapaianController extends Controller
 {
-    /**
-     * Tampilkan daftar capaian santri yang sedang login
-     */
+    private function getSantriId()
+    {
+        return auth('santri')->user()->id_santri;
+    }
+
     public function index(Request $request)
     {
-        $user = Auth::user();
-        
-        // Validasi role
-        if (!in_array($user->role, ['santri', 'wali'])) {
-            abort(403, 'Unauthorized access');
-        }
-        
-        $idSantri = $user->role_id;
-        
-        // Cache data santri selama 10 menit
-        $santri = Cache::remember("santri_capaian_{$idSantri}", 600, function () use ($idSantri) {
+        $idSantri = $this->getSantriId();
+
+        // Ambil data santri
+        $santri = Cache::remember("santri_{$idSantri}_profile", 600, function () use ($idSantri) {
             return Santri::where('id_santri', $idSantri)
-                ->select('id_santri', 'nama_lengkap', 'kelas', 'nis')
+                ->with(['kelasPrimary.kelas'])
+                ->select('id_santri', 'nama_lengkap', 'nis', 'status')
                 ->firstOrFail();
         });
-        
-        // Get semester aktif
-        $semesterAktif = Semester::aktif()->first();
-        $selectedSemester = $request->input('id_semester', $semesterAktif?->id_semester);
-        
-        // Query capaian dengan relasi
-        $query = Capaian::with(['materi:id_materi,nama_kitab,kategori,total_halaman', 'semester:id_semester,nama_semester'])
+
+        $semesterAktif    = Semester::aktif()->first();
+        $selectedSemester = $request->input('id_semester',
+            $semesterAktif ? $semesterAktif->id_semester : null
+        );
+
+        // Capaian untuk tab Ringkasan / Daftar / Grafik (filter semester)
+        $query = Capaian::with([
+                'materi:id_materi,nama_kitab,kategori,total_halaman,halaman_mulai,halaman_akhir',
+                'semester:id_semester,nama_semester',
+            ])
             ->where('id_santri', $idSantri)
-            ->select('id', 'id_capaian', 'id_santri', 'id_materi', 'id_semester', 'halaman_selesai', 'persentase', 'tanggal_input');
-        
-        // Filter semester
+            ->select('id', 'id_capaian', 'id_santri', 'id_materi',
+                     'id_semester', 'halaman_selesai', 'persentase', 'tanggal_input');
+
         if ($selectedSemester) {
             $query->where('id_semester', $selectedSemester);
         }
-        
+
         $capaians = $query->orderBy('tanggal_input', 'desc')->get();
-        
-        // Statistik Umum
-        $totalCapaian = $capaians->count();
+
+        // Statistik umum
+        $totalCapaian       = $capaians->count();
         $rataRataPersentase = $capaians->avg('persentase') ?? 0;
-        $materiSelesai = $capaians->where('persentase', '>=', 100)->count();
-        
-        // Statistik per Kategori
+        $materiSelesai      = $capaians->where('persentase', '>=', 100)->count();
+
+        // Statistik per kategori
         $statistikKategori = [
-            'Al-Qur\'an' => [
-                'count' => 0,
-                'avg' => 0,
-                'selesai' => 0,
-            ],
-            'Hadist' => [
-                'count' => 0,
-                'avg' => 0,
-                'selesai' => 0,
-            ],
-            'Materi Tambahan' => [
-                'count' => 0,
-                'avg' => 0,
-                'selesai' => 0,
-            ],
+            "Al-Qur'an"       => ['count' => 0, 'avg' => 0, 'selesai' => 0],
+            'Hadist'           => ['count' => 0, 'avg' => 0, 'selesai' => 0],
+            'Materi Tambahan'  => ['count' => 0, 'avg' => 0, 'selesai' => 0],
         ];
-        
+
         foreach ($capaians as $capaian) {
-            $kategori = $capaian->materi->kategori;
-            $statistikKategori[$kategori]['count']++;
-            $statistikKategori[$kategori]['avg'] += $capaian->persentase;
-            if ($capaian->persentase >= 100) {
-                $statistikKategori[$kategori]['selesai']++;
-            }
+            $kat = $capaian->materi->kategori ?? 'Materi Tambahan';
+            if (!isset($statistikKategori[$kat])) continue;
+            $statistikKategori[$kat]['count']++;
+            $statistikKategori[$kat]['avg'] += $capaian->persentase;
+            if ($capaian->persentase >= 100) $statistikKategori[$kat]['selesai']++;
         }
-        
-        // Hitung rata-rata
-        foreach ($statistikKategori as $kategori => $data) {
+        foreach ($statistikKategori as $kat => $data) {
             if ($data['count'] > 0) {
-                $statistikKategori[$kategori]['avg'] = $data['avg'] / $data['count'];
+                $statistikKategori[$kat]['avg'] = round($data['avg'] / $data['count'], 2);
             }
         }
-        
-        // Distribusi persentase untuk chart
+
+        // Distribusi persentase
         $distribusiPersentase = [
-            '0-25%' => $capaians->whereBetween('persentase', [0, 25])->count(),
-            '26-50%' => $capaians->whereBetween('persentase', [26, 50])->count(),
-            '51-75%' => $capaians->whereBetween('persentase', [51, 75])->count(),
-            '76-99%' => $capaians->whereBetween('persentase', [76, 99])->count(),
-            '100%' => $capaians->where('persentase', '>=', 100)->count(),
+            '0-25%'  => $capaians->filter(fn($c) => $c->persentase >= 0  && $c->persentase <= 25)->count(),
+            '26-50%' => $capaians->filter(fn($c) => $c->persentase > 25  && $c->persentase <= 50)->count(),
+            '51-75%' => $capaians->filter(fn($c) => $c->persentase > 50  && $c->persentase <= 75)->count(),
+            '76-99%' => $capaians->filter(fn($c) => $c->persentase > 75  && $c->persentase < 100)->count(),
+            '100%'   => $capaians->where('persentase', '>=', 100)->count(),
         ];
-        
-        // Data untuk semester dropdown
+
+        // PREDIKSI: ambil SEMUA capaian tanpa filter semester
+        $allCapaians = Capaian::with([
+                'materi:id_materi,nama_kitab,kategori',
+                'semester:id_semester,nama_semester,tahun_ajaran,periode',
+            ])
+            ->where('id_santri', $idSantri)
+            ->select('id', 'id_santri', 'id_materi', 'id_semester', 'persentase')
+            ->get();
+
+        // Susun history per semester (urut cronologis)
+        $allSemesters = Semester::orderBy('tahun_ajaran')->orderBy('periode')->get();
+
+        $historyData = [];
+        foreach ($allSemesters as $sem) {
+            $semCap = $allCapaians->where('id_semester', $sem->id_semester);
+            if ($semCap->isNotEmpty()) {
+                $historyData[] = [
+                    'sem' => $sem->nama_semester,
+                    'avg' => round($semCap->avg('persentase'), 2),
+                ];
+            }
+        }
+
+        // Hitung growth rate (rata-rata kenaikan antar semester)
+        $growthRate = 0;
+        if (count($historyData) >= 2) {
+            $diffs = [];
+            for ($i = 1; $i < count($historyData); $i++) {
+                $diffs[] = $historyData[$i]['avg'] - $historyData[$i - 1]['avg'];
+            }
+            $growthRate = round(array_sum($diffs) / count($diffs), 2);
+        } elseif (count($historyData) === 1) {
+            $growthRate = round($historyData[0]['avg'], 2);
+        }
+
+        $progressHistory = [
+            'history'      => $historyData,
+            'growth_rate'  => $growthRate,
+            'all_capaians' => $allCapaians,
+        ];
+
+        // Semester dropdown
         $semesters = Semester::select('id_semester', 'nama_semester', 'tahun_ajaran')
             ->orderBy('tahun_ajaran', 'desc')
             ->orderBy('periode', 'desc')
             ->get();
-        
+
+        // Status akses input capaian mandiri
+        $capaianAccessOpen   = CapaianAccessService::isOpen();
+        $capaianAccessConfig = CapaianAccessService::getConfig();
+        $capaianSisaWaktu    = CapaianAccessService::getSisaWaktu();
+
         return view('santri.capaian.index', compact(
             'santri',
             'capaians',
@@ -113,102 +144,28 @@ class SantriCapaianController extends Controller
             'materiSelesai',
             'statistikKategori',
             'distribusiPersentase',
+            'progressHistory',
             'semesters',
             'selectedSemester',
-            'semesterAktif'
+            'semesterAktif',
+            'capaianAccessOpen',
+            'capaianAccessConfig',
+            'capaianSisaWaktu'
         ));
     }
-    
-    /**
-     * Tampilkan detail capaian tertentu
-     */
+
     public function show($id)
     {
-        $user = Auth::user();
-        
-        if (!in_array($user->role, ['santri', 'wali'])) {
-            abort(403, 'Unauthorized access');
-        }
-        
+        $idSantri = $this->getSantriId();
+
         $capaian = Capaian::with([
             'materi:id_materi,nama_kitab,kategori,halaman_mulai,halaman_akhir,total_halaman',
             'semester:id_semester,nama_semester,tahun_ajaran',
-            'santri:id_santri,nama_lengkap,kelas'
+            'santri:id_santri,nama_lengkap,nis',
         ])
-        ->where('id_santri', $user->role_id)
+        ->where('id_santri', $idSantri)
         ->findOrFail($id);
-        
+
         return view('santri.capaian.show', compact('capaian'));
-    }
-    
-    /**
-     * API untuk data grafik (AJAX)
-     */
-    public function apiGrafikData(Request $request)
-    {
-        $user = Auth::user();
-        $type = $request->input('type', 'kategori');
-        $idSemester = $request->input('id_semester');
-        
-        $query = Capaian::with('materi:id_materi,kategori')
-            ->where('id_santri', $user->role_id)
-            ->select('id', 'id_materi', 'persentase', 'id_semester');
-        
-        if ($idSemester) {
-            $query->where('id_semester', $idSemester);
-        }
-        
-        $capaians = $query->get();
-        $data = [];
-        
-        switch ($type) {
-            case 'kategori':
-                $avgAlquran = $capaians->filter(fn($c) => $c->materi->kategori == 'Al-Qur\'an')->avg('persentase') ?? 0;
-                $avgHadist = $capaians->filter(fn($c) => $c->materi->kategori == 'Hadist')->avg('persentase') ?? 0;
-                $avgTambahan = $capaians->filter(fn($c) => $c->materi->kategori == 'Materi Tambahan')->avg('persentase') ?? 0;
-                
-                $data = [
-                    'labels' => ['Al-Qur\'an', 'Hadist', 'Materi Tambahan'],
-                    'datasets' => [[
-                        'label' => 'Rata-rata Progress (%)',
-                        'data' => [
-                            round($avgAlquran, 2),
-                            round($avgHadist, 2),
-                            round($avgTambahan, 2)
-                        ],
-                        'backgroundColor' => [
-                            'rgba(111, 186, 157, 0.8)',
-                            'rgba(129, 198, 232, 0.8)',
-                            'rgba(255, 213, 107, 0.8)',
-                        ],
-                    ]]
-                ];
-                break;
-                
-            case 'distribusi':
-                $data = [
-                    'labels' => ['0-25%', '26-50%', '51-75%', '76-99%', '100%'],
-                    'datasets' => [[
-                        'label' => 'Jumlah Materi',
-                        'data' => [
-                            $capaians->whereBetween('persentase', [0, 25])->count(),
-                            $capaians->whereBetween('persentase', [26, 50])->count(),
-                            $capaians->whereBetween('persentase', [51, 75])->count(),
-                            $capaians->whereBetween('persentase', [76, 99])->count(),
-                            $capaians->where('persentase', '>=', 100)->count(),
-                        ],
-                        'backgroundColor' => [
-                            'rgba(255, 139, 148, 0.8)',
-                            'rgba(255, 171, 145, 0.8)',
-                            'rgba(255, 213, 107, 0.8)',
-                            'rgba(129, 198, 232, 0.8)',
-                            'rgba(111, 186, 157, 0.8)',
-                        ],
-                    ]]
-                ];
-                break;
-        }
-        
-        return response()->json($data);
     }
 }

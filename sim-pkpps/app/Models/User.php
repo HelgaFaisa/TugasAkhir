@@ -18,7 +18,6 @@ class User extends Authenticatable
         'username',
         'password',
         'role',
-        'role_id',
     ];
 
     protected $hidden = [
@@ -31,35 +30,47 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    /**
-     * Relasi ke Santri
-     */
-    public function santri()
-    {
-        return $this->belongsTo(Santri::class, 'role_id', 'id_santri');
-    }
+    // ══════════════════ HELPER METHODS ══════════════════
 
     /**
-     * Relasi ke Wali
+     * Cek apakah user adalah admin (semua role admin)
      */
-    public function wali()
-    {
-        return $this->belongsTo(Wali::class, 'role_id', 'id_wali');
-    }
-
-    // Helper methods
     public function isAdmin()
     {
-        return $this->role === 'admin';
+        return in_array($this->role, ['super_admin', 'akademik', 'pamong']);
     }
 
-    public function isSantri()
+    /**
+     * Cek apakah user adalah super admin
+     */
+    public function isSuperAdmin()
     {
-        return $this->role === 'santri';
+        return $this->role === 'super_admin';
     }
 
-    public function isWali()
+    /**
+     * Cek apakah user adalah akademik
+     */
+    public function isAkademik()
     {
-        return $this->role === 'wali';
+        return $this->role === 'akademik';
+    }
+
+    /**
+     * Cek apakah user adalah pamong
+     */
+    public function isPamong()
+    {
+        return $this->role === 'pamong';
+    }
+
+    /**
+     * Cek apakah user memiliki salah satu role yang diberikan.
+     * Contoh: $user->hasRole('super_admin', 'akademik')
+     */
+    public function hasRole()
+    {
+        $roles = func_get_args();
+        return in_array($this->role, $roles);
     }
 }

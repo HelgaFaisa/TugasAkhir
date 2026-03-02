@@ -1,4 +1,4 @@
-// lib/features/kepulangan/presentation/pages/kepulangan_detail_page.dart
+﻿// lib/features/kepulangan/presentation/pages/kepulangan_detail_page.dart
 
 import 'package:flutter/material.dart';
 import '../../data/models/kepulangan_model.dart';
@@ -18,7 +18,7 @@ class KepulanganDetailPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Detail Kepulangan'),
         elevation: 0,
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: const Color(0xFF6FBA9D),
         foregroundColor: Colors.white,
       ),
       body: FutureBuilder<Map<String, dynamic>>(
@@ -70,7 +70,7 @@ class KepulanganDetailPage extends StatelessWidget {
                 children: [
                   // Kuota Indicator
                   Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(12),
                     child: KuotaIndicator(
                       kuotaInfo: kuotaInfo,
                       showDetail: false,
@@ -79,22 +79,22 @@ class KepulanganDetailPage extends StatelessWidget {
 
                   // Status Card
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: _buildStatusCard(kepulangan),
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
 
                   // Detail Info
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: Card(
                       elevation: 2,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(9),
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(12),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -102,11 +102,11 @@ class KepulanganDetailPage extends StatelessWidget {
                             const Text(
                               'Informasi Kepulangan',
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 12,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 12),
 
                             // Santri
                             _buildDetailRow(
@@ -114,7 +114,7 @@ class KepulanganDetailPage extends StatelessWidget {
                               santriInfo['nama_lengkap'] ?? '-',
                               Icons.person,
                             ),
-                            const Divider(height: 24),
+                            const Divider(height: 19),
 
                             // NIS
                             _buildDetailRow(
@@ -122,7 +122,7 @@ class KepulanganDetailPage extends StatelessWidget {
                               santriInfo['nis'] ?? '-',
                               Icons.badge,
                             ),
-                            const Divider(height: 24),
+                            const Divider(height: 19),
 
                             // Tanggal Izin
                             _buildDetailRow(
@@ -130,7 +130,7 @@ class KepulanganDetailPage extends StatelessWidget {
                               kepulangan.tanggalIzinFormatted,
                               Icons.calendar_today,
                             ),
-                            const Divider(height: 24),
+                            const Divider(height: 19),
 
                             // Tanggal Pulang
                             _buildDetailRow(
@@ -138,7 +138,7 @@ class KepulanganDetailPage extends StatelessWidget {
                               kepulangan.tanggalPulangFormatted,
                               Icons.flight_takeoff,
                             ),
-                            const Divider(height: 24),
+                            const Divider(height: 19),
 
                             // Tanggal Kembali
                             _buildDetailRow(
@@ -146,7 +146,7 @@ class KepulanganDetailPage extends StatelessWidget {
                               kepulangan.tanggalKembaliFormatted,
                               Icons.flight_land,
                             ),
-                            const Divider(height: 24),
+                            const Divider(height: 19),
 
                             // Durasi
                             _buildDetailRow(
@@ -154,7 +154,7 @@ class KepulanganDetailPage extends StatelessWidget {
                               '${kepulangan.durasiIzin} hari',
                               Icons.access_time,
                             ),
-                            const Divider(height: 24),
+                            const Divider(height: 19),
 
                             // Alasan
                             _buildDetailColumn(
@@ -166,7 +166,7 @@ class KepulanganDetailPage extends StatelessWidget {
                             // Catatan (jika ada)
                             if (kepulangan.catatan != null &&
                                 kepulangan.catatan!.isNotEmpty) ...[
-                              const Divider(height: 24),
+                              const Divider(height: 19),
                               _buildDetailColumn(
                                 'Catatan Persetujuan',
                                 kepulangan.catatan!,
@@ -179,7 +179,7 @@ class KepulanganDetailPage extends StatelessWidget {
 
                             // Approved date
                             if (kepulangan.approvedAtFormatted != null) ...[
-                              const Divider(height: 24),
+                              const Divider(height: 19),
                               _buildDetailRow(
                                 'Waktu Persetujuan',
                                 kepulangan.approvedAtFormatted!,
@@ -192,30 +192,30 @@ class KepulanganDetailPage extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
 
                   // Indicators Card
                   if (kepulangan.isAktif || kepulangan.isTerlambat)
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
                       child: Card(
                         elevation: 2,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(9),
                         ),
                         child: Padding(
-                          padding: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.all(12),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text(
                                 'Status Kepulangan',
                                 style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 12,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              const SizedBox(height: 12),
+                              const SizedBox(height: 9),
                               if (kepulangan.isAktif)
                                 _buildIndicatorBanner(
                                   'Kepulangan Sedang Berlangsung',
@@ -224,7 +224,7 @@ class KepulanganDetailPage extends StatelessWidget {
                                   Colors.blue,
                                 ),
                               if (kepulangan.isAktif && kepulangan.isTerlambat)
-                                const SizedBox(height: 8),
+                                const SizedBox(height: 7),
                               if (kepulangan.isTerlambat)
                                 _buildIndicatorBanner(
                                   'Terlambat Kembali',
@@ -238,7 +238,7 @@ class KepulanganDetailPage extends StatelessWidget {
                       ),
                     ),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 24),
                 ],
               ),
             ),
@@ -288,38 +288,38 @@ class KepulanganDetailPage extends StatelessWidget {
 
     return Card(
       elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: bgColor,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(9),
         ),
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(9),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(9),
               ),
-              child: Icon(icon, color: iconColor, size: 32),
+              child: Icon(icon, color: iconColor, size: 24),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'Status Pengajuan',
-                    style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                    style: TextStyle(color: Colors.grey.shade600, fontSize: 9),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 2),
                   Text(
                     statusText,
                     style: TextStyle(
                       color: iconColor,
-                      fontSize: 18,
+                      fontSize: 15,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -336,21 +336,21 @@ class KepulanganDetailPage extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 20, color: Colors.grey.shade600),
-        const SizedBox(width: 12),
+        Icon(icon, size: 15, color: Colors.grey.shade600),
+        const SizedBox(width: 9),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 label,
-                style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                style: TextStyle(color: Colors.grey.shade600, fontSize: 9),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 2),
               Text(
                 value,
                 style: const TextStyle(
-                  fontSize: 14,
+                  fontSize: 11,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -374,27 +374,27 @@ class KepulanganDetailPage extends StatelessWidget {
       children: [
         Row(
           children: [
-            Icon(icon, size: 20, color: Colors.grey.shade600),
-            const SizedBox(width: 12),
+            Icon(icon, size: 15, color: Colors.grey.shade600),
+            const SizedBox(width: 9),
             Text(
               label,
-              style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+              style: TextStyle(color: Colors.grey.shade600, fontSize: 9),
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 7),
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(9),
           decoration: BoxDecoration(
             color: backgroundColor ?? Colors.grey.shade50,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(7),
             border: borderColor != null ? Border.all(color: borderColor) : null,
           ),
           child: Text(
             value,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 11,
               color: textColor ?? Colors.grey.shade800,
             ),
           ),
@@ -410,16 +410,16 @@ class KepulanganDetailPage extends StatelessWidget {
     Color color,
   ) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(9),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(7),
         border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
-          Icon(icon, color: color, size: 24),
-          const SizedBox(width: 12),
+          Icon(icon, color: color, size: 19),
+          const SizedBox(width: 9),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -429,13 +429,13 @@ class KepulanganDetailPage extends StatelessWidget {
                   style: TextStyle(
                     color: color,
                     fontWeight: FontWeight.bold,
-                    fontSize: 14,
+                    fontSize: 11,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   subtitle,
-                  style: TextStyle(color: color.withValues(alpha: 0.8), fontSize: 12),
+                  style: TextStyle(color: color.withValues(alpha: 0.8), fontSize: 9),
                 ),
               ],
             ),
@@ -448,18 +448,18 @@ class KepulanganDetailPage extends StatelessWidget {
   Widget _buildErrorState(BuildContext context, String message) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 64, color: Colors.red.shade300),
-            const SizedBox(height: 16),
+            Icon(Icons.error_outline, size: 48, color: Colors.red.shade300),
+            const SizedBox(height: 12),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+              style: TextStyle(color: Colors.grey.shade600, fontSize: 11),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 19),
             ElevatedButton.icon(
               onPressed: () {
                 Navigator.pop(context);

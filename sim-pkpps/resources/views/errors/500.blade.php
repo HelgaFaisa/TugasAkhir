@@ -19,13 +19,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 14px;
         }
         
         .error-container {
             background: white;
             border-radius: 20px;
-            padding: 50px;
+            padding: 36px;
             max-width: 600px;
             width: 100%;
             text-align: center;
@@ -35,7 +35,7 @@
         .error-icon {
             font-size: 100px;
             color: #f44336;
-            margin-bottom: 20px;
+            margin-bottom: 14px;
             animation: shake 0.5s ease-in-out;
         }
         
@@ -52,9 +52,9 @@
         }
         
         h2 {
-            font-size: 28px;
+            font-size: 21px;
             color: #666;
-            margin-bottom: 20px;
+            margin-bottom: 14px;
         }
         
         .error-message {
@@ -74,7 +74,7 @@
         
         .error-message p {
             color: #666;
-            font-size: 14px;
+            font-size: 11px;
             margin: 0;
         }
         
@@ -101,7 +101,7 @@
         
         @media (max-width: 768px) {
             .error-container {
-                padding: 30px 20px;
+                padding: 22px 20px;
             }
             
             h1 {
@@ -127,7 +127,7 @@
         <h1>500</h1>
         <h2>Oops! Terjadi Kesalahan Server</h2>
         
-        <p style="color: #999; margin-bottom: 20px;">
+        <p style="color: #999; margin-bottom: 14px;">
             Maaf, terjadi kesalahan pada server. Tim kami sudah diberitahu dan sedang menangani masalah ini.
         </p>
         

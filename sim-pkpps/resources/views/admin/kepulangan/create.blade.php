@@ -10,14 +10,14 @@
 </div>
 
 {{-- Info Periode Kuota --}}
-<div style="background: #E8F7F2; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #6FBA9D;">
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+<div style="background: #E8F7F2; padding: 15px; border-radius: 8px; margin-bottom: 14px; border-left: 4px solid #6FBA9D;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 11px;">
         <div>
-            <strong>📅 Periode Kuota:</strong><br>
+            <strong> Periode Kuota:</strong><br>
             {{ $settings->periode_mulai->format('d M Y') }} - {{ $settings->periode_akhir->format('d M Y') }}
         </div>
         <div>
-            <strong>📊 Kuota Maksimal:</strong><br>
+            <strong> Kuota Maksimal:</strong><br>
             {{ $settings->kuota_maksimal }} Hari / Tahun
         </div>
     </div>
@@ -53,8 +53,8 @@
         </div>
 
         {{-- Info Santri & Kuota --}}
-        <div id="santriInfo" style="display: none; background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #6FBA9D;">
-            <h4 style="margin-top: 0; color: #2C3E50;">📋 Informasi Santri & Kuota</h4>
+        <div id="santriInfo" style="display: none; background: #f8f9fa; padding: 14px; border-radius: 8px; margin-bottom: 14px; border-left: 4px solid #6FBA9D;">
+            <h4 style="margin-top: 0; color: #2C3E50;"> Informasi Santri & Kuota</h4>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
                 <div>
                     <p style="margin: 5px 0;"><strong>Nama:</strong> <span id="santriNama">-</span></p>
@@ -79,11 +79,11 @@
 
             <div id="warningOverLimit" style="display: none; margin-top: 15px; padding: 12px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 6px; color: #856404;">
                 <i class="fas fa-exclamation-triangle"></i>
-                <strong>⚠️ PERHATIAN:</strong> <span id="warningText"></span>
+                <strong>âš ï¸ PERHATIAN:</strong> <span id="warningText"></span>
             </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 20px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 14px;">
             <div class="form-group">
                 <label for="tanggal_pulang">
                     <i class="fas fa-calendar-alt form-icon"></i>
@@ -113,9 +113,9 @@
         </div>
 
         {{-- Info Durasi Izin --}}
-        <div id="durasiInfo" style="display: none; background: #fff3e0; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #ff9800;">
-            <h4 style="margin-top: 0; color: #2C3E50;">⏱️ Detail Durasi Izin</h4>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px;">
+        <div id="durasiInfo" style="display: none; background: #fff3e0; padding: 14px; border-radius: 8px; margin-bottom: 14px; border-left: 4px solid #ff9800;">
+            <h4 style="margin-top: 0; color: #2C3E50;">â±ï¸ Detail Durasi Izin</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 11px;">
                 <div style="text-align: center; padding: 15px; background: white; border-radius: 8px;">
                     <div style="font-size: 0.85rem; color: #7F8C8D; margin-bottom: 5px;">Durasi Izin</div>
                     <div id="durasiHari" style="font-size: 2rem; font-weight: 700; color: #ff9800;">0</div>
@@ -134,7 +134,7 @@
             </div>
             <div id="warningDurasi" style="display: none; margin-top: 15px; padding: 12px; background: #ffebee; border: 1px solid #ffcdd2; border-radius: 6px; color: #c62828;">
                 <i class="fas fa-exclamation-circle"></i>
-                <strong>⚠️ PERHATIAN:</strong> <span id="warningDurasiMessage"></span>
+                <strong>âš ï¸ PERHATIAN:</strong> <span id="warningDurasiMessage"></span>
             </div>
         </div>
 
@@ -171,9 +171,9 @@
 {{-- Modal Konfirmasi Over Limit --}}
 <div class="modal fade" id="overLimitModal" tabindex="-1" style="display: none;">
     <div class="modal-dialog">
-        <div class="modal-content" style="background: white; border-radius: 12px; padding: 20px;">
-            <div style="margin-bottom: 20px;">
-                <h3 style="margin: 0; color: #2C3E50;">⚠️ Konfirmasi Izin Melebihi Batas</h3>
+        <div class="modal-content" style="background: white; border-radius: 12px; padding: 14px;">
+            <div style="margin-bottom: 14px;">
+                <h3 style="margin: 0; color: #2C3E50;">âš ï¸ Konfirmasi Izin Melebihi Batas</h3>
             </div>
             <div style="padding: 15px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 6px; margin-bottom: 15px;">
                 <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: #856404; margin-bottom: 10px;"></i>
@@ -182,7 +182,7 @@
             </div>
             <p style="margin: 15px 0;">Izin tetap bisa diproses, tetapi santri ini akan <strong>melebihi kuota maksimal</strong>.</p>
             <p style="margin: 15px 0; color: #7F8C8D; font-size: 0.9rem;">Apakah Anda yakin ingin melanjutkan pengajuan izin ini?</p>
-            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px;">
                 <button type="button" class="btn btn-secondary" onclick="closeModal('overLimitModal')">Batal</button>
                 <button type="button" class="btn btn-warning" id="confirmOverLimit" style="background: #ff9800; border-color: #ff9800;">
                     <i class="fas fa-check"></i> Ya, Lanjutkan Tetap
@@ -218,7 +218,7 @@ document.getElementById('id_santri').addEventListener('change', function() {
     infoDiv.style.display = 'block';
     
     // Show loading state
-    infoDiv.innerHTML = '<div style="text-align: center; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Memuat data santri...</div>';
+    infoDiv.innerHTML = '<div style="text-align: center; padding: 14px;"><i class="fas fa-spinner fa-spin"></i> Memuat data santri...</div>';
 
     // PERBAIKAN: Proper error handling untuk API
     fetch(`/admin/kepulangan/api/santri/${santriId}`)
@@ -262,7 +262,7 @@ function updateSantriInfo(data) {
     // Rebuild HTML structure
     const infoDiv = document.getElementById('santriInfo');
     infoDiv.innerHTML = `
-        <h4 style="margin-top: 0; color: #2C3E50;">📋 Informasi Santri & Kuota</h4>
+        <h4 style="margin-top: 0; color: #2C3E50;"> Informasi Santri & Kuota</h4>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
             <div>
                 <p style="margin: 5px 0;"><strong>Nama:</strong> <span id="santriNama">${santri.nama_lengkap}</span></p>
@@ -286,7 +286,7 @@ function updateSantriInfo(data) {
 
         <div id="warningOverLimit" style="display: ${kuota.status === 'melebihi' ? 'block' : 'none'}; margin-top: 15px; padding: 12px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 6px; color: #856404;">
             <i class="fas fa-exclamation-triangle"></i>
-            <strong>⚠️ PERHATIAN:</strong> <span id="warningText">Santri ini sudah melebihi kuota ${kuota.kuota_maksimal} hari per tahun! Total terpakai: ${kuota.total_terpakai} hari.</span>
+            <strong>âš ï¸ PERHATIAN:</strong> <span id="warningText">Santri ini sudah melebihi kuota ${kuota.kuota_maksimal} hari per tahun! Total terpakai: ${kuota.total_terpakai} hari.</span>
         </div>
     `;
 }

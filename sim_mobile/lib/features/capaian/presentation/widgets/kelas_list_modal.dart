@@ -1,4 +1,4 @@
-// lib/features/capaian/presentation/widgets/kelas_list_modal.dart
+﻿// lib/features/capaian/presentation/widgets/kelas_list_modal.dart
 // Modal bottom sheet untuk menampilkan semua kelas santri
 
 import 'package:flutter/material.dart';
@@ -41,25 +41,25 @@ class KelasListModal extends StatelessWidget {
         constraints: BoxConstraints(
           maxHeight: MediaQuery.of(context).size.height * 0.6,
         ),
-        padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+        padding: const EdgeInsets.fromLTRB(15, 9, 15, 15),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             // Drag handle
             Container(
-              width: 40,
-              height: 4,
+              width: 31,
+              height: 2,
               decoration: BoxDecoration(
                 color: Colors.grey[300],
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             // Title
             Row(
               children: [
-                const Icon(Icons.school_rounded, color: Color(0xFF7C3AED), size: 22),
-                const SizedBox(width: 10),
+                const Icon(Icons.school_rounded, color: Color(0xFF6FBA9D), size: 17),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,14 +67,14 @@ class KelasListModal extends StatelessWidget {
                       const Text(
                         'Daftar Kelas',
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 15,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF1E1B4B),
                         ),
                       ),
                       Text(
                         santriName,
-                        style: TextStyle(fontSize: 13, color: Colors.grey[500]),
+                        style: TextStyle(fontSize: 11, color: Colors.grey[500]),
                       ),
                     ],
                   ),
@@ -85,22 +85,22 @@ class KelasListModal extends StatelessWidget {
                 ),
               ],
             ),
-            const Divider(height: 24),
+            const Divider(height: 19),
             // Kelas list
             Flexible(
               child: ListView.separated(
                 shrinkWrap: true,
                 itemCount: kelasList.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 10),
+                separatorBuilder: (_, __) => const SizedBox(height: 8),
                 itemBuilder: (ctx, i) {
                   final kelas = kelasList[i];
                   final color = KelasBadge.getKelompokColor(kelas.kelompok);
 
                   return Container(
-                    padding: const EdgeInsets.all(14),
+                    padding: const EdgeInsets.all(11),
                     decoration: BoxDecoration(
                       color: color.withValues(alpha: 0.06),
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(11),
                       border: Border.all(
                         color: kelas.isPrimary
                             ? color.withValues(alpha: 0.4)
@@ -111,15 +111,15 @@ class KelasListModal extends StatelessWidget {
                     child: Row(
                       children: [
                         Container(
-                          width: 42,
-                          height: 42,
+                          width: 32,
+                          height: 32,
                           decoration: BoxDecoration(
                             color: color.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(9),
                           ),
-                          child: Icon(Icons.school_rounded, color: color, size: 22),
+                          child: Icon(Icons.school_rounded, color: color, size: 17),
                         ),
-                        const SizedBox(width: 14),
+                        const SizedBox(width: 11),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -127,7 +127,7 @@ class KelasListModal extends StatelessWidget {
                               Text(
                                 kelas.namaKelas,
                                 style: TextStyle(
-                                  fontSize: 15,
+                                  fontSize: 11,
                                   fontWeight: FontWeight.bold,
                                   color: color,
                                 ),
@@ -137,7 +137,7 @@ class KelasListModal extends StatelessWidget {
                                 Text(
                                   'Kelompok: ${kelas.kelompok}',
                                   style: TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 9,
                                     color: Colors.grey[600],
                                   ),
                                 ),
@@ -147,7 +147,7 @@ class KelasListModal extends StatelessWidget {
                                 Text(
                                   'TA: ${kelas.tahunAjaran}',
                                   style: TextStyle(
-                                    fontSize: 11,
+                                    fontSize: 8,
                                     color: Colors.grey[400],
                                   ),
                                 ),
@@ -157,15 +157,15 @@ class KelasListModal extends StatelessWidget {
                         ),
                         if (kelas.isPrimary)
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
                               color: color,
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(8),
                             ),
                             child: const Text(
                               'Utama',
                               style: TextStyle(
-                                fontSize: 11,
+                                fontSize: 8,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),

@@ -196,9 +196,9 @@ class LaporanKegiatanController extends Controller
                 DB::raw('SUM(CASE WHEN status = "Sakit" THEN 1 ELSE 0 END) as sakit'),
                 DB::raw('SUM(CASE WHEN status = "Alpa" THEN 1 ELSE 0 END) as alpa')
             )
-            ->first();
+            ->first() ?? (object) ['total' => 0, 'hadir' => 0, 'izin' => 0, 'sakit' => 0, 'alpa' => 0];
 
-        $persenKehadiran = $stats->total > 0 ? round(($stats->hadir / $stats->total) * 100, 1) : 0;
+        $persenKehadiran = ($stats->total ?? 0) > 0 ? round(($stats->hadir / $stats->total) * 100, 1) : 0;
 
         // Kehadiran per kegiatan
         $perKegiatan = AbsensiKegiatan::where('id_santri', $id_santri)
@@ -360,8 +360,8 @@ class LaporanKegiatanController extends Controller
                 DB::raw('SUM(CASE WHEN status="Sakit" THEN 1 ELSE 0 END) as sakit'),
                 DB::raw('SUM(CASE WHEN status="Alpa" THEN 1 ELSE 0 END) as alpa')
             )
-            ->first();
-        $stats->persen = $stats->total > 0 ? round(($stats->hadir / $stats->total) * 100, 1) : 0;
+            ->first() ?? (object) ['total' => 0, 'hadir' => 0, 'izin' => 0, 'sakit' => 0, 'alpa' => 0];
+        $stats->persen = ($stats->total ?? 0) > 0 ? round(($stats->hadir / $stats->total) * 100, 1) : 0;
 
         // Trend 4 minggu
         $trend = [];

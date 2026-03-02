@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use App\Models\Santri;
+use App\Models\SantriKelas;
 use App\Models\User;
 use App\Models\Kegiatan;
 use App\Models\AbsensiKegiatan;
@@ -16,6 +17,7 @@ use App\Models\KesehatanSantri;
 use App\Models\Kepulangan;
 use App\Models\PengajuanKepulangan;
 use App\Models\PembayaranSpp;
+use App\Models\Keuangan;          // ← TAMBAHAN: untuk data kas pondok
 use App\Models\UangSaku;
 use App\Models\Capaian;
 use App\Models\Semester;
@@ -48,16 +50,23 @@ class DashboardController extends Controller
             $tahunIni = (int) $today->format('Y');
 
             // ────────────────────────── KPI CARDS ──────────────────────────
-            $totalSantriAktif = Cache::remember('dash_santri_aktif', 300, fn () => Santri::aktif()->count());
+            $user = Auth::user();
+            $totalSantriAktif = Cache::remember('dash_santri_aktif', 300, function () {
+                return Santri::aktif()->count();
+            });
 
             // Kegiatan hari ini + status absensi
-            $kegiatanHariIni = Kegiatan::with(['kategori', 'absensis' => fn ($q) => $q->whereDate('tanggal', $today)])
+            $kegiatanHariIni = Kegiatan::with(['kategori', 'absensis' => function ($q) use ($today) {
+                $q->whereDate('tanggal', $today);
+            }])
                 ->where('hari', $hariIni)
                 ->orderBy('waktu_mulai')
                 ->get();
 
             $totalKegiatan = $kegiatanHariIni->count();
-            $sudahAbsensi = $kegiatanHariIni->filter(fn ($k) => $k->absensis->isNotEmpty())->count();
+            $sudahAbsensi = $kegiatanHariIni->filter(function ($k) {
+                return $k->absensis->isNotEmpty();
+            })->count();
             $belumAbsensi = $totalKegiatan - $sudahAbsensi;
 
             // Santri di UKP (sedang dirawat)
@@ -66,10 +75,13 @@ class DashboardController extends Controller
             // Pengajuan kepulangan menunggu approval
             $kepulanganMenunggu = PengajuanKepulangan::where('status', 'Menunggu')->count();
 
-            // Santri aktif yang belum punya akun wali
-            $santriTanpaWali = Santri::aktif()
-                ->whereDoesntHave('waliUser')
-                ->count();
+            // Santri aktif yang belum punya akun wali (super_admin only)
+            $santriTanpaWali = 0;
+            if ($user->role === 'super_admin') {
+                $santriTanpaWali = Santri::aktif()
+                    ->whereDoesntHave('waliUser')
+                    ->count();
+            }
 
             $kpiCards = compact(
                 'totalSantriAktif', 'totalKegiatan', 'sudahAbsensi',
@@ -95,16 +107,19 @@ class DashboardController extends Controller
             });
 
             // ────────────────────────── ALERT PANEL ──────────────────────────
-            // 1) Santri alpa beruntun (≥3 hari berturut-turut dalam 7 hari terakhir)
+            // 1) Santri alpa beruntun (semua role bisa lihat)
             $santriAlpaBeruntun = $this->getSantriAlpaBeruntun();
 
-            // 2) SPP jatuh tempo (belum lunas & batas_bayar sudah lewat)
-            $sppJatuhTempo = PembayaranSpp::telat()
-                ->with('santri:id_santri,nama_lengkap')
-                ->select('id_pembayaran', 'id_santri', 'bulan', 'tahun', 'nominal', 'batas_bayar')
-                ->orderBy('batas_bayar')
-                ->limit(10)
-                ->get();
+            // 2) SPP jatuh tempo (super_admin only)
+            $sppJatuhTempo = collect([]);
+            if ($user->role === 'super_admin') {
+                $sppJatuhTempo = PembayaranSpp::telat()
+                    ->with('santri:id_santri,nama_lengkap')
+                    ->select('id_pembayaran', 'id_santri', 'bulan', 'tahun', 'nominal', 'batas_bayar')
+                    ->orderBy('batas_bayar')
+                    ->limit(10)
+                    ->get();
+            }
 
             // 3) Pengajuan kepulangan menunggu review
             $kepulanganPending = PengajuanKepulangan::where('status', 'Menunggu')
@@ -119,22 +134,45 @@ class DashboardController extends Controller
             // ──────────────── GRAFIK TREN KEHADIRAN (4 MINGGU) ────────────────
             $trenKehadiran = $this->getTrenKehadiran($today);
 
-            // ──────────────── RINGKASAN SPP BULAN INI ────────────────
-            $sppBulanIni = Cache::remember("dash_spp_{$bulanIni}_{$tahunIni}", 300, function () use ($bulanIni, $tahunIni) {
-                $lunas = PembayaranSpp::where('bulan', $bulanIni)->where('tahun', $tahunIni)->lunas()->count();
-                $belum = PembayaranSpp::where('bulan', $bulanIni)->where('tahun', $tahunIni)->belumLunas()->count();
-                $terkumpul = PembayaranSpp::where('bulan', $bulanIni)->where('tahun', $tahunIni)->lunas()->sum('nominal');
-                $totalTagihan = PembayaranSpp::where('bulan', $bulanIni)->where('tahun', $tahunIni)->sum('nominal');
+            // ──────────────── RINGKASAN SPP + KEUANGAN BULAN INI ─────────────
+            // Default (untuk non super_admin atau jika query gagal)
+            $sppBulanIni = [
+                'lunas'         => 0,
+                'belum'         => 0,
+                'terkumpul'     => 0,
+                'totalTagihan'  => 0,
+                'pemasukanLain' => 0,  // pemasukan kas pondok selain SPP
+                'pengeluaran'   => 0,  // pengeluaran kas pondok
+            ];
 
-                return compact('lunas', 'belum', 'terkumpul', 'totalTagihan');
-            });
+            if ($user->role === 'super_admin') {
+                // Pakai cache key baru "dash_spp_full_" agar tidak tumpang-tindih
+                // dengan cache key lama "dash_spp_" yang belum punya key keuangan
+                $sppBulanIni = Cache::remember("dash_spp_full_{$bulanIni}_{$tahunIni}", 300, function () use ($bulanIni, $tahunIni) {
+                    // ── Data SPP ──
+                    $lunas        = PembayaranSpp::where('bulan', $bulanIni)->where('tahun', $tahunIni)->lunas()->count();
+                    $belum        = PembayaranSpp::where('bulan', $bulanIni)->where('tahun', $tahunIni)->belumLunas()->count();
+                    $terkumpul    = (float) PembayaranSpp::where('bulan', $bulanIni)->where('tahun', $tahunIni)->lunas()->sum('nominal');
+                    $totalTagihan = (float) PembayaranSpp::where('bulan', $bulanIni)->where('tahun', $tahunIni)->sum('nominal');
 
-            // ──────────────── FEED AKTIVITAS TERBARU ────────────────
-            $feedAktivitas = $this->getFeedAktivitas($today);
+                    // ── Data Keuangan Pondok (non-SPP) ──
+                    $pemasukanLain = (float) Keuangan::pemasukan()
+                        ->whereMonth('tanggal', $bulanIni)
+                        ->whereYear('tanggal', $tahunIni)
+                        ->sum('nominal');
+
+                    $pengeluaran = (float) Keuangan::pengeluaran()
+                        ->whereMonth('tanggal', $bulanIni)
+                        ->whereYear('tanggal', $tahunIni)
+                        ->sum('nominal');
+
+                    return compact('lunas', 'belum', 'terkumpul', 'totalTagihan', 'pemasukanLain', 'pengeluaran');
+                });
+            }
 
             return view('admin.dashboardAdmin', compact(
                 'kpiCards', 'kegiatanHariIni', 'alerts',
-                'trenKehadiran', 'sppBulanIni', 'feedAktivitas',
+                'trenKehadiran', 'sppBulanIni',
                 'hariIni', 'today'
             ));
 
@@ -156,7 +194,6 @@ class DashboardController extends Controller
     {
         $weekAgo = Carbon::today()->subDays(7);
 
-        // Ambil data alpa per santri 7 hari terakhir
         $alpaData = AbsensiKegiatan::where('status', 'Alpa')
             ->whereDate('tanggal', '>=', $weekAgo)
             ->select('id_santri')
@@ -190,7 +227,6 @@ class DashboardController extends Controller
 
         $kategoris = KategoriKegiatan::select('kategori_id', 'nama_kategori')->get();
 
-        // 4 minggu terakhir → label "Mg 1" s.d "Mg 4"
         for ($i = 3; $i >= 0; $i--) {
             $start = $today->copy()->subWeeks($i)->startOfWeek(Carbon::MONDAY);
             $end = $start->copy()->endOfWeek(Carbon::SUNDAY);
@@ -216,13 +252,12 @@ class DashboardController extends Controller
     }
 
     /**
-     * Feed aktivitas terbaru: absensi, pelanggaran, pembayaran SPP, transaksi uang saku
+     * Feed aktivitas terbaru
      */
     private function getFeedAktivitas(Carbon $today): \Illuminate\Support\Collection
     {
         $items = collect();
 
-        // Absensi terbaru
         AbsensiKegiatan::with(['santri:id_santri,nama_lengkap', 'kegiatan:kegiatan_id,nama_kegiatan'])
             ->whereDate('tanggal', $today)
             ->orderByDesc('created_at')
@@ -235,7 +270,6 @@ class DashboardController extends Controller
                 'time' => $a->created_at,
             ]));
 
-        // Pelanggaran terbaru (7 hari)
         RiwayatPelanggaran::with(['santri:id_santri,nama_lengkap', 'kategori:id_kategori,nama_pelanggaran'])
             ->whereDate('tanggal', '>=', $today->copy()->subDays(7))
             ->terbaru()
@@ -248,7 +282,6 @@ class DashboardController extends Controller
                 'time' => $p->created_at,
             ]));
 
-        // Pembayaran SPP terbaru (7 hari)
         PembayaranSpp::with('santri:id_santri,nama_lengkap')
             ->lunas()
             ->whereNotNull('tanggal_bayar')
@@ -267,183 +300,166 @@ class DashboardController extends Controller
     }
 
     /**
-     * Dashboard Santri/Wali - FIXED VERSION ✅
+     * Dashboard Santri
      */
     public function santri()
     {
         try {
-            $user = Auth::user();
-            
+            $account = auth('santri')->user();
+
             Log::info('=== DASHBOARD SANTRI START ===');
-            Log::info('User ID: ' . $user->id);
-            Log::info('Role: ' . $user->role);
-            Log::info('Role ID: ' . $user->role_id);
-            
-            // Validasi role
-            if (!in_array($user->role, ['santri', 'wali'])) {
-                Log::error('Role tidak sesuai: ' . $user->role);
-                abort(403, 'Akses ditolak. Role Anda: ' . $user->role);
-            }
-            
-            // ✅ Ambil data santri
-            $santri = Santri::where('id_santri', $user->role_id)
-                ->select('id_santri', 'nama_lengkap', 'kelas')
+            Log::info('Account ID: ' . $account->id);
+            Log::info('Role: ' . $account->role);
+            Log::info('ID Santri: ' . $account->id_santri);
+
+            $santri = Santri::with([
+                    'kelasPrimary.kelas.kelompok',
+                ])
+                ->where('id_santri', $account->id_santri)
+                ->select('id_santri', 'nama_lengkap')
                 ->first();
-            
+
             if (!$santri) {
-                Log::error('Santri tidak ditemukan dengan role_id: ' . $user->role_id);
+                Log::error('Santri tidak ditemukan dengan id_santri: ' . $account->id_santri);
                 abort(404, 'Data santri tidak ditemukan.');
             }
-            
+
             Log::info('Santri ditemukan: ' . $santri->nama_lengkap);
-            
+
+            $namaKelas = $santri->kelas;
             $idSantri = $santri->id_santri;
             $today = Carbon::today();
             $weekAgo = Carbon::now()->subDays(7);
-            
-            // ✅ Ambil semester aktif dengan FALLBACK
+
+            // Ambil semester aktif dengan FALLBACK
             $semesterAktif = null;
             try {
                 $semesterAktif = Semester::aktif()
                     ->select('id_semester', 'nama_semester', 'tahun_ajaran')
                     ->first();
-                
+
                 if (!$semesterAktif) {
                     $semesterAktif = Semester::select('id_semester', 'nama_semester', 'tahun_ajaran')
                         ->orderBy('tahun_ajaran', 'desc')
                         ->orderBy('periode', 'desc')
                         ->first();
                 }
-                
+
                 Log::info('Semester aktif: ' . ($semesterAktif ? $semesterAktif->nama_semester : 'Tidak ada'));
             } catch (\Exception $e) {
                 Log::warning('Error mengambil semester: ' . $e->getMessage());
                 $semesterAktif = null;
             }
-            
-            // ✅ AMBIL PROGRES AL-QUR'AN dengan FALLBACK
+
+            // Progres Al-Qur'an
             $progresAlquran = 0;
             try {
                 $query = Capaian::where('id_santri', $idSantri);
-                
                 if ($semesterAktif) {
                     $query->where('id_semester', $semesterAktif->id_semester);
                 }
-                
-                $progresAlquran = $query->whereHas('materi', function($q) {
+                $progresAlquran = $query->whereHas('materi', function ($q) {
                     $q->where('kategori', 'Al-Qur\'an');
                 })->avg('persentase') ?? 0;
-                
+
                 Log::info('Progres Al-Quran: ' . $progresAlquran);
             } catch (\Exception $e) {
                 Log::warning('Error progres Al-Quran: ' . $e->getMessage());
-                $progresAlquran = 0;
             }
-            
-            // ✅ AMBIL PROGRES HADIST dengan FALLBACK
+
+            // Progres Hadist
             $progresHadist = 0;
             try {
                 $query = Capaian::where('id_santri', $idSantri);
-                
                 if ($semesterAktif) {
                     $query->where('id_semester', $semesterAktif->id_semester);
                 }
-                
-                $progresHadist = $query->whereHas('materi', function($q) {
+                $progresHadist = $query->whereHas('materi', function ($q) {
                     $q->where('kategori', 'Hadist');
                 })->avg('persentase') ?? 0;
-                
+
                 Log::info('Progres Hadist: ' . $progresHadist);
             } catch (\Exception $e) {
                 Log::warning('Error progres Hadist: ' . $e->getMessage());
-                $progresHadist = 0;
             }
-            
-            // ✅ AMBIL PROGRES MATERI TAMBAHAN dengan FALLBACK
+
+            // Progres Materi Tambahan
             $progresMateriTambahan = 0;
             try {
                 $query = Capaian::where('id_santri', $idSantri);
-                
                 if ($semesterAktif) {
                     $query->where('id_semester', $semesterAktif->id_semester);
                 }
-                
-                $progresMateriTambahan = $query->whereHas('materi', function($q) {
+                $progresMateriTambahan = $query->whereHas('materi', function ($q) {
                     $q->where('kategori', 'Materi Tambahan');
                 })->avg('persentase') ?? 0;
-                
+
                 Log::info('Progres Materi Tambahan: ' . $progresMateriTambahan);
             } catch (\Exception $e) {
                 Log::warning('Error progres Materi Tambahan: ' . $e->getMessage());
-                $progresMateriTambahan = 0;
             }
-            
-            // ✅ DATA UNTUK GRAFIK 1: Progress per Materi dengan FALLBACK
+
+            // Data untuk grafik: Progress per Materi
             $capaianPerMateri = collect([]);
             try {
-                $query = Capaian::with(['materi' => function($q) {
-                        $q->select('id_materi', 'nama_kitab', 'kategori', 'total_halaman');
-                    }])
+                $query = Capaian::with(['materi' => function ($q) {
+                    $q->select('id_materi', 'nama_kitab', 'kategori', 'total_halaman');
+                }])
                     ->where('id_santri', $idSantri);
-                
+
                 if ($semesterAktif) {
                     $query->where('id_semester', $semesterAktif->id_semester);
                 }
-                
+
                 $capaianPerMateri = $query->select('id', 'id_materi', 'persentase', 'halaman_selesai')
                     ->orderBy('persentase', 'desc')
                     ->limit(10)
                     ->get();
-                
+
                 Log::info('Capaian per materi: ' . $capaianPerMateri->count() . ' items');
             } catch (\Exception $e) {
                 Log::warning('Error capaian per materi: ' . $e->getMessage());
                 $capaianPerMateri = collect([]);
             }
-            
-            // ✅ DATA UNTUK GRAFIK 2: Distribusi Status dengan FALLBACK
+
+            // Data untuk grafik: Distribusi Status
             $distribusiStatus = [
                 'selesai' => 0,
                 'hampir_selesai' => 0,
                 'sedang_berjalan' => 0,
                 'baru_dimulai' => 0,
             ];
-            
             try {
                 $baseQuery = Capaian::where('id_santri', $idSantri);
-                
                 if ($semesterAktif) {
                     $baseQuery->where('id_semester', $semesterAktif->id_semester);
                 }
-                
+
                 $distribusiStatus = [
                     'selesai' => (clone $baseQuery)->where('persentase', '>=', 100)->count(),
                     'hampir_selesai' => (clone $baseQuery)->whereBetween('persentase', [75, 99.99])->count(),
                     'sedang_berjalan' => (clone $baseQuery)->whereBetween('persentase', [25, 74.99])->count(),
                     'baru_dimulai' => (clone $baseQuery)->whereBetween('persentase', [0, 24.99])->count(),
                 ];
-                
+
                 Log::info('Distribusi status: ' . json_encode($distribusiStatus));
             } catch (\Exception $e) {
                 Log::warning('Error distribusi status: ' . $e->getMessage());
             }
-            
-            // ✅ Data dashboard utama
+
             $data = [
-                'nama_santri' => $santri->nama_lengkap,
-                'kelas' => $santri->kelas,
-                'progres_quran' => round($progresAlquran, 1),
-                'progres_hadist' => round($progresHadist, 1),
+                'nama_santri'             => $santri->nama_lengkap,
+                'kelas'                   => $namaKelas,
+                'progres_quran'           => round($progresAlquran, 1),
+                'progres_hadist'          => round($progresHadist, 1),
                 'progres_materi_tambahan' => round($progresMateriTambahan, 1),
-                'saldo_uang_saku' => method_exists($santri, 'getSaldoUangSakuAttribute') 
-                    ? $santri->saldo_uang_saku 
-                    : 0,
-                'poin_pelanggaran' => RiwayatPelanggaran::where('id_santri', $idSantri)->sum('poin') ?? 0,
+                'saldo_uang_saku'         => $santri->saldo_uang_saku ?? 0,
+                'poin_pelanggaran'        => RiwayatPelanggaran::where('id_santri', $idSantri)->sum('poin') ?? 0,
             ];
-            
+
             Log::info('Data array: ' . json_encode($data));
-            
-            // ✅ Query status kesehatan dengan FALLBACK
+
+            // Status kesehatan
             $statusKesehatan = null;
             try {
                 $statusKesehatan = KesehatanSantri::where('id_santri', $idSantri)
@@ -454,8 +470,8 @@ class DashboardController extends Controller
             } catch (\Exception $e) {
                 Log::warning('Error status kesehatan: ' . $e->getMessage());
             }
-            
-            // ✅ Query kepulangan aktif dengan FALLBACK
+
+            // Kepulangan aktif
             $kepulanganAktif = null;
             try {
                 $kepulanganAktif = Kepulangan::where('id_santri', $idSantri)
@@ -467,37 +483,36 @@ class DashboardController extends Controller
             } catch (\Exception $e) {
                 Log::warning('Error kepulangan aktif: ' . $e->getMessage());
             }
-            
-            // ✅ Query berita terbaru dengan FALLBACK
+
+            // Berita terbaru
             $beritaTerbaru = collect([]);
             try {
                 $beritaTerbaru = Berita::select('id_berita', 'judul', 'created_at')
                     ->where('status', 'published')
                     ->where('created_at', '>=', $weekAgo)
-                    ->where(function($query) use ($santri) {
+                    ->where(function ($query) use ($namaKelas) {
                         $query->where('target_berita', 'semua')
-                            ->orWhere(function($q) use ($santri) {
+                            ->orWhere(function ($q) use ($namaKelas) {
                                 $q->where('target_berita', 'kelas_tertentu')
-                                  ->whereJsonContains('target_kelas', $santri->kelas);
+                                  ->whereJsonContains('target_kelas', $namaKelas);
                             });
                     })
                     ->orderBy('created_at', 'desc')
                     ->limit(5)
                     ->get();
-                
+
                 Log::info('Berita terbaru: ' . $beritaTerbaru->count() . ' items');
             } catch (\Exception $e) {
                 Log::warning('Error berita terbaru: ' . $e->getMessage());
                 $beritaTerbaru = collect([]);
             }
-            
+
             Log::info('=== DASHBOARD SANTRI SUCCESS ===');
-            
-            // Return view dengan semua data
+
             return view('santri.dashboardSantri', compact(
                 'data',
                 'santri',
-                'user',
+                'account',
                 'beritaTerbaru',
                 'statusKesehatan',
                 'kepulanganAktif',
@@ -505,20 +520,18 @@ class DashboardController extends Controller
                 'distribusiStatus',
                 'semesterAktif'
             ));
-            
+
         } catch (\Exception $e) {
             Log::error('=== FATAL ERROR DI DASHBOARD SANTRI ===');
             Log::error('Message: ' . $e->getMessage());
             Log::error('File: ' . $e->getFile());
             Log::error('Line: ' . $e->getLine());
             Log::error('Trace: ' . $e->getTraceAsString());
-            
-            // Tampilkan error detail jika debug mode
+
             if (config('app.debug')) {
                 abort(500, 'Error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
-            } else {
-                abort(500, 'Terjadi kesalahan saat memuat dashboard. Silakan hubungi administrator.');
             }
+            abort(500, 'Terjadi kesalahan saat memuat dashboard. Silakan hubungi administrator.');
         }
     }
 }

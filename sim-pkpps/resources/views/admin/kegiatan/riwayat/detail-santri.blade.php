@@ -1,3 +1,4 @@
+{{-- resources/views/admin/kegiatan/riwayat/detail-santri.blade.php --}}
 @extends('layouts.app')
 
 @section('content')
@@ -6,7 +7,7 @@
 </div>
 
 <!-- Info Santri -->
-<div class="content-box" style="margin-bottom: 20px;">
+<div class="content-box" style="margin-bottom: 14px;">
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
             <h3 style="margin: 0; color: var(--primary-color);">{{ $santri->nama_lengkap }}</h3>
@@ -48,7 +49,7 @@
 
 <!-- Grafik Kehadiran Per Kategori -->
 @if($statsByKategori->count() > 0)
-<div class="content-box" style="margin-bottom: 20px;">
+<div class="content-box" style="margin-bottom: 14px;">
     <h3 style="margin: 0 0 20px 0; color: var(--primary-color);">
         <i class="fas fa-chart-bar"></i> Kehadiran Per Kategori
     </h3>
@@ -58,7 +59,7 @@
 
 <!-- Grafik Tren 30 Hari -->
 @if($riwayat30Hari->count() > 0)
-<div class="content-box" style="margin-bottom: 20px;">
+<div class="content-box" style="margin-bottom: 14px;">
     <h3 style="margin: 0 0 20px 0; color: var(--primary-color);">
         <i class="fas fa-chart-line"></i> Tren Kehadiran 30 Hari Terakhir
     </h3>
@@ -68,7 +69,7 @@
 
 <!-- Kehadiran Per Kelas Santri -->
 @if($statsByKelasSantri->count() > 0)
-<div class="content-box" style="margin-bottom: 20px;">
+<div class="content-box" style="margin-bottom: 14px;">
     <h3 style="margin: 0 0 20px 0; color: var(--primary-color);">
         <i class="fas fa-layer-group"></i> Kehadiran Per Kelas
     </h3>
@@ -143,7 +144,7 @@
             </tbody>
         </table>
 
-        <div style="margin-top: 20px;">
+        <div style="margin-top: 14px;">
             {{ $riwayats->links() }}
         </div>
     @else

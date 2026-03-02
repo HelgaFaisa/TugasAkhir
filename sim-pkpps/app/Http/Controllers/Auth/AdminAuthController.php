@@ -33,24 +33,28 @@ class AdminAuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        // Clear session lama sebelum login
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        
-        // Start session baru
-        $request->session()->start();
-
-        // Coba login dengan username DAN role harus 'admin'
+        // -- Coba login dengan username --
         if (Auth::attempt([
-            'username' => $credentials['username'], 
-            'password' => $credentials['password'], 
-            'role' => 'admin'
+            'username' => $credentials['username'],
+            'password' => $credentials['password'],
         ], $request->boolean('remember'))) {
-            
-            // Regenerate session untuk keamanan
+
+            $user = Auth::user();
+            $adminRoles = ['super_admin', 'akademik', 'pamong'];
+
+            // -- Pastikan hanya role admin yang bisa login via form admin --
+            if (!in_array($user->role, $adminRoles)) {
+                Auth::logout();
+                $request->session()->invalidate();
+                throw ValidationException::withMessages([
+                    'username' => 'Akun ini bukan akun admin.',
+                ]);
+            }
+
+            // -- Regenerate session untuk keamanan --
             $request->session()->regenerate();
-            
-            return redirect()->intended(route('admin.dashboard')); 
+
+            return redirect()->intended(route('admin.dashboard'));
         }
 
         // Track failed attempts
@@ -112,8 +116,8 @@ class AdminAuthController extends Controller
         $user = User::create([
             'name' => 'Administrator', 
             'email' => $request->email,
-            'username' => $request->email, // WAJIB: Gunakan email sebagai username untuk login
-            'role' => 'admin',
+            'username' => $request->email,
+            'role' => 'super_admin',
             'password' => Hash::make($request->password),
         ]);
 

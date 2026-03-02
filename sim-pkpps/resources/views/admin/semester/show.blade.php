@@ -23,7 +23,7 @@
     </div>
 
     {{-- Statistik Cards --}}
-    <div class="row-cards" style="margin: 30px 0;">
+    <div class="row-cards" style="margin: 22px 0;">
         <div class="card card-info">
             <h3>Total Capaian</h3>
             <div class="card-value">{{ $totalCapaian }}</div>

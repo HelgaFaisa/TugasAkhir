@@ -16,7 +16,7 @@ class ApiKesehatanController extends Controller
     {
         try {
             // Ambil id_santri dari user yang login (wali)
-            $idSantri = $request->user()->role_id;
+            $idSantri = $request->user()->id_santri;
             
             // Cek santri exist
             $santri = Santri::where('id_santri', $idSantri)->first();
@@ -91,7 +91,7 @@ class ApiKesehatanController extends Controller
     public function show(Request $request, $idKesehatan)
     {
         try {
-            $idSantri = $request->user()->role_id;
+            $idSantri = $request->user()->id_santri;
             
             // Cari data kesehatan
             $kesehatan = KesehatanSantri::where('id_kesehatan', $idKesehatan)
@@ -134,7 +134,7 @@ class ApiKesehatanController extends Controller
     public function statistik(Request $request)
     {
         try {
-            $idSantri = $request->user()->role_id;
+            $idSantri = $request->user()->id_santri;
             
             // Hitung total per status
             $totalDirawat = KesehatanSantri::where('id_santri', $idSantri)

@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('title', 'Edit Santri: ' . $santri->nama_lengkap); ?>
 
 <?php $__env->startSection('content'); ?>
@@ -20,8 +18,8 @@
     <?php endif; ?>
 
     
-    <div style="background: linear-gradient(135deg, #E3F2FD 0%, #D1E9F9 100%); padding: 20px; border-radius: 8px; border-left: 4px solid #81C6E8; margin-bottom: 25px;">
-        <div style="display: flex; align-items: center; gap: 15px;">
+    <div style="background: linear-gradient(135deg, #E3F2FD 0%, #D1E9F9 100%); padding: 14px; border-radius: 8px; border-left: 4px solid #81C6E8; margin-bottom: 25px;">
+        <div style="display: flex; align-items: center; gap: 11px;">
             <?php if($santri->foto): ?>
                 <img src="<?php echo e(asset('storage/' . $santri->foto)); ?>" 
                      alt="Foto <?php echo e($santri->nama_lengkap); ?>" 

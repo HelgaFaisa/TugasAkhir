@@ -19,17 +19,9 @@ class ApiKepulanganController extends Controller
     {
         try {
             $user = Auth::user();
-            
-            // Pastikan user adalah santri atau wali
-            if (!in_array($user->role, ['santri', 'wali'])) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Akses ditolak. Hanya santri/wali yang dapat mengakses.',
-                ], 403);
-            }
 
-            // Ambil id_santri dari role_id (untuk santri dan wali, role_id = id_santri)
-            $idSantri = $user->role_id;
+            // Ambil id_santri dari akun yang login
+            $idSantri = $user->id_santri;
             
             if (!$idSantri) {
                 return response()->json([
@@ -70,7 +62,7 @@ class ApiKepulanganController extends Controller
                 'success' => true,
                 'message' => 'Data kepulangan berhasil diambil.',
                 'data' => [
-                    'kepulangan' => $kepulangan->map(function($item) {
+                    'kepulangan' => collect($kepulangan->items())->map(function($item) {
                         return [
                             'id_kepulangan' => $item->id_kepulangan,
                             'tanggal_izin' => $item->tanggal_izin->format('Y-m-d'),
@@ -128,16 +120,8 @@ class ApiKepulanganController extends Controller
     {
         try {
             $user = Auth::user();
-            
-            // Pastikan user adalah santri atau wali
-            if (!in_array($user->role, ['santri', 'wali'])) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Akses ditolak.',
-                ], 403);
-            }
 
-            $idSantri = $user->role_id;
+            $idSantri = $user->id_santri;
 
             // Get kepulangan dengan validasi kepemilikan
             $kepulangan = Kepulangan::with('santri')
@@ -220,7 +204,7 @@ class ApiKepulanganController extends Controller
                 ], 403);
             }
 
-            $idSantri = $user->role_id;
+            $idSantri = $user->id_santri;
             
             if (!$idSantri) {
                 return response()->json([
@@ -267,6 +251,69 @@ class ApiKepulanganController extends Controller
             ];
 
             return response()->json($data, 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Notifikasi status kepulangan santri saat ini
+     * GET /api/v1/kepulangan/notifikasi
+     */
+    public function notifikasiKepulangan(Request $request)
+    {
+        try {
+            $user = Auth::user();
+
+            if (!in_array($user->role, ['santri', 'wali'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Akses ditolak.',
+                ], 403);
+            }
+
+            $idSantri = $user->id_santri;
+            $today = Carbon::today();
+
+            // Cari kepulangan yang sedang aktif (tanggal hari ini ada di antara tanggal_pulang dan tanggal_kembali)
+            $kepulangan = Kepulangan::where('id_santri', $idSantri)
+                ->where('status', 'Disetujui')
+                ->where('tanggal_pulang', '<=', $today)
+                ->where('tanggal_kembali', '>=', $today)
+                ->orderBy('tanggal_kembali', 'desc')
+                ->first();
+
+            if (!$kepulangan) {
+                return response()->json([
+                    'success' => true,
+                    'data' => [
+                        'sedang_pulang' => false,
+                        'tanggal_kembali' => null,
+                        'sisa_hari' => 0,
+                        'status' => null,
+                    ],
+                ]);
+            }
+
+            $tanggalKembali = Carbon::parse($kepulangan->tanggal_kembali);
+            $sisaHari = $today->diffInDays($tanggalKembali, false); // negatif jika sudah lewat
+            $statusKepulangan = $sisaHari < 0 ? 'terlambat' : 'aktif';
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'sedang_pulang' => true,
+                    'tanggal_kembali' => $tanggalKembali->format('Y-m-d'),
+                    'tanggal_kembali_formatted' => $tanggalKembali->locale('id')->isoFormat('D MMMM Y'),
+                    'sisa_hari' => (int) $sisaHari,
+                    'status' => $statusKepulangan,
+                    'alasan' => $kepulangan->alasan,
+                ],
+            ]);
 
         } catch (\Exception $e) {
             return response()->json([

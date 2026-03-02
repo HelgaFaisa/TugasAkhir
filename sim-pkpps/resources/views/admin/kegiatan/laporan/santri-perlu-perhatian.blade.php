@@ -15,14 +15,14 @@
     </a>
 </div>
 
-<div class="content-box" style="margin-bottom:20px;">
+<div class="content-box" style="margin-bottom: 14px;">
     <p style="margin:0; color:var(--text-light); font-size:0.85rem;">
         <i class="fas fa-info-circle"></i> Daftar santri dengan kehadiran &lt;70% dalam periode <strong>{{ $periodeLabel }}</strong>
     </p>
 </div>
 
 {{-- Filter --}}
-<div class="content-box" style="margin-bottom:20px;">
+<div class="content-box" style="margin-bottom: 14px;">
     <form method="GET" style="display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap;">
         <input type="hidden" name="periode" value="{{ request('periode', 'bulan_ini') }}">
         <div class="form-group" style="margin:0;">

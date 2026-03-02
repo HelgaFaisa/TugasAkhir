@@ -20,16 +20,7 @@ class ApiPengajuanKepulanganController extends Controller
     {
         try {
             $user = Auth::user();
-            
-            // Validasi role
-            if (!in_array($user->role, ['santri', 'wali'])) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Akses ditolak.',
-                ], 403);
-            }
-
-            $idSantri = $user->role_id;
+            $idSantri = $user->id_santri;
 
             // Validasi input
             $validated = $request->validate([
@@ -98,15 +89,7 @@ class ApiPengajuanKepulanganController extends Controller
     {
         try {
             $user = Auth::user();
-            
-            if (!in_array($user->role, ['santri', 'wali'])) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Akses ditolak.',
-                ], 403);
-            }
-
-            $idSantri = $user->role_id;
+            $idSantri = $user->id_santri;
 
             // Build query
             $page = $request->input('page', 1);
@@ -176,7 +159,7 @@ class ApiPengajuanKepulanganController extends Controller
     {
         try {
             $user = Auth::user();
-            $idSantri = $user->role_id;
+            $idSantri = $user->id_santri;
 
             $validated = $request->validate([
                 'tanggal_pulang' => 'required|date',

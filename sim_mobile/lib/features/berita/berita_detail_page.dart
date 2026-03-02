@@ -1,4 +1,4 @@
-// lib/features/berita/berita_detail_page.dart
+﻿// lib/features/berita/berita_detail_page.dart
 
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
@@ -58,7 +58,7 @@ class _BeritaDetailPageState extends State<BeritaDetailPage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Detail Berita'),
-        backgroundColor: const Color(0xFF7C3AED),
+        backgroundColor: const Color(0xFF6FBA9D),
         foregroundColor: Colors.white,
       ),
       body: _isLoading
@@ -70,46 +70,46 @@ class _BeritaDetailPageState extends State<BeritaDetailPage> {
                   // Gambar
                   BeritaImage(
                     imageUrl: _berita?['gambar_url'],
-                    height: 250,
+                    height: MediaQuery.of(context).size.height * 0.3,
                   ),
 
                   // Content
                   Padding(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(15),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Tanggal
                         Text(
                           _berita?['tanggal_lengkap'] ?? '',
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                          style: TextStyle(fontSize: 9, color: Colors.grey[600]),
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 9),
 
                         // Judul
                         Text(
                           _berita?['judul'] ?? '',
                           style: const TextStyle(
-                            fontSize: 24,
+                            fontSize: 19,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 9),
 
                         // Penulis
                         Row(
                           children: [
                             CircleAvatar(
                               radius: 16,
-                              backgroundColor: const Color(0xFF7C3AED),
-                              child: const Icon(Icons.person, size: 20, color: Colors.white),
+                              backgroundColor: const Color(0xFF6FBA9D),
+                              child: const Icon(Icons.person, size: 15, color: Colors.white),
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: 7),
                             Expanded(
                               child: Text(
                                 _berita?['penulis'] ?? '',
                                 style: const TextStyle(
-                                  fontSize: 14,
+                                  fontSize: 11,
                                   fontWeight: FontWeight.w600,
                                 ),
                                 maxLines: 1,
@@ -118,13 +118,13 @@ class _BeritaDetailPageState extends State<BeritaDetailPage> {
                             ),
                           ],
                         ),
-                        const Divider(height: 32),
+                        const Divider(height: 24),
 
                         // Konten HTML (dari Quill Editor)
                         HtmlWidget(
                           _berita?['konten'] ?? '',
                           textStyle: const TextStyle(
-                            fontSize: 16,
+                            fontSize: 12,
                             height: 1.6,
                           ),
                         ),

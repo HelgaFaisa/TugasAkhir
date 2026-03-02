@@ -106,15 +106,7 @@
 
         <hr>
 
-        <!-- Info Box -->
-        <div class="alert alert-info">
-            <i class="fas fa-info-circle"></i> <strong>Informasi:</strong>
-            <ul class="mb-0 mt-2">
-                <li>Kelompok kelas adalah kategori untuk mengelompokkan kelas (contoh: Kelas Pondok, Sekolah Formal)</li>
-                <li>Setelah membuat kelompok, Anda dapat menambahkan kelas-kelas ke dalam kelompok ini</li>
-                <li>Kelompok tidak aktif tidak dapat digunakan untuk membuat kelas baru</li>
-            </ul>
-        </div>
+        
 
         <!-- Action Buttons -->
         <div class="form-group" style="display: flex; gap: 10px;">

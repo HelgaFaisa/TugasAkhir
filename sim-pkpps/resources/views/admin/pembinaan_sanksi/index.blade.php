@@ -4,10 +4,7 @@
 
 @section('content')
 <div class="page-header">
-    <h2><i class="fas fa-book-open"></i> Pembinaan & Sanksi</h2>
-    <p style="margin-top: 10px; color: var(--text-light);">
-        Kelola konten pembinaan dan sanksi yang dapat dilihat oleh santri dan wali santri
-    </p>
+    <h2><i class="fas fa-book-open"></i> Tata Tertib</h2>
 </div>
 
 @if(session('success'))
@@ -23,14 +20,11 @@
 @endif
 
 <div class="content-box">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
         <h3 style="margin: 0; color: var(--primary-color);">
             <i class="fas fa-list"></i> Daftar Konten
         </h3>
         <div style="display: flex; gap: 10px;">
-            <a href="{{ route('admin.kategori-pelanggaran.index') }}" class="btn btn-info">
-                <i class="fas fa-arrow-left"></i> Master Pelanggaran
-            </a>
             <a href="{{ route('admin.pembinaan-sanksi.create') }}" class="btn btn-primary">
                 <i class="fas fa-plus-circle"></i> Tambah Konten
             </a>
@@ -38,7 +32,7 @@
     </div>
 
     @if($data->isNotEmpty())
-        <div class="alert alert-info" style="margin-bottom: 20px;">
+        <div class="alert alert-info" style="margin-bottom: 14px;">
             <i class="fas fa-info-circle"></i>
             <strong>Info:</strong> Konten akan ditampilkan sesuai urutan. Drag atau ubah nomor urutan untuk mengatur tampilan.
         </div>
@@ -116,9 +110,9 @@
     @else
         <div class="empty-state">
             <i class="fas fa-folder-open"></i>
-            <h3>Belum ada konten pembinaan & sanksi</h3>
+            <h3>Belum ada konten</h3>
             <p>Mulai dengan menambahkan konten baru menggunakan Rich Text Editor.</p>
-            <p style="color: var(--text-light); margin-bottom: 20px;">
+            <p style="color: var(--text-light); margin-bottom: 14px;">
                 Anda dapat membuat peraturan, tata tertib, pembinaan, atau sanksi dengan format yang rapi.
             </p>
             <a href="{{ route('admin.pembinaan-sanksi.create') }}" class="btn btn-primary">

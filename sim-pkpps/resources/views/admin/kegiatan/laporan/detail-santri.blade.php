@@ -2,11 +2,11 @@
 
 @section('content')
 <style>
-.detail-header { display: flex; gap: 20px; align-items: flex-start; margin-bottom: 20px; }
+.detail-header { display: flex; gap: 20px; align-items: flex-start; margin-bottom: 14px; }
 .detail-avatar { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #10B981, #34D399); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 2rem; font-weight: 700; flex-shrink: 0; }
 .detail-info h3 { margin: 0 0 4px; color: var(--primary-dark); }
 .detail-info p { margin: 0; font-size: 0.85rem; color: var(--text-light); }
-.mini-kpi { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.mini-kpi { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 14px; }
 .mini-kpi-card { padding: 16px; border-radius: 10px; text-align: center; }
 .mini-kpi-card.hadir { background: #ECFDF5; color: #065F46; }
 .mini-kpi-card.izin { background: #FFFBEB; color: #92400E; }
@@ -14,7 +14,7 @@
 .mini-kpi-card.alpa { background: #FEF2F2; color: #991B1B; }
 .mini-kpi-val { font-size: 1.6rem; font-weight: 700; }
 .mini-kpi-label { font-size: 0.78rem; margin-top: 4px; }
-.chart-box { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 20px; }
+.chart-box { background: #fff; border-radius: 12px; padding: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 14px; }
 .chart-box h4 { margin: 0 0 16px; color: var(--primary-dark); font-size: 1rem; }
 .progress-bar-lg { background: #e9ecef; border-radius: 10px; height: 24px; overflow: hidden; margin: 12px 0; }
 .progress-bar-lg .fill { height: 100%; border-radius: 10px; transition: width 0.5s; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.82rem; font-weight: 600; }
@@ -39,7 +39,7 @@
 </div>
 
 {{-- Header --}}
-<div class="content-box" style="margin-bottom: 20px;">
+<div class="content-box" style="margin-bottom: 14px;">
     <div class="detail-header">
         <div class="detail-avatar">{{ strtoupper(substr($santri->nama_lengkap, 0, 1)) }}</div>
         <div class="detail-info">
@@ -78,7 +78,7 @@
 </div>
 
 {{-- Overall Progress --}}
-<div class="content-box" style="margin-bottom:20px;">
+<div class="content-box" style="margin-bottom: 14px;">
     <h4 style="margin:0 0 8px; font-size:0.95rem;"><i class="fas fa-chart-bar"></i> Kehadiran Keseluruhan</h4>
     <div class="progress-bar-lg">
         <div class="fill" style="width:{{ $persenKehadiran }}%; background:{{ $persenKehadiran >= 85 ? '#10B981' : ($persenKehadiran >= 70 ? '#FBBF24' : '#EF4444') }};">
@@ -115,10 +115,10 @@
         @if($streak > 0)
             <div class="insight-box i-success">
                 <i class="fas fa-fire"></i>
-                Streak kehadiran beruntun: <strong>{{ $streak }} kegiatan</strong> 🔥
+                Streak kehadiran beruntun: <strong>{{ $streak }} kegiatan</strong> ðŸ”¥
             </div>
         @endif
-        @if($stats->total > 0)
+        @if(($stats->total ?? 0) > 0)
             <div class="insight-box i-info">
                 <i class="fas fa-calculator"></i>
                 Total tercatat: {{ $stats->total }} absensi ({{ $stats->hadir }} hadir, {{ $stats->alpa }} alpa)

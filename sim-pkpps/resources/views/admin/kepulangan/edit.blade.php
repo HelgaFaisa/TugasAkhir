@@ -25,7 +25,7 @@
         @method('PUT')
         
         {{-- Info Kepulangan --}}
-        <div style="background: #E8F7F2; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #6FBA9D;">
+        <div style="background: #E8F7F2; padding: 15px; border-radius: 8px; margin-bottom: 14px; border-left: 4px solid #6FBA9D;">
             <p style="margin: 5px 0;"><strong>ID Kepulangan:</strong> {{ $kepulangan->id_kepulangan }}</p>
             <p style="margin: 5px 0;"><strong>Santri:</strong> {{ $kepulangan->santri->nama_lengkap }} ({{ $kepulangan->santri->id_santri }})</p>
             <p style="margin: 5px 0;"><strong>Status:</strong> 
@@ -35,7 +35,7 @@
             </p>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 20px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 14px;">
             <div class="form-group">
                 <label for="tanggal_pulang">
                     <i class="fas fa-calendar-alt form-icon"></i>
@@ -65,7 +65,7 @@
         </div>
 
         {{-- Info Durasi --}}
-        <div id="durasiInfo" style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #FF8B94;">
+        <div id="durasiInfo" style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 14px; border-left: 4px solid #FF8B94;">
             <p style="margin: 5px 0;"><strong>Durasi Izin:</strong> <span id="durasiHari" style="display: inline-block; background: #007bff; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem;">{{ $kepulangan->durasi_izin }} hari</span></p>
         </div>
 

@@ -108,16 +108,7 @@ class ApiCapaianController extends Controller
     {
         try {
             $user = $request->user();
-            
-            // Validasi role
-            if (!in_array($user->role, ['santri', 'wali'])) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Akses ditolak. Role: ' . $user->role,
-                ], 403);
-            }
-
-            $idSantri = $user->role_id;
+            $idSantri = $user->id_santri;
 
             $santri = Santri::with(['kelasPrimary.kelas.kelompok', 'kelasSantri.kelas.kelompok'])
                 ->where('id_santri', $idSantri)
@@ -221,7 +212,7 @@ class ApiCapaianController extends Controller
     {
         try {
             $user = $request->user();
-            $idSantri = $user->role_id;
+            $idSantri = $user->id_santri;
 
             $validKategori = ['Al-Qur\'an', 'Hadist', 'Materi Tambahan'];
             if (!in_array($kategori, $validKategori)) {
@@ -304,7 +295,7 @@ class ApiCapaianController extends Controller
     {
         try {
             $user = $request->user();
-            $idSantri = $user->role_id;
+            $idSantri = $user->id_santri;
 
             $capaian = Capaian::where('id_capaian', $idCapaian)
                 ->where('id_santri', $idSantri)
@@ -386,7 +377,7 @@ class ApiCapaianController extends Controller
     {
         try {
             $user = $request->user();
-            $idSantri = $user->role_id;
+            $idSantri = $user->id_santri;
 
             $semesters = Semester::orderBy('tahun_ajaran')
                 ->orderBy('periode')
@@ -435,12 +426,7 @@ class ApiCapaianController extends Controller
     {
         try {
             $user = $request->user();
-
-            if (!in_array($user->role, ['santri', 'wali'])) {
-                return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
-            }
-
-            $idSantri = $user->role_id;
+            $idSantri = $user->id_santri;
 
             $santri = Santri::with(['kelasPrimary.kelas.kelompok'])->where('id_santri', $idSantri)->first();
             if (!$santri) {
@@ -514,12 +500,7 @@ class ApiCapaianController extends Controller
     {
         try {
             $user = $request->user();
-
-            if (!in_array($user->role, ['santri', 'wali'])) {
-                return response()->json(['success' => false, 'message' => 'Akses ditolak'], 403);
-            }
-
-            $idSantri = $user->role_id;
+            $idSantri = $user->id_santri;
             $santri = Santri::with(['kelasPrimary.kelas.kelompok', 'kelasSantri.kelas.kelompok'])
                 ->where('id_santri', $idSantri)
                 ->first();

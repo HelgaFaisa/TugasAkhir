@@ -28,7 +28,7 @@
                    id="nama_kategori" 
                    class="form-control @error('nama_kategori') is-invalid @enderror" 
                    value="{{ old('nama_kategori') }}" 
-                   placeholder="Contoh: Kajian Kitab, Olahraga, Kesenian"
+                   placeholder="Contoh: KBM Shubuh, KBM Siang, Sekolah"
                    required>
             @error('nama_kategori')
                 <span class="invalid-feedback">{{ $message }}</span>

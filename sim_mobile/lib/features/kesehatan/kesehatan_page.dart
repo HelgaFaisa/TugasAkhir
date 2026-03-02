@@ -1,4 +1,4 @@
-// lib/features/kesehatan/kesehatan_page.dart
+﻿// lib/features/kesehatan/kesehatan_page.dart
 
 import 'package:flutter/material.dart';
 import '../../core/api/api_service.dart';
@@ -107,7 +107,7 @@ class _KesehatanPageState extends State<KesehatanPage> {
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: const Text('Riwayat Kesehatan'),
-        backgroundColor: const Color(0xFF7C3AED),
+        backgroundColor: const Color(0xFF6FBA9D),
         foregroundColor: Colors.white,
         actions: [
           IconButton(
@@ -119,15 +119,15 @@ class _KesehatanPageState extends State<KesehatanPage> {
       body: RefreshIndicator(
         onRefresh: () => _loadKesehatan(isRefresh: true),
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(12),
           children: [
             // Card Statistik
             if (_statistik != null) _buildStatistikCard(),
-            const SizedBox(height: 20),
+            const SizedBox(height: 15),
 
             // Filter Status
             _buildFilterChips(),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
 
             // Alert jika sedang dirawat
             if (_statistik?['sedang_dirawat'] != null)
@@ -152,17 +152,17 @@ class _KesehatanPageState extends State<KesehatanPage> {
   Widget _buildStatistikCard() {
     return Card(
       elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
               'Statistik Kesehatan',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
@@ -200,15 +200,15 @@ class _KesehatanPageState extends State<KesehatanPage> {
         Text(
           value,
           style: TextStyle(
-            fontSize: 24,
+            fontSize: 19,
             fontWeight: FontWeight.bold,
             color: color,
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 2),
         Text(
           label,
-          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+          style: TextStyle(fontSize: 9, color: Colors.grey[600]),
         ),
       ],
     );
@@ -231,7 +231,7 @@ class _KesehatanPageState extends State<KesehatanPage> {
   Widget _buildFilterChip(String label, String value) {
     final isSelected = _selectedStatus == value;
     return Padding(
-      padding: const EdgeInsets.only(right: 8),
+      padding: const EdgeInsets.only(right: 7),
       child: FilterChip(
         label: Text(label),
         selected: isSelected,
@@ -243,25 +243,25 @@ class _KesehatanPageState extends State<KesehatanPage> {
           });
           _loadKesehatan();
         },
-        selectedColor: const Color(0xFF7C3AED).withValues(alpha: 0.2),
-        checkmarkColor: const Color(0xFF7C3AED),
+        selectedColor: const Color(0xFF6FBA9D).withValues(alpha: 0.2),
+        checkmarkColor: const Color(0xFF6FBA9D),
       ),
     );
   }
 
   Widget _buildAlertDirawat(Map<String, dynamic> data) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.red[50],
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(9),
         border: Border.all(color: Colors.red[200]!),
       ),
       child: Row(
         children: [
           Icon(Icons.warning_amber_rounded, color: Colors.red[700]),
-          const SizedBox(width: 12),
+          const SizedBox(width: 9),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -275,7 +275,7 @@ class _KesehatanPageState extends State<KesehatanPage> {
                 ),
                 Text(
                   '${data['keluhan']} (${data['lama_dirawat']})',
-                  style: TextStyle(fontSize: 12, color: Colors.red[800]),
+                  style: TextStyle(fontSize: 9, color: Colors.red[800]),
                 ),
               ],
             ),
@@ -290,8 +290,8 @@ class _KesehatanPageState extends State<KesehatanPage> {
     final statusColor = _getStatusColor(status);
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      margin: const EdgeInsets.only(bottom: 9),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
       child: InkWell(
         onTap: () {
           Navigator.push(
@@ -301,24 +301,24 @@ class _KesehatanPageState extends State<KesehatanPage> {
             ),
           );
         },
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(9),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
                       color: statusColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(9),
                     ),
                     child: Text(
                       _getStatusLabel(status),
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 9,
                         fontWeight: FontWeight.bold,
                         color: statusColor,
                       ),
@@ -327,25 +327,25 @@ class _KesehatanPageState extends State<KesehatanPage> {
                   const Spacer(),
                   Text(
                     item['tanggal_masuk_formatted'] ?? '',
-                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                    style: TextStyle(fontSize: 9, color: Colors.grey[600]),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 9),
               Text(
                 item['keluhan'] ?? '',
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 7),
               Row(
                 children: [
-                  Icon(Icons.calendar_today, size: 14, color: Colors.grey[600]),
-                  const SizedBox(width: 4),
+                  Icon(Icons.calendar_today, size: 11, color: Colors.grey[600]),
+                  const SizedBox(width: 2),
                   Text(
                     'Lama: ${item['lama_dirawat']}',
-                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                    style: TextStyle(fontSize: 9, color: Colors.grey[600]),
                   ),
                 ],
               ),
@@ -358,7 +358,7 @@ class _KesehatanPageState extends State<KesehatanPage> {
 
   Widget _buildLoadMoreButton() {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16),
+      padding: const EdgeInsets.symmetric(vertical: 12),
       child: Center(
         child: ElevatedButton(
           onPressed: () {
@@ -374,14 +374,14 @@ class _KesehatanPageState extends State<KesehatanPage> {
   Widget _buildEmptyState() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(24),
         child: Column(
           children: [
-            Icon(Icons.medical_services_outlined, size: 80, color: Colors.grey[400]),
-            const SizedBox(height: 16),
+            Icon(Icons.medical_services_outlined, size: 60, color: Colors.grey[400]),
+            const SizedBox(height: 12),
             Text(
               'Belum ada riwayat kesehatan',
-              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
             ),
           ],
         ),

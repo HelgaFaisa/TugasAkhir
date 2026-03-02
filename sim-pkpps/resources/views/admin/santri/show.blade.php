@@ -80,7 +80,7 @@
                                 ->groupBy(fn($sk) => $sk->kelas->kelompok->nama_kelompok)
                                 ->sortBy(fn($items, $key) => $items->first()->kelas->kelompok->urutan ?? 99);
                         @endphp
-                        <div style="display: flex; flex-direction: column; gap: 15px;">
+                        <div style="display: flex; flex-direction: column; gap: 11px;">
                             @foreach($grouped as $kelompokName => $items)
                                 <div style="padding: 12px; background: linear-gradient(135deg, #F8FBF9 0%, #E8F7F2 100%); border-radius: 8px; border-left: 4px solid #6FBA9D;">
                                     <div style="font-weight: 600; color: #2C5F4F; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
@@ -199,10 +199,10 @@
         </table>
     </div>
 
-    <div style="margin-top: 30px; padding: 20px; background: linear-gradient(135deg, #F8FBF9 0%, #E8F7F2 100%); border-radius: 8px; border-left: 4px solid #6FBA9D;">
+    <div style="margin-top: 22px; padding: 14px; background: linear-gradient(135deg, #F8FBF9 0%, #E8F7F2 100%); border-radius: 8px; border-left: 4px solid #6FBA9D;">
         <p style="margin: 0; color: #2C5F4F; font-size: 0.9rem;">
             <i class="fas fa-info-circle"></i> 
-            <strong>Informasi:</strong> Data santri ini dapat diedit atau dihapus melalui halaman index atau menggunakan tombol Edit di atas.
+            <strong>Informasi:</strong> Data santri ini dapat diedit atau dihapus menggunakan tombol Edit di atas.
         </p>
     </div>
 </div>

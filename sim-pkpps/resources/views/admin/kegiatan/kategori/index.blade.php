@@ -3,6 +3,9 @@
 @section('content')
 <div class="page-header">
     <h2><i class="fas fa-list-alt"></i> Kategori Kegiatan</h2>
+    <a href="{{ route('admin.kegiatan.jadwal') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Kembali
+            </a>
 </div>
 
 @if(session('success'))
@@ -12,7 +15,7 @@
 @endif
 
 <div class="content-box">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
         <form method="GET" style="flex: 1; max-width: 400px;">
             <div style="display: flex; gap: 10px;">
                 <input type="text" name="search" class="form-control" placeholder="Cari kategori..." value="{{ request('search') }}">
@@ -73,7 +76,7 @@
             </tbody>
         </table>
 
-        <div style="margin-top: 20px;">
+        <div style="margin-top: 14px;">
             {{ $kategoris->links() }}
         </div>
     @else

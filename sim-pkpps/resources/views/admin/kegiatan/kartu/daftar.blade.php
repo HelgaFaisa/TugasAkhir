@@ -55,7 +55,7 @@
             <small class="form-text">UID akan otomatis terisi saat kartu ditempelkan ke reader.</small>
         </div>
 
-        <div id="scanStatus" style="padding: 15px; border-radius: var(--border-radius-sm); text-align: center; margin-bottom: 20px; display: none;"></div>
+        <div id="scanStatus" style="padding: 15px; border-radius: var(--border-radius-sm); text-align: center; margin-bottom: 14px; display: none;"></div>
 
         <div class="btn-group">
             <button type="submit" class="btn btn-success">

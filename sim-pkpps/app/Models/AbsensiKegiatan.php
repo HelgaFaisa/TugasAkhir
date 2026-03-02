@@ -85,6 +85,8 @@ class AbsensiKegiatan extends Model
             'Izin' => '<span class="badge badge-warning"><i class="fas fa-info-circle"></i> Izin</span>',
             'Sakit' => '<span class="badge badge-info"><i class="fas fa-heartbeat"></i> Sakit</span>',
             'Alpa' => '<span class="badge badge-danger"><i class="fas fa-times"></i> Alpa</span>',
+            'Terlambat' => '<span class="badge" style="background: #FF9800; color: white;"><i class="fas fa-clock"></i> Terlambat</span>',
+            'Pulang' => '<span class="badge" style="background: #FFF3E0; color: #E65100;"><i class="fas fa-home"></i> Pulang</span>',
         ];
 
         return $badges[$this->status] ?? $this->status;
@@ -120,6 +122,8 @@ class AbsensiKegiatan extends Model
             'Izin' => 'badge-info',
             'Sakit' => 'badge-warning',
             'Alpa' => 'badge-danger',
+            'Terlambat' => 'badge-warning',
+            'Pulang' => 'badge-secondary',
             default => 'badge-secondary',
         };
     }

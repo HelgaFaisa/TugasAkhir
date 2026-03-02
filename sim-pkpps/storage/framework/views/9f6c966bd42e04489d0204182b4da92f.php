@@ -1,9 +1,9 @@
-
-
-
 <?php $__env->startSection('title', 'Tambah Pembayaran SPP'); ?>
 
 <?php $__env->startSection('content'); ?>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+
 <div class="page-header">
     <h2><i class="fas fa-plus-circle"></i> Tambah Pembayaran SPP</h2>
 </div>
@@ -270,17 +270,37 @@ unset($__errorArgs, $__bag); ?>
     </form>
 </div>
 
-<?php $__env->startPush('scripts'); ?>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
-// Auto-fill tanggal bayar jika status = Lunas
-document.querySelector('select[name="status"]').addEventListener('change', function() {
-    const tanggalBayar = document.querySelector('input[name="tanggal_bayar"]');
-    if (this.value === 'Lunas' && !tanggalBayar.value) {
-        const today = new Date().toISOString().split('T')[0];
-        tanggalBayar.value = today;
-    }
+$(document).ready(function() {
+    // Inisialisasi Select2
+    $('select[name="id_santri"]').select2({
+        placeholder: '-- Pilih Santri --',
+        allowClear: true,
+        width: '100%'
+    });
+    $('select[name="bulan"]').select2({
+        placeholder: '-- Pilih Bulan --',
+        allowClear: true,
+        width: '100%'
+    });
+    $('select[name="status"]').select2({
+        placeholder: '-- Pilih Status --',
+        allowClear: false,
+        minimumResultsForSearch: Infinity,
+        width: '100%'
+    });
+
+    // Auto-fill tanggal bayar jika status = Lunas
+    $('select[name="status"]').on('change', function() {
+        const tanggalBayar = document.querySelector('input[name="tanggal_bayar"]');
+        if (this.value === 'Lunas' && !tanggalBayar.value) {
+            const today = new Date().toISOString().split('T')[0];
+            tanggalBayar.value = today;
+        }
+    });
 });
 </script>
-<?php $__env->stopPush(); ?>
 <?php $__env->stopSection(); ?>
 <?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\TugasAkhir\sim-pkpps\resources\views/admin/pembayaran-spp/create.blade.php ENDPATH**/ ?>

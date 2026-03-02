@@ -37,7 +37,7 @@
                    id="nama_kelas" 
                    name="nama_kelas" 
                    value="{{ old('nama_kelas') }}" 
-                   placeholder="Contoh: PB, Lambatan, SD 1, SMP 7"
+                   placeholder="Contoh: Lambatan, cepatan, SD 1, SMP 7"
                    required
                    autofocus>
             @error('nama_kelas')
@@ -68,9 +68,6 @@
             @error('id_kelompok')
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
-            <small class="form-text text-muted">
-                Pilih kelompok kelas: Kelas Pondok, Sekolah Formal, atau Umum.
-            </small>
         </div>
 
         <!-- Urutan -->

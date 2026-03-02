@@ -46,13 +46,13 @@
 </div>
 
 <!-- Filter & Search -->
-<div class="content-box" style="margin-bottom: 30px;">
-    <h3 style="margin-bottom: 20px; color: var(--primary-color);">
+<div class="content-box" style="margin-bottom: 22px;">
+    <h3 style="margin-bottom: 14px; color: var(--primary-color);">
         <i class="fas fa-filter"></i> Filter & Pencarian
     </h3>
     
     <form method="GET" action="{{ route('admin.riwayat-pelanggaran.index') }}">
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 11px; margin-bottom: 14px;">
             <!-- Search -->
             <div class="form-group" style="margin-bottom: 0;">
                 <label for="search">
@@ -145,7 +145,7 @@
 
 <!-- Tabel Data -->
 <div class="content-box">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
         <h3 style="margin: 0; color: var(--primary-color);">
             <i class="fas fa-table"></i> Daftar Riwayat Pelanggaran
         </h3>
@@ -235,7 +235,7 @@
         </table>
 
         <!-- Pagination -->
-        <div style="margin-top: 20px;">
+        <div style="margin-top: 14px;">
             {{ $data->links() }}
         </div>
     @else

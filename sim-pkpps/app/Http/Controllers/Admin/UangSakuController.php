@@ -14,18 +14,46 @@ class UangSakuController extends Controller
 {
     /**
      * Tampilkan daftar uang saku — Grouped per Santri
+     * Default: bulan ini
      */
     public function index(Request $request)
     {
         $search = $request->get('search');
 
-        // Query santri aktif yang punya transaksi (atau semua jika tidak ada filter)
+        // ── Default: bulan ini ──────────────────────────────────────
+        $dari   = $request->get('dari',   now()->startOfMonth()->format('Y-m-d'));
+        $sampai = $request->get('sampai', now()->endOfMonth()->format('Y-m-d'));
+        $sort   = $request->get('sort', 'nama'); // nama | saldo_asc | saldo_desc | transaksi_desc | terakhir
+
+        // ── KPI ringkasan periode (dipengaruhi filter tanggal) ──────
+        $kpiQuery = UangSaku::whereBetween('tanggal_transaksi', [$dari, $sampai]);
+        $kpi = [
+            'total_transaksi'   => (clone $kpiQuery)->count(),
+            'total_pemasukan'   => (float)(clone $kpiQuery)->where('jenis_transaksi', 'pemasukan')->sum('nominal'),
+            'total_pengeluaran' => (float)(clone $kpiQuery)->where('jenis_transaksi', 'pengeluaran')->sum('nominal'),
+            'total_santri'      => (clone $kpiQuery)->distinct('id_santri')->count('id_santri'),
+        ];
+        // Selisih periode: apakah dalam rentang ini uang yang masuk lebih besar dari yang keluar
+        $kpi['selisih'] = $kpi['total_pemasukan'] - $kpi['total_pengeluaran'];
+
+        // ── KPI Real-time: Total saldo aktual seluruh santri (tidak dipengaruhi filter) ──
+        // Ambil saldo_sesudah dari transaksi TERAKHIR masing-masing santri
+        $totalSaldoSemua = DB::table('uang_saku as u1')
+            ->join(DB::raw('(
+                SELECT id_santri, MAX(id) as max_id
+                FROM uang_saku
+                GROUP BY id_santri
+            ) as latest'), function ($join) {
+                $join->on('u1.id_santri', '=', 'latest.id_santri')
+                     ->on('u1.id', '=', 'latest.max_id');
+            })
+            ->sum('u1.saldo_sesudah');
+
+        $kpi['total_saldo_realtime'] = (float) $totalSaldoSemua;
+
+        // ── Query santri ────────────────────────────────────────────
         $santriQuery = Santri::aktif()
             ->select('id_santri', 'nama_lengkap')
-            ->withCount(['uangSaku as transaksi_bulan_ini' => function ($q) {
-                $q->whereMonth('tanggal_transaksi', now()->month)
-                  ->whereYear('tanggal_transaksi', now()->year);
-            }])
             ->has('uangSaku');
 
         if ($search) {
@@ -35,37 +63,72 @@ class UangSakuController extends Controller
             });
         }
 
-        $santriList = $santriQuery->orderBy('nama_lengkap')
-            ->paginate(20)
-            ->appends(request()->query());
+        $santriQuery->orderBy('nama_lengkap');
 
-        // Ambil saldo terakhir & transaksi terbaru per santri (batch)
+        $santriList = $santriQuery->paginate(20)->appends(request()->query());
+
         $ids = $santriList->pluck('id_santri');
 
-        // Saldo terakhir per santri (dari transaksi terbaru)
-        $saldoMap = UangSaku::whereIn('id_santri', $ids)
-            ->select('id_santri', 'saldo_sesudah')
-            ->orderByDesc('tanggal_transaksi')
-            ->orderByDesc('created_at')
+        // ── Saldo terakhir per santri (efisien: subquery per-id) ────
+        // Ambil id transaksi terakhir per santri lalu join, hindari get()->unique() yang boros
+        $latestIds = DB::table('uang_saku')
+            ->whereIn('id_santri', $ids)
+            ->select('id_santri', DB::raw('MAX(id) as max_id'))
+            ->groupBy('id_santri')
+            ->pluck('max_id', 'id_santri');
+
+        $saldoMap = UangSaku::whereIn('id', $latestIds->values())
             ->get()
-            ->unique('id_santri')
             ->keyBy('id_santri');
 
-        // Transaksi terbaru per santri (max 5)
+        // ── Pemasukan & pengeluaran bulan ini per santri ────────────
+        $bulanIniStats = UangSaku::whereIn('id_santri', $ids)
+            ->whereMonth('tanggal_transaksi', now()->month)
+            ->whereYear('tanggal_transaksi', now()->year)
+            ->select(
+                'id_santri',
+                DB::raw('SUM(CASE WHEN jenis_transaksi="pemasukan"  THEN nominal ELSE 0 END) as pemasukan_bulan'),
+                DB::raw('SUM(CASE WHEN jenis_transaksi="pengeluaran" THEN nominal ELSE 0 END) as pengeluaran_bulan'),
+                DB::raw('COUNT(*) as total_bulan')
+            )
+            ->groupBy('id_santri')
+            ->get()
+            ->keyBy('id_santri');
+
+        // ── Transaksi terbaru per santri (max 5, untuk collapsed detail) ──
         $transaksiMap = UangSaku::whereIn('id_santri', $ids)
             ->orderByDesc('tanggal_transaksi')
             ->orderByDesc('created_at')
             ->get()
             ->groupBy('id_santri')
-            ->map(fn ($group) => $group->take(5));
+            ->map(fn($g) => $g->take(5));
 
-        // Attach ke santri objects
-        $santriList->getCollection()->each(function ($santri) use ($saldoMap, $transaksiMap) {
-            $santri->saldo_terakhir = $saldoMap[$santri->id_santri]->saldo_sesudah ?? 0;
-            $santri->transaksi_terbaru = $transaksiMap[$santri->id_santri] ?? collect();
+        // ── Attach semua data ke santri objects ─────────────────────
+        $collection = $santriList->getCollection()->map(function ($santri) use ($saldoMap, $bulanIniStats, $transaksiMap) {
+            $saldoRow = $saldoMap[$santri->id_santri] ?? null;
+            $bulan    = $bulanIniStats[$santri->id_santri] ?? null;
+
+            $santri->saldo_terakhir         = $saldoRow ? (float)$saldoRow->saldo_sesudah : 0;
+            $santri->transaksi_terakhir_tgl  = $saldoRow ? $saldoRow->tanggal_transaksi : null;
+            $santri->pemasukan_bulan         = $bulan ? (float)$bulan->pemasukan_bulan   : 0;
+            $santri->pengeluaran_bulan       = $bulan ? (float)$bulan->pengeluaran_bulan : 0;
+            $santri->transaksi_bulan_ini     = $bulan ? (int)$bulan->total_bulan          : 0;
+            $santri->transaksi_terbaru       = $transaksiMap[$santri->id_santri] ?? collect();
+            return $santri;
         });
 
-        return view('admin.uang-saku.index', compact('santriList'));
+        // ── Re-sort collection setelah attach ───────────────────────
+        $sorted = match($sort) {
+            'saldo_asc'       => $collection->sortBy('saldo_terakhir'),
+            'saldo_desc'      => $collection->sortByDesc('saldo_terakhir'),
+            'transaksi_desc'  => $collection->sortByDesc('transaksi_bulan_ini'),
+            'terakhir'        => $collection->sortByDesc('transaksi_terakhir_tgl'),
+            default           => $collection->sortBy('nama_lengkap'),
+        };
+
+        $santriList->setCollection($sorted->values());
+
+        return view('admin.uang-saku.index', compact('santriList', 'kpi', 'dari', 'sampai', 'sort'));
     }
 
     /**
@@ -77,15 +140,13 @@ class UangSakuController extends Controller
 
         $bulanIni = now();
 
-        // Saldo terakhir
         $lastTx = UangSaku::where('id_santri', $id_santri)
             ->orderByDesc('tanggal_transaksi')
             ->orderByDesc('created_at')
             ->first();
 
-        $saldo = $lastTx ? $lastTx->saldo_sesudah : 0;
+        $saldo = $lastTx ? (float)$lastTx->saldo_sesudah : 0;
 
-        // Total pemasukan & pengeluaran bulan ini
         $pemasukanBulanIni = UangSaku::where('id_santri', $id_santri)
             ->where('jenis_transaksi', 'pemasukan')
             ->whereMonth('tanggal_transaksi', $bulanIni->month)
@@ -98,13 +159,12 @@ class UangSakuController extends Controller
             ->whereYear('tanggal_transaksi', $bulanIni->year)
             ->sum('nominal');
 
-        // 3 transaksi terakhir
         $transaksiTerakhir = UangSaku::where('id_santri', $id_santri)
             ->orderByDesc('tanggal_transaksi')
             ->orderByDesc('created_at')
             ->limit(3)
             ->get()
-            ->map(fn ($t) => [
+            ->map(fn($t) => [
                 'tanggal'    => $t->tanggal_transaksi->format('d/m/Y'),
                 'jenis'      => $t->jenis_transaksi,
                 'nominal'    => number_format($t->nominal, 0, ',', '.'),
@@ -112,18 +172,15 @@ class UangSakuController extends Controller
             ]);
 
         return response()->json([
-            'nama'                     => $santri->nama_lengkap,
-            'saldo_terakhir'           => number_format($saldo, 0, ',', '.'),
-            'saldo_raw'                => $saldo,
-            'total_pemasukan_bulan_ini' => number_format($pemasukanBulanIni, 0, ',', '.'),
+            'nama'                        => $santri->nama_lengkap,
+            'saldo_terakhir'              => number_format($saldo, 0, ',', '.'),
+            'saldo_raw'                   => $saldo,
+            'total_pemasukan_bulan_ini'   => number_format($pemasukanBulanIni, 0, ',', '.'),
             'total_pengeluaran_bulan_ini' => number_format($pengeluaranBulanIni, 0, ',', '.'),
-            'transaksi_terakhir'       => $transaksiTerakhir,
+            'transaksi_terakhir'          => $transaksiTerakhir,
         ]);
     }
 
-    /**
-     * Form tambah transaksi
-     */
     public function create()
     {
         $santriList = Santri::where('status', 'Aktif')
@@ -134,128 +191,92 @@ class UangSakuController extends Controller
         return view('admin.uang-saku.create', compact('santriList'));
     }
 
-    /**
-     * Simpan transaksi baru
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'id_santri' => 'required|exists:santris,id_santri',
-            'jenis_transaksi' => 'required|in:pemasukan,pengeluaran',
-            'nominal' => 'required|numeric|min:1|max:99999999',
-            'keterangan' => 'nullable|string|max:500',
+            'id_santri'         => 'required|exists:santris,id_santri',
+            'jenis_transaksi'   => 'required|in:pemasukan,pengeluaran',
+            'nominal'           => 'required|numeric|min:1|max:99999999',
+            'keterangan'        => 'nullable|string|max:500',
             'tanggal_transaksi' => 'required|date',
-        ], [
-            'id_santri.required' => 'Santri wajib dipilih.',
-            'id_santri.exists' => 'Santri tidak ditemukan.',
-            'jenis_transaksi.required' => 'Jenis transaksi wajib dipilih.',
-            'nominal.required' => 'Nominal wajib diisi.',
-            'nominal.numeric' => 'Nominal harus berupa angka.',
-            'nominal.min' => 'Nominal minimal Rp 1.',
-            'tanggal_transaksi.required' => 'Tanggal transaksi wajib diisi.',
         ]);
 
         DB::beginTransaction();
         try {
             UangSaku::create($validated);
-            
-            // Update saldo transaksi berikutnya jika ada
             $this->recalculateSaldoAfter($validated['id_santri'], $validated['tanggal_transaksi']);
-            
             DB::commit();
             Cache::forget('santri_aktif_uang_saku');
-            
             return redirect()->route('admin.uang-saku.index')
                 ->with('success', 'Transaksi uang saku berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withInput()
-                ->with('error', 'Gagal menambahkan transaksi: ' . $e->getMessage());
+            return back()->withInput()->with('error', 'Gagal menambahkan transaksi: ' . $e->getMessage());
         }
     }
 
-    /**
-     * Tampilkan detail transaksi
-     */
     public function show($id)
     {
         $transaksi = UangSaku::with('santri')->findOrFail($id);
         return view('admin.uang-saku.show', compact('transaksi'));
     }
 
-    /**
-     * Form edit transaksi
-     */
     public function edit($id)
     {
-        $transaksi = UangSaku::with('santri')->findOrFail($id);
-        
+        $transaksi  = UangSaku::with('santri')->findOrFail($id);
         $santriList = Santri::where('status', 'Aktif')
             ->select('id_santri', 'nama_lengkap')
             ->orderBy('nama_lengkap')
             ->get();
-
         return view('admin.uang-saku.edit', compact('transaksi', 'santriList'));
     }
 
-    /**
-     * Update transaksi
-     */
     public function update(Request $request, $id)
     {
         $transaksi = UangSaku::findOrFail($id);
-
         $validated = $request->validate([
-            'jenis_transaksi' => 'required|in:pemasukan,pengeluaran',
-            'nominal' => 'required|numeric|min:1|max:99999999',
-            'keterangan' => 'nullable|string|max:500',
+            'jenis_transaksi'   => 'required|in:pemasukan,pengeluaran',
+            'nominal'           => 'required|numeric|min:1|max:99999999',
+            'keterangan'        => 'nullable|string|max:500',
             'tanggal_transaksi' => 'required|date',
-        ], [
-            'jenis_transaksi.required' => 'Jenis transaksi wajib dipilih.',
-            'nominal.required' => 'Nominal wajib diisi.',
-            'nominal.numeric' => 'Nominal harus berupa angka.',
-            'nominal.min' => 'Nominal minimal Rp 1.',
-            'tanggal_transaksi.required' => 'Tanggal transaksi wajib diisi.',
         ]);
+
+        // Simpan tanggal lama sebelum update, agar recalculate dimulai dari yang paling awal
+        $tanggalLama = $transaksi->tanggal_transaksi->format('Y-m-d');
 
         DB::beginTransaction();
         try {
-            $transaksi->update($validated);
-            
-            // Recalculate semua saldo setelah transaksi ini
-            $this->recalculateSaldoAfter($transaksi->id_santri, $transaksi->tanggal_transaksi);
-            
+            // Gunakan saveQuietly agar model boot (updating) tidak ikut menghitung ulang saldo
+            // — recalculate akan dikerjakan secara menyeluruh oleh recalculateSaldoAfter()
+            $transaksi->fill($validated)->saveQuietly();
+
+            // Recalculate dari tanggal yang paling awal antara tanggal lama dan baru
+            $tanggalBaru = $validated['tanggal_transaksi'];
+            $tanggalMulai = min($tanggalLama, $tanggalBaru);
+
+            $this->recalculateSaldoAfter($transaksi->id_santri, $tanggalMulai);
             DB::commit();
             Cache::forget('santri_aktif_uang_saku');
-            
             return redirect()->route('admin.uang-saku.index')
                 ->with('success', 'Transaksi berhasil diperbarui.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withInput()
-                ->with('error', 'Gagal memperbarui transaksi: ' . $e->getMessage());
+            return back()->withInput()->with('error', 'Gagal memperbarui transaksi: ' . $e->getMessage());
         }
     }
 
-    /**
-     * Hapus transaksi
-     */
     public function destroy($id)
     {
         $transaksi = UangSaku::findOrFail($id);
-        $idSantri = $transaksi->id_santri;
-        $tanggal = $transaksi->tanggal_transaksi;
+        $idSantri  = $transaksi->id_santri;
+        $tanggal   = $transaksi->tanggal_transaksi->format('Y-m-d');
 
         DB::beginTransaction();
         try {
             $transaksi->delete();
-            
-            // Recalculate saldo setelah transaksi dihapus
             $this->recalculateSaldoAfter($idSantri, $tanggal);
-            
             DB::commit();
             Cache::forget('santri_aktif_uang_saku');
-            
             return redirect()->route('admin.uang-saku.index')
                 ->with('success', 'Transaksi berhasil dihapus.');
         } catch (\Exception $e) {
@@ -264,35 +285,21 @@ class UangSakuController extends Controller
         }
     }
 
-    /**
-     * Tampilkan riwayat uang saku per santri dengan filter tanggal
-     */
     public function riwayat(Request $request, $id_santri)
     {
         $santri = Santri::where('id_santri', $id_santri)->firstOrFail();
-        
-        // Default: bulan ini
-        $tanggalDari = $request->filled('tanggal_dari') 
-            ? $request->tanggal_dari 
-            : now()->startOfMonth()->format('Y-m-d');
-        
-        $tanggalSampai = $request->filled('tanggal_sampai') 
-            ? $request->tanggal_sampai 
-            : now()->endOfMonth()->format('Y-m-d');
-        
-        // Query transaksi dengan filter tanggal
-        $query = UangSaku::where('id_santri', $id_santri);
-        
-        if ($tanggalDari && $tanggalSampai) {
-            $query->whereBetween('tanggal_transaksi', [$tanggalDari, $tanggalSampai]);
-        }
-        
+
+        $tanggalDari   = $request->filled('tanggal_dari')   ? $request->tanggal_dari   : now()->startOfMonth()->format('Y-m-d');
+        $tanggalSampai = $request->filled('tanggal_sampai') ? $request->tanggal_sampai : now()->endOfMonth()->format('Y-m-d');
+
+        $query = UangSaku::where('id_santri', $id_santri)
+            ->whereBetween('tanggal_transaksi', [$tanggalDari, $tanggalSampai]);
+
         $transaksi = $query->orderBy('tanggal_transaksi', 'desc')
             ->orderBy('created_at', 'desc')
             ->paginate(20)
             ->appends($request->query());
 
-        // Statistik dengan filter tanggal
         $totalPemasukan = UangSaku::where('id_santri', $id_santri)
             ->where('jenis_transaksi', 'pemasukan')
             ->whereBetween('tanggal_transaksi', [$tanggalDari, $tanggalSampai])
@@ -303,82 +310,79 @@ class UangSakuController extends Controller
             ->whereBetween('tanggal_transaksi', [$tanggalDari, $tanggalSampai])
             ->sum('nominal');
 
-        // Saldo terakhir tetap dari keseluruhan transaksi
-        $saldoTerakhir = $santri->saldo_uang_saku;
+        // Ambil saldo aktual dari transaksi TERAKHIR santri ini (real-time, bukan dari filter)
+        $lastTx = UangSaku::where('id_santri', $id_santri)
+            ->orderByDesc('tanggal_transaksi')
+            ->orderByDesc('created_at')
+            ->first();
+        $saldoTerakhir = $lastTx ? (float)$lastTx->saldo_sesudah : 0;
 
-        // Data untuk grafik dengan filter tanggal
         $dataGrafik = UangSaku::where('id_santri', $id_santri)
             ->whereBetween('tanggal_transaksi', [$tanggalDari, $tanggalSampai])
             ->select(
                 DB::raw('DATE(tanggal_transaksi) as tanggal'),
-                DB::raw('SUM(CASE WHEN jenis_transaksi = "pemasukan" THEN nominal ELSE 0 END) as pemasukan'),
-                DB::raw('SUM(CASE WHEN jenis_transaksi = "pengeluaran" THEN nominal ELSE 0 END) as pengeluaran')
+                DB::raw('SUM(CASE WHEN jenis_transaksi="pemasukan"  THEN nominal ELSE 0 END) as pemasukan'),
+                DB::raw('SUM(CASE WHEN jenis_transaksi="pengeluaran" THEN nominal ELSE 0 END) as pengeluaran')
             )
             ->groupBy('tanggal')
             ->orderBy('tanggal')
             ->get();
 
-        // Jika tidak ada transaksi di rentang tanggal, buat data kosong
         if ($dataGrafik->isEmpty()) {
-            $dataGrafik = collect([
-                (object)[
-                    'tanggal' => $tanggalDari,
-                    'pemasukan' => 0,
-                    'pengeluaran' => 0
-                ]
-            ]);
+            $dataGrafik = collect([(object)['tanggal' => $tanggalDari, 'pemasukan' => 0, 'pengeluaran' => 0]]);
         }
 
-        // Info periode
-        $periodeDari = \Carbon\Carbon::parse($tanggalDari);
-        $periodeSampai = \Carbon\Carbon::parse($tanggalSampai);
-        
+        $periodeDari   = Carbon::parse($tanggalDari);
+        $periodeSampai = Carbon::parse($tanggalSampai);
+
         return view('admin.uang-saku.riwayat', compact(
-            'santri',
-            'transaksi',
-            'totalPemasukan',
-            'totalPengeluaran',
-            'saldoTerakhir',
-            'dataGrafik',
-            'tanggalDari',
-            'tanggalSampai',
-            'periodeDari',
-            'periodeSampai'
+            'santri', 'transaksi',
+            'totalPemasukan', 'totalPengeluaran', 'saldoTerakhir',
+            'dataGrafik', 'tanggalDari', 'tanggalSampai',
+            'periodeDari', 'periodeSampai'
         ));
     }
 
     /**
-     * Helper: Recalculate saldo untuk transaksi setelah tanggal tertentu
+     * Hitung ulang saldo_sebelum & saldo_sesudah untuk semua transaksi
+     * milik $idSantri yang tanggalnya >= $tanggal.
+     *
+     * Dipanggil setelah store / update / destroy agar urutan saldo
+     * tetap konsisten meski transaksi disisipkan di tengah.
      */
     private function recalculateSaldoAfter($idSantri, $tanggal)
     {
+        // Pastikan format tanggal string (bukan Carbon object)
+        $tanggal = $tanggal instanceof \Carbon\Carbon
+            ? $tanggal->format('Y-m-d')
+            : $tanggal;
+
         $transaksiSetelah = UangSaku::where('id_santri', $idSantri)
             ->where('tanggal_transaksi', '>=', $tanggal)
             ->orderBy('tanggal_transaksi')
             ->orderBy('created_at')
+            ->orderBy('id')
             ->get();
 
         foreach ($transaksiSetelah as $index => $trans) {
             if ($index === 0) {
-                // Transaksi pertama: ambil saldo dari transaksi sebelumnya
-                $saldoSebelumnya = UangSaku::where('id_santri', $idSantri)
-                    ->where('id', '<', $trans->id)
-                    ->orderBy('tanggal_transaksi', 'desc')
-                    ->orderBy('created_at', 'desc')
+                // Cari saldo_sesudah transaksi tepat sebelum batch ini
+                $prev = UangSaku::where('id_santri', $idSantri)
+                    ->where('tanggal_transaksi', '<', $tanggal)
+                    ->orderByDesc('tanggal_transaksi')
+                    ->orderByDesc('created_at')
+                    ->orderByDesc('id')
                     ->first();
-                
-                $trans->saldo_sebelum = $saldoSebelumnya ? $saldoSebelumnya->saldo_sesudah : 0;
+                $trans->saldo_sebelum = $prev ? (float)$prev->saldo_sesudah : 0;
             } else {
-                $trans->saldo_sebelum = $transaksiSetelah[$index - 1]->saldo_sesudah;
+                $trans->saldo_sebelum = (float)$transaksiSetelah[$index - 1]->saldo_sesudah;
             }
 
-            if ($trans->jenis_transaksi === 'pemasukan') {
-                $trans->saldo_sesudah = $trans->saldo_sebelum + $trans->nominal;
-            } else {
-                $trans->saldo_sesudah = $trans->saldo_sebelum - $trans->nominal;
-            }
+            $trans->saldo_sesudah = $trans->jenis_transaksi === 'pemasukan'
+                ? $trans->saldo_sebelum + (float)$trans->nominal
+                : $trans->saldo_sebelum - (float)$trans->nominal;
 
-            $trans->saveQuietly(); // Save tanpa trigger event
+            $trans->saveQuietly();
         }
     }
 }

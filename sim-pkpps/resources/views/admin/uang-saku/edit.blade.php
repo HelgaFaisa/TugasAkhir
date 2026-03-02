@@ -20,7 +20,7 @@
         </div>
 
         {{-- Info Card Santri (AJAX on page load) --}}
-        <div id="santri-info" style="display:none; margin-bottom:20px;">
+        <div id="santri-info" style="display:none; margin-bottom: 14px;">
             <div class="content-box" style="padding:16px; background:var(--primary-light);">
                 <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin-bottom:12px;">
                     <div>

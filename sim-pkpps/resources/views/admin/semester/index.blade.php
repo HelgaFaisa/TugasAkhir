@@ -87,7 +87,7 @@
         </table>
 
         {{-- Pagination --}}
-        <div style="margin-top: 20px;">
+        <div style="margin-top: 14px;">
             {{ $semesters->links() }}
         </div>
     @else

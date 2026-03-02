@@ -25,7 +25,7 @@
 <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
     {{-- Main Detail --}}
     <div class="content-box">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
             <h3 style="margin: 0;">Informasi Kepulangan</h3>
             <span style="display: inline-block; padding: 8px 16px; border-radius: 6px; font-size: 1rem; font-weight: 600;
                 @if($kepulangan->status == 'Menunggu') background: #ffc107; color: #000;
@@ -67,19 +67,19 @@
                 <td>
                     @if($kepulangan->is_aktif)
                         <span style="display: inline-block; background: #28a745; color: white; padding: 4px 10px; border-radius: 4px; font-size: 0.9rem;">
-                            🏠 Sedang Izin
+                            ðŸ  Sedang Izin
                         </span>
                     @elseif($kepulangan->is_terlambat)
                         <span style="display: inline-block; background: #dc3545; color: white; padding: 4px 10px; border-radius: 4px; font-size: 0.9rem;">
-                            ⏰ Terlambat Kembali
+                            â° Terlambat Kembali
                         </span>
                     @elseif($kepulangan->status == 'Selesai')
                         <span style="display: inline-block; background: #6c757d; color: white; padding: 4px 10px; border-radius: 4px; font-size: 0.9rem;">
-                            ✅ Sudah Selesai
+                            âœ… Sudah Selesai
                         </span>
                     @else
                         <span style="display: inline-block; background: #81C6E8; color: white; padding: 4px 10px; border-radius: 4px; font-size: 0.9rem;">
-                            📅 Belum Dimulai
+                            ðŸ“… Belum Dimulai
                         </span>
                     @endif
                 </td>
@@ -107,7 +107,7 @@
         </table>
 
         {{-- Action Buttons --}}
-        <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+        <div style="margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap;">
             <a href="{{ route('admin.kepulangan.index') }}" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Kembali
             </a>
@@ -139,7 +139,7 @@
     {{-- Sidebar --}}
     <div>
         {{-- Info Santri --}}
-        <div class="content-box" style="margin-bottom: 20px;">
+        <div class="content-box" style="margin-bottom: 14px;">
             <h4 style="margin-top: 0; color: #2C3E50; border-bottom: 2px solid #6FBA9D; padding-bottom: 10px;">
                 <i class="fas fa-user"></i> Informasi Santri
             </h4>
@@ -172,18 +172,18 @@
         </div>
 
         {{-- Statistik Kuota Santri --}}
-        <div class="content-box" style="margin-bottom: 20px;">
+        <div class="content-box" style="margin-bottom: 14px;">
             <h4 style="margin-top: 0; color: #2C3E50; border-bottom: 2px solid #6FBA9D; padding-bottom: 10px;">
                 <i class="fas fa-chart-pie"></i> Kuota Izin Periode Ini
             </h4>
             
-            <div style="background: linear-gradient(135deg, {{ $kuotaSantri['badge_color'] == 'danger' ? '#ff5252 0%, #f48fb1 100%' : ($kuotaSantri['badge_color'] == 'warning' ? '#ffd54f 0%, #ffb74d 100%' : '#81c784 0%, #66bb6a 100%') }}); padding: 20px; border-radius: 12px; text-align: center; color: white; margin-bottom: 15px;">
+            <div style="background: linear-gradient(135deg, {{ $kuotaSantri['badge_color'] == 'danger' ? '#ff5252 0%, #f48fb1 100%' : ($kuotaSantri['badge_color'] == 'warning' ? '#ffd54f 0%, #ffb74d 100%' : '#81c784 0%, #66bb6a 100%') }}); padding: 14px; border-radius: 12px; text-align: center; color: white; margin-bottom: 15px;">
                 <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 5px;">Total Terpakai</div>
-                <div style="font-size: 3rem; font-weight: 700; line-height: 1;">{{ $kuotaSantri['total_terpakai'] }}</div>
+                <div style="font-size: 2.2rem; font-weight: 700; line-height: 1;">{{ $kuotaSantri['total_terpakai'] }}</div>
                 <div style="font-size: 1rem; opacity: 0.9;">dari {{ $kuotaSantri['kuota_maksimal'] }} hari</div>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 11px; margin-bottom: 15px;">
                 <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 8px;">
                     <div style="font-size: 0.85rem; color: #7F8C8D; margin-bottom: 5px;">Sisa Kuota</div>
                     <div style="font-size: 1.8rem; font-weight: 700; color: {{ $kuotaSantri['badge_color'] == 'danger' ? '#dc3545' : ($kuotaSantri['badge_color'] == 'warning' ? '#ff9800' : '#28a745') }};">
@@ -251,7 +251,7 @@
             </h4>
             <div style="position: relative; padding-left: 20px;">
                 @foreach($detailIzin['details'] as $detail)
-                <div style="position: relative; margin-bottom: 20px; padding: 12px; background: {{ $detail['id'] == $kepulangan->id_kepulangan ? 'rgba(255, 193, 7, 0.1)' : '#f8f9fa' }}; border-radius: 6px; border-left: 3px solid {{ $detail['id'] == $kepulangan->id_kepulangan ? '#ffc107' : '#6FBA9D' }};">
+                <div style="position: relative; margin-bottom: 14px; padding: 12px; background: {{ $detail['id'] == $kepulangan->id_kepulangan ? 'rgba(255, 193, 7, 0.1)' : '#f8f9fa' }}; border-radius: 6px; border-left: 3px solid {{ $detail['id'] == $kepulangan->id_kepulangan ? '#ffc107' : '#6FBA9D' }};">
                     @if($detail['id'] == $kepulangan->id_kepulangan)
                         <div style="position: absolute; top: -5px; right: -5px;">
                             <i class="fas fa-star" style="color: #ffc107;"></i>
@@ -282,7 +282,7 @@
 
 {{-- History Kepulangan Lainnya --}}
 @if($history->count() > 0)
-<div class="content-box" style="margin-top: 20px;">
+<div class="content-box" style="margin-top: 14px;">
     <h4 style="margin-top: 0; color: #2C3E50; border-bottom: 2px solid #6FBA9D; padding-bottom: 10px;">
         <i class="fas fa-list"></i> Riwayat Kepulangan Lainnya (5 Terakhir)
     </h4>
@@ -336,17 +336,17 @@
 {{-- Modals --}}
 <div class="modal fade" id="approveModal" tabindex="-1" style="display: none;">
     <div class="modal-dialog">
-        <div class="modal-content" style="background: white; border-radius: 12px; padding: 20px;">
+        <div class="modal-content" style="background: white; border-radius: 12px; padding: 14px;">
             <form id="approveForm">
                 @csrf
-                <div style="margin-bottom: 20px;">
+                <div style="margin-bottom: 14px;">
                     <h3 style="margin: 0; color: #2C3E50;">Setujui Izin Kepulangan</h3>
                 </div>
                 <div class="form-group">
                     <label>Catatan (Opsional):</label>
                     <textarea name="catatan" class="form-control" rows="3" placeholder="Tambahkan catatan..."></textarea>
                 </div>
-                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px;">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('approveModal')">Batal</button>
                     <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Setujui</button>
                 </div>
@@ -357,17 +357,17 @@
 
 <div class="modal fade" id="rejectModal" tabindex="-1" style="display: none;">
     <div class="modal-dialog">
-        <div class="modal-content" style="background: white; border-radius: 12px; padding: 20px;">
+        <div class="modal-content" style="background: white; border-radius: 12px; padding: 14px;">
             <form id="rejectForm">
                 @csrf
-                <div style="margin-bottom: 20px;">
+                <div style="margin-bottom: 14px;">
                     <h3 style="margin: 0; color: #2C3E50;">Tolak Izin Kepulangan</h3>
                 </div>
                 <div class="form-group">
                     <label>Alasan Penolakan: <span style="color: #dc3545;">*</span></label>
                     <textarea name="alasan_penolakan" class="form-control" rows="3" placeholder="Jelaskan alasan penolakan..." required></textarea>
                 </div>
-                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px;">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('rejectModal')">Batal</button>
                     <button type="submit" class="btn btn-danger"><i class="fas fa-times"></i> Tolak</button>
                 </div>
@@ -378,10 +378,10 @@
 
 <div class="modal fade" id="resetKuotaModal" tabindex="-1" style="display: none;">
     <div class="modal-dialog">
-        <div class="modal-content" style="background: white; border-radius: 12px; padding: 20px;">
+        <div class="modal-content" style="background: white; border-radius: 12px; padding: 14px;">
             <form id="resetKuotaForm">
                 @csrf
-                <div style="margin-bottom: 20px;">
+                <div style="margin-bottom: 14px;">
                     <h3 style="margin: 0; color: #2C3E50;">Reset Kuota Santri</h3>
                 </div>
                 <div style="padding: 15px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 6px; margin-bottom: 15px;">
@@ -394,7 +394,7 @@
                     <label>Catatan Reset (Opsional):</label>
                     <textarea name="catatan" class="form-control" rows="2" placeholder="Alasan reset kuota..."></textarea>
                 </div>
-                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px;">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('resetKuotaModal')">Batal</button>
                     <button type="submit" class="btn btn-warning"><i class="fas fa-sync-alt"></i> Reset Kuota</button>
                 </div>

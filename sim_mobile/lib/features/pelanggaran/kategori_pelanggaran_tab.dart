@@ -1,4 +1,4 @@
-// lib/features/pelanggaran/kategori_pelanggaran_tab.dart
+﻿// lib/features/pelanggaran/kategori_pelanggaran_tab.dart
 
 import 'package:flutter/material.dart';
 import '../../core/api/api_service.dart';
@@ -75,7 +75,7 @@ class _KategoriPelanggaranTabState extends State<KategoriPelanggaranTab> {
           if (_klasifikasiList.isNotEmpty)
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 12),
               color: Colors.white,
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
@@ -83,15 +83,15 @@ class _KategoriPelanggaranTabState extends State<KategoriPelanggaranTab> {
                   children: [
                     // Chip "Semua"
                     Padding(
-                      padding: const EdgeInsets.only(right: 8),
+                      padding: const EdgeInsets.only(right: 7),
                       child: FilterChip(
                         label: const Text('Semua'),
                         selected: _selectedKlasifikasi == null,
                         onSelected: (selected) {
                           if (selected) _filterByKlasifikasi(null);
                         },
-                        selectedColor: const Color(0xFF7C3AED).withValues(alpha: 0.2),
-                        checkmarkColor: const Color(0xFF7C3AED),
+                        selectedColor: const Color(0xFF6FBA9D).withValues(alpha: 0.2),
+                        checkmarkColor: const Color(0xFF6FBA9D),
                       ),
                     ),
                     
@@ -100,7 +100,7 @@ class _KategoriPelanggaranTabState extends State<KategoriPelanggaranTab> {
                       final isSelected = _selectedKlasifikasi == klasifikasi['id_klasifikasi'];
                       
                       return Padding(
-                        padding: const EdgeInsets.only(right: 8),
+                        padding: const EdgeInsets.only(right: 7),
                         child: FilterChip(
                           label: Text(klasifikasi['nama_klasifikasi'] ?? ''),
                           selected: isSelected,
@@ -109,8 +109,8 @@ class _KategoriPelanggaranTabState extends State<KategoriPelanggaranTab> {
                               _filterByKlasifikasi(klasifikasi['id_klasifikasi']);
                             }
                           },
-                          selectedColor: const Color(0xFF7C3AED).withValues(alpha: 0.2),
-                          checkmarkColor: const Color(0xFF7C3AED),
+                          selectedColor: const Color(0xFF6FBA9D).withValues(alpha: 0.2),
+                          checkmarkColor: const Color(0xFF6FBA9D),
                         ),
                       );
                     }),
@@ -128,7 +128,7 @@ class _KategoriPelanggaranTabState extends State<KategoriPelanggaranTab> {
                 : _kategoriList.isEmpty
                     ? _buildEmptyState()
                     : ListView.builder(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(12),
                         itemCount: _kategoriList.length,
                         itemBuilder: (context, index) {
                           final kategori = _kategoriList[index];
@@ -149,16 +149,16 @@ class _KategoriPelanggaranTabState extends State<KategoriPelanggaranTab> {
     final namaKlasifikasi = klasifikasi?['nama_klasifikasi'] ?? '';
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 9),
       elevation: 2,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(9),
       ),
       child: InkWell(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(9),
         onTap: () => _showDetailDialog(kategori),
         child: Padding(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(11),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -173,28 +173,28 @@ class _KategoriPelanggaranTabState extends State<KategoriPelanggaranTab> {
                         Text(
                           namaPelanggaran,
                           style: const TextStyle(
-                            fontSize: 15,
+                            fontSize: 11,
                             fontWeight: FontWeight.bold,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
                         if (namaKlasifikasi.isNotEmpty) ...[
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 2),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 3,
+                              horizontal: 7,
+                              vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF7C3AED).withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(4),
+                              color: const Color(0xFF6FBA9D).withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(2),
                             ),
                             child: Text(
                               namaKlasifikasi,
                               style: const TextStyle(
-                                fontSize: 11,
-                                color: Color(0xFF7C3AED),
+                                fontSize: 8,
+                                color: Color(0xFF6FBA9D),
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -203,29 +203,29 @@ class _KategoriPelanggaranTabState extends State<KategoriPelanggaranTab> {
                       ],
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 9),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
+                      horizontal: 8,
+                      vertical: 5,
                     ),
                     decoration: BoxDecoration(
                       color: Colors.red[100],
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(7),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const Icon(
                           Icons.star,
-                          size: 14,
+                          size: 11,
                           color: Colors.red,
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: 2),
                         Text(
                           '$poin',
                           style: const TextStyle(
-                            fontSize: 14,
+                            fontSize: 11,
                             fontWeight: FontWeight.bold,
                             color: Colors.red,
                           ),
@@ -238,12 +238,12 @@ class _KategoriPelanggaranTabState extends State<KategoriPelanggaranTab> {
 
               // Kafaroh Preview
               if (kafaroh != '-') ...[
-                const SizedBox(height: 10),
+                const SizedBox(height: 8),
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     color: Colors.orange[50],
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(7),
                     border: Border.all(
                       color: Colors.orange[200]!,
                       width: 1,
@@ -253,15 +253,15 @@ class _KategoriPelanggaranTabState extends State<KategoriPelanggaranTab> {
                     children: [
                       Icon(
                         Icons.info_outline,
-                        size: 16,
+                        size: 12,
                         color: Colors.orange[700],
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 7),
                       Expanded(
                         child: Text(
                           kafaroh,
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 9,
                             color: Colors.grey[700],
                           ),
                           maxLines: 2,
@@ -274,11 +274,11 @@ class _KategoriPelanggaranTabState extends State<KategoriPelanggaranTab> {
               ],
 
               // Tap untuk detail
-              const SizedBox(height: 8),
+              const SizedBox(height: 7),
               Text(
                 'Tap untuk detail',
                 style: TextStyle(
-                  fontSize: 11,
+                  fontSize: 8,
                   color: Colors.grey[500],
                   fontStyle: FontStyle.italic,
                 ),
@@ -300,27 +300,27 @@ class _KategoriPelanggaranTabState extends State<KategoriPelanggaranTab> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               namaPelanggaran,
-              style: const TextStyle(fontSize: 17),
+              style: const TextStyle(fontSize: 13),
             ),
             if (namaKlasifikasi.isNotEmpty) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: 7),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF7C3AED).withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(6),
+                  color: const Color(0xFF6FBA9D).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(5),
                 ),
                 child: Text(
                   namaKlasifikasi,
                   style: const TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF7C3AED),
+                    fontSize: 9,
+                    color: Color(0xFF6FBA9D),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -340,20 +340,20 @@ class _KategoriPelanggaranTabState extends State<KategoriPelanggaranTab> {
                     'Poin Pelanggaran:',
                     style: TextStyle(fontWeight: FontWeight.w600),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 7),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 4,
+                      horizontal: 9,
+                      vertical: 2,
                     ),
                     decoration: BoxDecoration(
                       color: Colors.red[100],
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(7),
                     ),
                     child: Text(
                       '$poin Poin',
                       style: const TextStyle(
-                        fontSize: 14,
+                        fontSize: 11,
                         fontWeight: FontWeight.bold,
                         color: Colors.red,
                       ),
@@ -361,29 +361,29 @@ class _KategoriPelanggaranTabState extends State<KategoriPelanggaranTab> {
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
 
               // Kafaroh
               const Text(
                 'Kafaroh / Taqorrub:',
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
-                  fontSize: 14,
+                  fontSize: 11,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 7),
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(9),
                 decoration: BoxDecoration(
                   color: Colors.orange[50],
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(7),
                   border: Border.all(color: Colors.orange[200]!),
                 ),
                 child: Text(
                   kafaroh,
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: 11,
                     color: Colors.grey[800],
                     height: 1.5,
                   ),
@@ -409,14 +409,14 @@ class _KategoriPelanggaranTabState extends State<KategoriPelanggaranTab> {
         children: [
           Icon(
             Icons.warning_amber_outlined,
-            size: 80,
+            size: 60,
             color: Colors.grey[400],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           Text(
             'Tidak ada data kategori pelanggaran',
             style: TextStyle(
-              fontSize: 15,
+              fontSize: 11,
               color: Colors.grey[600],
             ),
           ),

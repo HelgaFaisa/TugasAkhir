@@ -13,13 +13,13 @@ class KepulanganCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 2,
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(9),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -30,26 +30,26 @@ class KepulanganCard extends StatelessWidget {
                   _buildStatusBadge(),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
+                      horizontal: 9,
+                      vertical: 5,
                     ),
                     decoration: BoxDecoration(
                       color: Colors.blue.shade50,
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
                       children: [
                         Icon(
                           Icons.access_time,
-                          size: 14,
+                          size: 11,
                           color: Colors.blue.shade700,
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: 2),
                         Text(
                           '${kepulangan.durasiIzin} hari',
                           style: TextStyle(
                             color: Colors.blue.shade700,
-                            fontSize: 12,
+                            fontSize: 9,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -59,23 +59,23 @@ class KepulanganCard extends StatelessWidget {
                 ],
               ),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: 9),
 
               // Tanggal Pulang - Kembali
               Row(
                 children: [
                   Icon(
                     Icons.calendar_today,
-                    size: 16,
+                    size: 12,
                     color: Colors.grey.shade600,
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 7),
                   Expanded(
                     child: Text(
                       '${kepulangan.tanggalPulangFormatted} - ${kepulangan.tanggalKembaliFormatted}',
                       style: TextStyle(
                         color: Colors.grey.shade800,
-                        fontSize: 14,
+                        fontSize: 11,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -83,20 +83,20 @@ class KepulanganCard extends StatelessWidget {
                 ],
               ),
 
-              const SizedBox(height: 8),
+              const SizedBox(height: 7),
 
               // Alasan
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.subject, size: 16, color: Colors.grey.shade600),
-                  const SizedBox(width: 8),
+                  Icon(Icons.subject, size: 12, color: Colors.grey.shade600),
+                  const SizedBox(width: 7),
                   Expanded(
                     child: Text(
                       kepulangan.alasan,
                       style: TextStyle(
                         color: Colors.grey.shade700,
-                        fontSize: 13,
+                        fontSize: 11,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -108,12 +108,12 @@ class KepulanganCard extends StatelessWidget {
               // Catatan (jika ada)
               if (kepulangan.catatan != null &&
                   kepulangan.catatan!.isNotEmpty) ...[
-                const SizedBox(height: 8),
+                const SizedBox(height: 7),
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(7),
                   decoration: BoxDecoration(
                     color: Colors.amber.shade50,
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(7),
                     border: Border.all(color: Colors.amber.shade200),
                   ),
                   child: Row(
@@ -121,16 +121,16 @@ class KepulanganCard extends StatelessWidget {
                     children: [
                       Icon(
                         Icons.info_outline,
-                        size: 14,
+                        size: 11,
                         color: Colors.amber.shade800,
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 5),
                       Expanded(
                         child: Text(
                           kepulangan.catatan!,
                           style: TextStyle(
                             color: Colors.amber.shade900,
-                            fontSize: 12,
+                            fontSize: 9,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -143,7 +143,7 @@ class KepulanganCard extends StatelessWidget {
 
               // Indicators (Aktif / Terlambat)
               if (kepulangan.isAktif || kepulangan.isTerlambat) ...[
-                const SizedBox(height: 8),
+                const SizedBox(height: 7),
                 Wrap(
                   spacing: 8,
                   children: [
@@ -166,10 +166,10 @@ class KepulanganCard extends StatelessWidget {
               // Approved date (jika sudah disetujui)
               if (kepulangan.status == 'Disetujui' &&
                   kepulangan.approvedAtFormatted != null) ...[
-                const SizedBox(height: 8),
+                const SizedBox(height: 7),
                 Text(
                   'Disetujui: ${kepulangan.approvedAtFormatted}',
-                  style: TextStyle(color: Colors.grey.shade500, fontSize: 11),
+                  style: TextStyle(color: Colors.grey.shade500, fontSize: 8),
                 ),
               ],
             ],
@@ -212,21 +212,21 @@ class KepulanganCard extends StatelessWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: textColor),
-          const SizedBox(width: 4),
+          Icon(icon, size: 11, color: textColor),
+          const SizedBox(width: 2),
           Text(
             kepulangan.status,
             style: TextStyle(
               color: textColor,
-              fontSize: 12,
+              fontSize: 9,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -237,22 +237,22 @@ class KepulanganCard extends StatelessWidget {
 
   Widget _buildIndicatorChip(String label, IconData icon, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(9),
         border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 12, color: color),
-          const SizedBox(width: 4),
+          Icon(icon, size: 9, color: color),
+          const SizedBox(width: 2),
           Text(
             label,
             style: TextStyle(
               color: color,
-              fontSize: 11,
+              fontSize: 8,
               fontWeight: FontWeight.w600,
             ),
           ),

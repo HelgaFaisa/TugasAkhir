@@ -16,7 +16,7 @@ class ApiSppController extends Controller
     public function statusBulanIni(Request $request)
     {
         try {
-            $idSantri = $request->user()->role_id;
+            $idSantri = $request->user()->id_santri;
             $bulanIni = date('n');
             $tahunIni = date('Y');
             
@@ -67,7 +67,7 @@ class ApiSppController extends Controller
     public function tunggakan(Request $request)
     {
         try {
-            $idSantri = $request->user()->role_id;
+            $idSantri = $request->user()->id_santri;
             
             // Hitung tunggakan
             $tunggakanList = PembayaranSpp::where('id_santri', $idSantri)
@@ -104,7 +104,7 @@ class ApiSppController extends Controller
     public function riwayat(Request $request)
     {
         try {
-            $idSantri = $request->user()->role_id;
+            $idSantri = $request->user()->id_santri;
             
             // Query riwayat
             $query = PembayaranSpp::where('id_santri', $idSantri)
@@ -174,7 +174,7 @@ class ApiSppController extends Controller
     public function statistik(Request $request)
     {
         try {
-            $idSantri = $request->user()->role_id;
+            $idSantri = $request->user()->id_santri;
             
             $totalLunas = PembayaranSpp::where('id_santri', $idSantri)
                 ->where('status', 'Lunas')

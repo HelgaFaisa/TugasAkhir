@@ -15,7 +15,7 @@
 @endphp
 
 @if($pendingPengajuan > 0)
-    <div class="alert alert-warning" style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px; background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%); border: none; color: #000;">
+    <div class="alert alert-warning" style="display: flex; align-items: center; gap: 11px; margin-bottom: 14px; background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%); border: none; color: #000;">
         <i class="fas fa-bell" style="font-size: 2rem;"></i>
         <div style="flex: 1;">
             <strong style="font-size: 1.1rem;">Ada {{ $pendingPengajuan }} pengajuan kepulangan dari mobile yang menunggu review!</strong>
@@ -28,20 +28,20 @@
 @endif
 
 {{-- Info Periode Kuota --}}
-<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; align-items: center;">
+<div style="background: linear-gradient(135deg, #6FBA9D 0%, #89cdb3 100%); color: white; padding: 14px; border-radius: 12px; margin-bottom: 14px;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; align-items: center;">
         <div>
-            <h4 style="margin: 0 0 5px 0; opacity: 0.9;">📅 Periode Kuota</h4>
+            <h4 style="margin: 0 0 5px 0; opacity: 0.9;"> Periode Kuota</h4>
             <p style="margin: 0; font-size: 1.1rem; font-weight: 600;">
                 {{ $settings->periode_mulai->format('d M Y') }} - {{ $settings->periode_akhir->format('d M Y') }}
             </p>
         </div>
         <div>
-            <h4 style="margin: 0 0 5px 0; opacity: 0.9;">📊 Kuota Maksimal</h4>
+            <h4 style="margin: 0 0 5px 0; opacity: 0.9;"> Kuota Maksimal</h4>
             <p style="margin: 0; font-size: 1.1rem; font-weight: 600;">{{ $settings->kuota_maksimal }} Hari / Tahun</p>
         </div>
         <div>
-            <h4 style="margin: 0 0 5px 0; opacity: 0.9;">🔄 Terakhir Reset</h4>
+            <h4 style="margin: 0 0 5px 0; opacity: 0.9;"> Terakhir Reset</h4>
             <p style="margin: 0; font-size: 1.1rem; font-weight: 600;">
                 {{ $settings->terakhir_reset ? $settings->terakhir_reset->format('d M Y') : 'Belum Pernah' }}
             </p>
@@ -99,7 +99,7 @@
 {{-- Main Content --}}
 <div class="content-box">
     {{-- Header Actions --}}
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 11px;">
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
             <a href="{{ route('admin.kepulangan.create') }}" class="btn btn-primary">
                 <i class="fas fa-plus"></i> Tambah Izin Kepulangan
@@ -118,8 +118,8 @@
     </div>
 
     {{-- Filter Section --}}
-    <form method="GET" action="{{ route('admin.kepulangan.index') }}" id="filterForm" style="margin-bottom: 20px;">
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; align-items: end;">
+    <form method="GET" action="{{ route('admin.kepulangan.index') }}" id="filterForm" style="margin-bottom: 14px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 11px; align-items: end;">
             <div class="form-group" style="margin-bottom: 0;">
                 <input type="text" 
                        name="search" 
@@ -259,9 +259,9 @@
                                 {{ $item->status }}
                             </span>
                             @if($item->is_aktif)
-                                <br><small style="color: #28a745; font-weight: 600;">🏠 Sedang Izin</small>
+                                <br><small style="color: #28a745; font-weight: 600;">Sedang Izin</small>
                             @elseif($item->is_terlambat)
-                                <br><small style="color: #dc3545; font-weight: 600;">⏰ Terlambat</small>
+                                <br><small style="color: #dc3545; font-weight: 600;">Terlambat</small>
                             @endif
                         </td>
                         <td class="text-center">
@@ -317,8 +317,8 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="9" style="text-align: center; padding: 40px;">
-                            <i class="fas fa-inbox" style="font-size: 3rem; color: #ccc; margin-bottom: 15px;"></i>
+                        <td colspan="9" style="text-align: center; padding: 22px;">
+                            <i class="fas fa-inbox" style="font-size: 2.2rem; color: #ccc; margin-bottom: 15px;"></i>
                             <p style="color: #7F8C8D;">Tidak ada data kepulangan ditemukan</p>
                         </td>
                     </tr>
@@ -329,7 +329,7 @@
 
     {{-- Pagination --}}
     @if($kepulangan->hasPages())
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; flex-wrap: wrap; gap: 15px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; flex-wrap: wrap; gap: 11px;">
             <div>
                 Menampilkan {{ $kepulangan->firstItem() ?? 0 }} - {{ $kepulangan->lastItem() ?? 0 }} 
                 dari {{ $kepulangan->total() }} data
@@ -344,10 +344,10 @@
 {{-- Modal Approve --}}
 <div class="modal fade" id="approveModal" tabindex="-1" style="display: none;">
     <div class="modal-dialog">
-        <div class="modal-content" style="background: white; border-radius: 12px; padding: 20px;">
+        <div class="modal-content" style="background: white; border-radius: 12px; padding: 14px;">
             <form id="approveForm">
                 @csrf
-                <div style="margin-bottom: 20px;">
+                <div style="margin-bottom: 14px;">
                     <h3 style="margin: 0; color: #2C3E50;">Setujui Izin Kepulangan</h3>
                 </div>
                 <div class="form-group">
@@ -355,7 +355,7 @@
                     <textarea name="catatan" class="form-control" rows="3" 
                               placeholder="Tambahkan catatan untuk persetujuan ini..."></textarea>
                 </div>
-                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px;">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('approveModal')">Batal</button>
                     <button type="submit" class="btn btn-success">
                         <i class="fas fa-check"></i> Setujui
@@ -369,10 +369,10 @@
 {{-- Modal Reject --}}
 <div class="modal fade" id="rejectModal" tabindex="-1" style="display: none;">
     <div class="modal-dialog">
-        <div class="modal-content" style="background: white; border-radius: 12px; padding: 20px;">
+        <div class="modal-content" style="background: white; border-radius: 12px; padding: 14px;">
             <form id="rejectForm">
                 @csrf
-                <div style="margin-bottom: 20px;">
+                <div style="margin-bottom: 14px;">
                     <h3 style="margin: 0; color: #2C3E50;">Tolak Izin Kepulangan</h3>
                 </div>
                 <div class="form-group">
@@ -380,7 +380,7 @@
                     <textarea name="alasan_penolakan" class="form-control" rows="3" 
                               placeholder="Jelaskan alasan penolakan..." required></textarea>
                 </div>
-                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px;">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('rejectModal')">Batal</button>
                     <button type="submit" class="btn btn-danger">
                         <i class="fas fa-times"></i> Tolak
@@ -394,13 +394,13 @@
 {{-- Modal Delete --}}
 <div class="modal fade" id="deleteModal" tabindex="-1" style="display: none;">
     <div class="modal-dialog">
-        <div class="modal-content" style="background: white; border-radius: 12px; padding: 20px;">
-            <div style="margin-bottom: 20px;">
+        <div class="modal-content" style="background: white; border-radius: 12px; padding: 14px;">
+            <div style="margin-bottom: 14px;">
                 <h3 style="margin: 0; color: #2C3E50;">Konfirmasi Hapus</h3>
             </div>
             <p>Apakah Anda yakin ingin menghapus data kepulangan ini?</p>
             <p style="color: #dc3545; font-size: 0.9rem;">Data yang sudah dihapus tidak dapat dikembalikan.</p>
-            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px;">
                 <button type="button" class="btn btn-secondary" onclick="closeModal('deleteModal')">Batal</button>
                 <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
                     <i class="fas fa-trash"></i> Hapus
@@ -413,17 +413,17 @@
 {{-- Modal Complete (Selesaikan Kepulangan) --}}
 <div class="modal fade" id="completeModal" tabindex="-1" style="display: none;">
     <div class="modal-dialog">
-        <div class="modal-content" style="background: white; border-radius: 12px; padding: 20px;">
+        <div class="modal-content" style="background: white; border-radius: 12px; padding: 14px;">
             <form id="completeForm">
                 @csrf
-                <div style="margin-bottom: 20px;">
+                <div style="margin-bottom: 14px;">
                     <h3 style="margin: 0; color: #2C3E50;">
                         <i class="fas fa-check-circle" style="color: #28a745;"></i> 
                         Selesaikan Kepulangan
                     </h3>
                 </div>
                 
-                <div style="background: #E8F7F2; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #6FBA9D;">
+                <div style="background: #E8F7F2; padding: 15px; border-radius: 8px; margin-bottom: 14px; border-left: 4px solid #6FBA9D;">
                     <p style="margin: 5px 0;"><strong>ID Kepulangan:</strong> <span id="completeIdKepulangan"></span></p>
                     <p style="margin: 5px 0;"><strong>Santri:</strong> <span id="completeNamaSantri"></span></p>
                     <p style="margin: 5px 0;"><strong>Tanggal Pulang:</strong> <span id="completeTanggalPulang"></span></p>
@@ -446,12 +446,12 @@
                     </small>
                 </div>
 
-                <div id="durasiAktualInfo" style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #007bff; display: none;">
+                <div id="durasiAktualInfo" style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 14px; border-left: 4px solid #007bff; display: none;">
                     <p style="margin: 0;"><strong>Durasi Aktual:</strong> <span id="durasiAktual" style="font-weight: 600; color: #007bff;">-</span> hari</p>
                     <p style="margin: 5px 0 0 0; font-size: 0.9rem; color: #7F8C8D;" id="selisihInfo"></p>
                 </div>
 
-                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px;">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('completeModal')">Batal</button>
                     <button type="submit" class="btn btn-success">
                         <i class="fas fa-check"></i> Selesaikan
@@ -618,14 +618,14 @@ function calculateDurasiAktual() {
     
     if (durasiAktual < durasiRencana) {
         const selisih = durasiRencana - durasiAktual;
-        selisihText = `✅ Santri pulang ${selisih} hari lebih cepat dari rencana. Kuota akan berkurang ${durasiAktual} hari.`;
+        selisihText = `âœ… Santri pulang ${selisih} hari lebih cepat dari rencana. Kuota akan berkurang ${durasiAktual} hari.`;
         selisihColor = '#28a745';
     } else if (durasiAktual > durasiRencana) {
         const selisih = durasiAktual - durasiRencana;
-        selisihText = `⚠️ Santri pulang ${selisih} hari lebih lambat dari rencana. Kuota akan bertambah ${selisih} hari.`;
+        selisihText = `âš ï¸ Santri pulang ${selisih} hari lebih lambat dari rencana. Kuota akan bertambah ${selisih} hari.`;
         selisihColor = '#ffc107';
     } else {
-        selisihText = `✓ Sesuai rencana (${durasiAktual} hari).`;
+        selisihText = `âœ“ Sesuai rencana (${durasiAktual} hari).`;
         selisihColor = '#007bff';
     }
     

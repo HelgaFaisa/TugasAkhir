@@ -1,4 +1,5 @@
 <?php
+// app/Http/Controllers/Santri/SantriBeritaController.php
 
 namespace App\Http\Controllers\Santri;
 
@@ -7,22 +8,27 @@ use App\Models\Berita;
 use App\Models\Santri;
 use App\Models\SantriKelas;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class SantriBeritaController extends Controller
 {
+    // -- Helper: Ambil id_santri dari akun yang login --
+    private function getSantriId()
+    {
+        return auth('santri')->user()->id_santri;
+    }
+
     /**
      * Tampilkan daftar berita yang bisa diakses santri
      */
     public function index(Request $request)
     {
-        $user = Auth::user();
+        $idSantri = $this->getSantriId();
 
-        $santri = Santri::where('id_santri', $user->role_id)
+        $santri = Santri::where('id_santri', $idSantri)
             ->select('id_santri')
             ->firstOrFail();
 
-        // Ambil id kelas santri
+        // -- Ambil id kelas santri --
         $kelasIds = SantriKelas::where('id_santri', $santri->id_santri)
             ->pluck('id_kelas')->toArray();
 
@@ -52,9 +58,9 @@ class SantriBeritaController extends Controller
      */
     public function show($id_berita)
     {
-        $user = Auth::user();
+        $idSantri = $this->getSantriId();
 
-        $santri = Santri::where('id_santri', $user->role_id)
+        $santri = Santri::where('id_santri', $idSantri)
             ->select('id_santri')
             ->firstOrFail();
 

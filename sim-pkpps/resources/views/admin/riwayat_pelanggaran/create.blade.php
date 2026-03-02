@@ -80,7 +80,7 @@
             @enderror
         </div>
 
-        <div id="info-pelanggaran" style="display: none; background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid var(--warning-color);">
+        <div id="info-pelanggaran" style="display: none; background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 14px; border-left: 4px solid var(--warning-color);">
             <h4 style="margin: 0 0 10px 0; color: var(--warning-color);">
                 <i class="fas fa-info-circle"></i> Informasi Pelanggaran
             </h4>
@@ -131,7 +131,7 @@
             @enderror
         </div>
 
-        <div class="btn-group" style="margin-top: 30px;">
+        <div class="btn-group" style="margin-top: 22px;">
             <button type="submit" class="btn btn-primary">
                 <i class="fas fa-save"></i> Simpan
             </button>

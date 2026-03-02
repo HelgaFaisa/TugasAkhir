@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\AbsensiKegiatan;
 use App\Models\Kegiatan;
+use App\Models\Kelas;
+use App\Models\Kepulangan;
 use App\Models\Santri;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -12,49 +14,11 @@ use Illuminate\Support\Facades\DB;
 class AbsensiKegiatanController extends Controller
 {
     /**
-     * Daftar kegiatan untuk absensi
+     * Daftar kegiatan untuk absensi — diarahkan ke Dashboard Kegiatan (tidak redundan)
      */
     public function index(Request $request)
     {
-        // Query dengan eager loading untuk optimasi
-        $query = Kegiatan::with(['kategori', 'kelasKegiatan'])
-            ->select('id', 'kegiatan_id', 'kategori_id', 'nama_kegiatan', 'hari', 'waktu_mulai', 'waktu_selesai');
-
-        // Filter Hari
-        if ($request->filled('hari')) {
-            $query->where('hari', $request->hari);
-        }
-
-        // Filter Kategori
-        if ($request->filled('kategori_id')) {
-            $query->where('kategori_id', $request->kategori_id);
-        }
-
-        // Filter Kelas
-        if ($request->filled('id_kelas')) {
-            $query->whereHas('kelasKegiatan', function($q) use ($request) {
-                $q->where('kelas.id', $request->id_kelas);
-            });
-        }
-
-        // Search
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('nama_kegiatan', 'like', "%{$search}%")
-                  ->orWhere('kegiatan_id', 'like', "%{$search}%");
-            });
-        }
-
-        // Pagination dengan 15 item per page
-        $kegiatans = $query->orderBy('hari')->orderBy('waktu_mulai')->paginate(15)->appends(request()->query());
-        
-        // Data untuk filter
-        $hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Ahad'];
-        $kategoris = \App\Models\KategoriKegiatan::select('kategori_id', 'nama_kategori')->get();
-        $kelasList = \App\Models\Kelas::with('kelompok')->orderBy('urutan')->get();
-
-        return view('admin.kegiatan.absensi.index', compact('kegiatans', 'hariList', 'kategoris', 'kelasList'));
+        return redirect()->route('admin.kegiatan.jadwal');
     }
 
     /**
@@ -63,47 +27,57 @@ class AbsensiKegiatanController extends Controller
     public function inputAbsensi($kegiatan_id)
     {
         // Get kegiatan dengan relasi kategori dan kelas
-        $kegiatan = Kegiatan::with(['kategori', 'kelasKegiatan'])
+        $kegiatan = Kegiatan::with(['kategori', 'kelasKegiatan.kelompok'])
             ->where('kegiatan_id', $kegiatan_id)
             ->firstOrFail();
             
         $tanggal = request('tanggal', now()->format('Y-m-d'));
         
-        // Get santri sesuai kelas kegiatan
+        // Build santri grouped by kegiatan kelas
+        $santriGrouped = collect();
+        
         if ($kegiatan->isForAllClasses()) {
-            // Kegiatan umum: ambil SEMUA santri aktif
-            $santris = Santri::where('status', 'Aktif')
-                ->with('kelasSantri.kelas')
+            // Kegiatan umum: ambil SEMUA santri aktif, group by primary kelas
+            $allSantris = Santri::where('status', 'Aktif')
+                ->with(['kelasSantri.kelas', 'kelasPrimary.kelas'])
                 ->orderBy('nama_lengkap')
                 ->get();
+            
+            $santriGrouped = $allSantris->groupBy(function($s) {
+                $primary = $s->kelasPrimary;
+                return $primary && $primary->kelas ? $primary->kelas->nama_kelas : 'Tanpa Kelas';
+            })->sortKeys();
         } else {
-            // Kegiatan khusus: ambil santri yang kelasnya match
-            $kelasIds = $kegiatan->kelasKegiatan->pluck('id')->toArray();
-            
-            // Coba ambil santri dari sistem kelas baru
-            $santris = Santri::where('status', 'Aktif')
-                ->whereHas('kelasSantri', function($query) use ($kelasIds) {
-                    $query->whereIn('id_kelas', $kelasIds);
-                })
-                ->with('kelasSantri.kelas')
-                ->orderBy('nama_lengkap')
-                ->get();
-            
-            // Fallback: Jika tidak ada santri (belum migrasi), gunakan old column kelas
-            if ($santris->isEmpty()) {
-                $kelasNames = $kegiatan->kelasKegiatan->pluck('nama_kelas')->toArray();
-                $santris = Santri::where('status', 'Aktif')
-                    ->whereIn('kelas', $kelasNames)
-                    ->with('kelasSantri.kelas')
+            // Kegiatan khusus: group by kegiatan kelas
+            foreach ($kegiatan->kelasKegiatan as $kelas) {
+                $santriInKelas = Santri::where('status', 'Aktif')
+                    ->whereHas('kelasSantri', function($q) use ($kelas) {
+                        $q->where('id_kelas', $kelas->id);
+                    })
+                    ->with(['kelasSantri.kelas', 'kelasPrimary.kelas'])
                     ->orderBy('nama_lengkap')
                     ->get();
+                
+                if ($santriInKelas->count() > 0) {
+                    $santriGrouped[$kelas->nama_kelas] = $santriInKelas;
+                }
             }
         }
+        
+        // Flatten for total count
+        $santris = $santriGrouped->flatten()->unique('id_santri');
 
         // Ambil data absensi yang sudah ada
         $absensiData = AbsensiKegiatan::where('kegiatan_id', $kegiatan_id)
             ->whereDate('tanggal', $tanggal)
             ->pluck('status', 'id_santri')
+            ->toArray();
+
+        // Cek santri yang sedang pulang
+        $santriSedangPulang = Kepulangan::where('status', 'Disetujui')
+            ->where('tanggal_pulang', '<=', $tanggal)
+            ->where('tanggal_kembali', '>=', $tanggal)
+            ->pluck('id_santri')
             ->toArray();
 
         // Info kelas kegiatan untuk view
@@ -113,24 +87,42 @@ class AbsensiKegiatanController extends Controller
             'jumlah_kelas' => $kegiatan->kelasKegiatan->count(),
         ];
 
-        return view('admin.kegiatan.absensi.input', compact('kegiatan', 'santris', 'absensiData', 'tanggal', 'kegiatanInfo'));
+        return view('admin.kegiatan.absensi.input', compact('kegiatan', 'santris', 'santriGrouped', 'absensiData', 'tanggal', 'kegiatanInfo', 'santriSedangPulang'));
     }
 
     /**
-     * Simpan absensi manual
+     * Simpan absensi manual (hanya santri yang dikirim form)
      */
     public function simpanAbsensi(Request $request)
     {
         $validated = $request->validate([
             'kegiatan_id' => 'required|exists:kegiatans,kegiatan_id',
             'tanggal' => 'required|date',
-            'absensi' => 'required|array',
-            'absensi.*' => 'required|in:Hadir,Izin,Sakit,Alpa',
+            'absensi' => 'nullable|array',
+            'absensi.*' => 'nullable|in:Hadir,Izin,Sakit,Alpa,Terlambat,Pulang',
         ]);
+
+        // Cek santri yang sedang pulang
+        $santriSedangPulang = Kepulangan::where('status', 'Disetujui')
+            ->where('tanggal_pulang', '<=', $request->tanggal)
+            ->where('tanggal_kembali', '>=', $request->tanggal)
+            ->pluck('id_santri')
+            ->toArray();
+
+        $absensiInput = $request->absensi ?? [];
 
         DB::beginTransaction();
         try {
-            foreach ($request->absensi as $id_santri => $status) {
+            $saved = 0;
+            foreach ($absensiInput as $id_santri => $status) {
+                // Skip jika kosong (santri dilewati)
+                if (empty($status)) {
+                    continue;
+                }
+
+                // Paksa status Pulang untuk santri yang sedang pulang
+                $finalStatus = in_array($id_santri, $santriSedangPulang) ? 'Pulang' : $status;
+
                 AbsensiKegiatan::updateOrCreate(
                     [
                         'kegiatan_id' => $request->kegiatan_id,
@@ -138,20 +130,64 @@ class AbsensiKegiatanController extends Controller
                         'tanggal' => $request->tanggal,
                     ],
                     [
-                        'status' => $status,
+                        'status' => $finalStatus,
                         'metode_absen' => 'Manual',
                         'waktu_absen' => now()->format('H:i:s'),
                     ]
                 );
+                $saved++;
             }
 
             DB::commit();
-            return redirect()->route('admin.absensi-kegiatan.index')
-                ->with('success', 'Absensi berhasil disimpan.');
+            return redirect()->route('admin.kegiatan.index')
+                ->with('success', "Absensi berhasil disimpan ({$saved} santri).");
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Gagal menyimpan absensi: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Edit single absensi record
+     */
+    public function editAbsensi($id)
+    {
+        $absensi = AbsensiKegiatan::with(['santri', 'kegiatan.kategori'])->findOrFail($id);
+        return view('admin.kegiatan.absensi.edit', compact('absensi'));
+    }
+
+    /**
+     * Update single absensi record
+     */
+    public function updateAbsensi(Request $request, $id)
+    {
+        $absensi = AbsensiKegiatan::findOrFail($id);
+
+        $validated = $request->validate([
+            'status' => 'required|in:Hadir,Izin,Sakit,Alpa,Terlambat,Pulang',
+        ]);
+
+        $absensi->update([
+            'status' => $validated['status'],
+            'waktu_absen' => now()->format('H:i:s'),
+        ]);
+
+        return redirect()->route('admin.absensi-kegiatan.rekap', $absensi->kegiatan_id)
+            ->with('success', 'Status absensi ' . $absensi->santri->nama_lengkap . ' berhasil diperbarui.');
+    }
+
+    /**
+     * Hapus single absensi record
+     */
+    public function hapusAbsensi($id)
+    {
+        $absensi = AbsensiKegiatan::findOrFail($id);
+        $kegiatanId = $absensi->kegiatan_id;
+        $nama = $absensi->santri->nama_lengkap;
+        $absensi->delete();
+
+        return redirect()->route('admin.absensi-kegiatan.rekap', $kegiatanId)
+            ->with('success', 'Data absensi ' . $nama . ' berhasil dihapus.');
     }
 
     /**
@@ -161,7 +197,7 @@ class AbsensiKegiatanController extends Controller
     {
         $kegiatan = Kegiatan::with(['kategori', 'kelasKegiatan'])->where('kegiatan_id', $kegiatan_id)->firstOrFail();
         
-        $query = AbsensiKegiatan::with('santri')
+        $query = AbsensiKegiatan::with(['santri.kelasSantri.kelas'])
             ->where('kegiatan_id', $kegiatan_id);
 
         // Filter tanggal
@@ -175,18 +211,61 @@ class AbsensiKegiatanController extends Controller
                   ->whereYear('tanggal', date('Y', strtotime($request->bulan)));
         }
 
+        // Filter kelas
+        if ($request->filled('kelas_id')) {
+            $query->whereHas('santri.kelasSantri', function($q) use ($request) {
+                $q->where('id_kelas', $request->kelas_id);
+            });
+        }
+
         $absensis = $query->orderBy('tanggal', 'desc')
             ->orderBy('waktu_absen', 'desc')
-            ->paginate(20);
+            ->get();
+
+        // Build kelas list for filter dropdown
+        if ($kegiatan->isForAllClasses()) {
+            $kelasFilterList = Kelas::active()->ordered()->get();
+        } else {
+            $kelasFilterList = $kegiatan->kelasKegiatan;
+        }
+
+        // Grup per kelas berdasarkan kegiatan kelas
+        if ($kegiatan->isForAllClasses()) {
+            $absensiPerKelas = $absensis->groupBy(function ($item) {
+                return $item->santri->kelas_name ?? 'Belum Ada Kelas';
+            })->sortKeys();
+        } else {
+            $absensiPerKelas = collect();
+            foreach ($kegiatan->kelasKegiatan as $kelas) {
+                $kelasAbsensis = $absensis->filter(function ($item) use ($kelas) {
+                    return $item->santri->kelasSantri->contains('id_kelas', $kelas->id);
+                });
+                if ($kelasAbsensis->count() > 0) {
+                    $absensiPerKelas[$kelas->nama_kelas] = $kelasAbsensis;
+                }
+            }
+        }
 
         // Statistik
-        $stats = AbsensiKegiatan::where('kegiatan_id', $kegiatan_id)
-            ->select('status', DB::raw('count(*) as total'))
+        $statsQuery = AbsensiKegiatan::where('kegiatan_id', $kegiatan_id);
+        if ($request->filled('tanggal')) {
+            $statsQuery->whereDate('tanggal', $request->tanggal);
+        }
+        if ($request->filled('bulan')) {
+            $statsQuery->whereMonth('tanggal', date('m', strtotime($request->bulan)))
+                       ->whereYear('tanggal', date('Y', strtotime($request->bulan)));
+        }
+        if ($request->filled('kelas_id')) {
+            $statsQuery->whereHas('santri.kelasSantri', function($q) use ($request) {
+                $q->where('id_kelas', $request->kelas_id);
+            });
+        }
+        $stats = $statsQuery->select('status', DB::raw('count(*) as total'))
             ->groupBy('status')
             ->pluck('total', 'status')
             ->toArray();
 
-        return view('admin.kegiatan.absensi.rekap', compact('kegiatan', 'absensis', 'stats'));
+        return view('admin.kegiatan.absensi.rekap', compact('kegiatan', 'absensis', 'absensiPerKelas', 'stats', 'kelasFilterList'));
     }
 
     /**

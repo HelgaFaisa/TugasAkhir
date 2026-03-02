@@ -43,7 +43,7 @@
 </div>
 
 {{-- Filter Form --}}
-<div class="content-box" style="margin-top: 20px;">
+<div class="content-box" style="margin-top: 14px;">
     <form method="GET" action="{{ route('santri.uang-saku.index') }}" class="filter-form-inline">
         <input type="text" name="search" class="form-control" placeholder="Cari keterangan..." value="{{ request('search') }}" style="min-width: 200px;">
         
@@ -68,7 +68,7 @@
 </div>
 
 {{-- Tabel Riwayat --}}
-<div class="table-container" style="margin-top: 20px;">
+<div class="table-container" style="margin-top: 14px;">
     @if($riwayatUangSaku->count() > 0)
         <table class="data-table">
             <thead>
@@ -116,7 +116,7 @@
         </table>
         
         {{-- Pagination --}}
-        <div style="margin-top: 20px;">
+        <div style="margin-top: 14px;">
             {{ $riwayatUangSaku->links() }}
         </div>
     @else

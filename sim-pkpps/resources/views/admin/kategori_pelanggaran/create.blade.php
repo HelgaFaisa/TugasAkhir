@@ -3,6 +3,9 @@
 @section('title', 'Tambah Pelanggaran')
 
 @section('content')
+{{-- Select2 CSS --}}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+
 <div class="page-header">
     <h2><i class="fas fa-plus-circle"></i> Tambah Pelanggaran</h2>
 </div>
@@ -87,7 +90,7 @@
                       id="kafaroh"
                       class="form-control @error('kafaroh') is-invalid @enderror"
                       rows="6"
-                      placeholder="Contoh: Membaca Al-Qur'an 1 juz, Sholat tahajud 2 rakaat, dll...">{{ old('kafaroh') }}</textarea>
+                      placeholder="Contoh: Bangunan, Sholat tasbih, dll...">{{ old('kafaroh') }}</textarea>
             @error('kafaroh')
                 <span class="invalid-feedback">{{ $message }}</span>
             @enderror
@@ -111,7 +114,7 @@
             </div>
         </div>
 
-        <div class="btn-group" style="margin-top: 30px;">
+        <div class="btn-group" style="margin-top: 22px;">
             <button type="submit" class="btn btn-primary">
                 <i class="fas fa-save"></i> Simpan
             </button>
@@ -121,4 +124,16 @@
         </div>
     </form>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#id_klasifikasi').select2({
+        placeholder: '-- Pilih Klasifikasi --',
+        allowClear: true,
+        width: '100%'
+    });
+});
+</script>
 @endsection

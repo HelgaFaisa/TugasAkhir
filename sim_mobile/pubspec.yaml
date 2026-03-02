@@ -37,6 +37,7 @@ dependencies:
   provider: ^6.1.1
   fl_chart: ^0.69.0
   flutter_widget_from_html_core: ^0.15.2
+  google_fonts: ^6.1.0
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -64,6 +65,9 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  assets:
+    - assets/images/logo.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:

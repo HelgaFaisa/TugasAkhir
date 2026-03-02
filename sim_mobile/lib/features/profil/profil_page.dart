@@ -1,4 +1,4 @@
-// lib/features/profil/profil_page.dart
+﻿// lib/features/profil/profil_page.dart
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -58,7 +58,7 @@ class _ProfilPageState extends State<ProfilPage> {
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: const Text('Profil Santri'),
-        backgroundColor: const Color(0xFF7C3AED),
+        backgroundColor: const Color(0xFF6FBA9D),
         foregroundColor: Colors.white,
         elevation: 0,
       ),
@@ -75,7 +75,7 @@ class _ProfilPageState extends State<ProfilPage> {
                     
                     // Content
                     Padding(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(12),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -91,13 +91,13 @@ class _ProfilPageState extends State<ProfilPage> {
                               _buildInfoRow('Status', _santriData?['status'], isLast: true),
                             ],
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 12),
 
                           // Kelas yang Diikuti (NEW)
                           if (_santriData?['kelas_list'] != null && (_santriData!['kelas_list'] as List).isNotEmpty)
                             _buildKelasListSection(),
                           if (_santriData?['kelas_list'] != null && (_santriData!['kelas_list'] as List).isNotEmpty)
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 12),
 
                           // Alamat & Asal
                           _buildSectionCard(
@@ -108,7 +108,7 @@ class _ProfilPageState extends State<ProfilPage> {
                               _buildInfoRow('Daerah Asal', _santriData?['daerah_asal'], isLast: true),
                             ],
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 12),
 
                           // Data Orang Tua / Wali
                           _buildSectionCard(
@@ -119,7 +119,7 @@ class _ProfilPageState extends State<ProfilPage> {
                               _buildInfoRow('Nomor HP Orang Tua', _santriData?['nomor_hp_ortu'], isLast: true),
                             ],
                           ),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 19),
                         ],
                       ),
                     ),
@@ -142,8 +142,8 @@ class _ProfilPageState extends State<ProfilPage> {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Color(0xFF7C3AED),
-            Color(0xFF5B21B6),
+            Color(0xFF6FBA9D),
+            Color(0xFF4D987B),
           ],
         ),
         borderRadius: BorderRadius.only(
@@ -152,65 +152,65 @@ class _ProfilPageState extends State<ProfilPage> {
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+        padding: const EdgeInsets.fromLTRB(19, 0, 19, 24),
         child: Column(
           children: [
             // Avatar
             Container(
-              padding: const EdgeInsets.all(4),
+              padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 3),
+                border: Border.all(color: Colors.white, width: 2),
               ),
               child: CircleAvatar(
                 radius: 50,
                 backgroundColor: Colors.white,
                 child: Icon(
                   Icons.person,
-                  size: 50,
-                  color: const Color(0xFF7C3AED).withValues(alpha: 0.7),
+                  size: 39,
+                  color: const Color(0xFF6FBA9D).withValues(alpha: 0.7),
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
 
             // Nama
             Text(
               namaLengkap,
               style: const TextStyle(
-                fontSize: 22,
+                fontSize: 17,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
 
             // ID Santri
             Text(
               idSantri,
               style: const TextStyle(
-                fontSize: 14,
+                fontSize: 11,
                 color: Colors.white70,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 9),
 
             // Primary Kelas Badge (NEW)
             _buildPrimaryKelasBadge(),
-            const SizedBox(height: 8),
+            const SizedBox(height: 7),
 
             // Status Badge
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
               decoration: BoxDecoration(
                 color: status == 'Aktif' ? Colors.green : Colors.orange,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(15),
               ),
               child: Text(
                 status,
                 style: const TextStyle(
-                  fontSize: 12,
+                  fontSize: 9,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
@@ -230,29 +230,29 @@ class _ProfilPageState extends State<ProfilPage> {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Section Title
             Row(
               children: [
-                Icon(icon, size: 20, color: const Color(0xFF7C3AED)),
-                const SizedBox(width: 8),
+                Icon(icon, size: 15, color: const Color(0xFF6FBA9D)),
+                const SizedBox(width: 7),
                 Text(
                   title,
                   style: const TextStyle(
-                    fontSize: 16,
+                    fontSize: 12,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF7C3AED),
+                    color: Color(0xFF6FBA9D),
                   ),
                 ),
               ],
             ),
-            const Divider(height: 24),
+            const Divider(height: 19),
             // Content
             ...children,
           ],
@@ -262,37 +262,42 @@ class _ProfilPageState extends State<ProfilPage> {
   }
 
   Widget _buildInfoRow(String label, String? value, {bool isMultiline = false, bool isLast = false}) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: isLast ? 0 : 12),
-      child: Row(
-        crossAxisAlignment: isMultiline ? CrossAxisAlignment.start : CrossAxisAlignment.center,
-        children: [
-          SizedBox(
-            width: 130,
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[600],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final labelWidth = constraints.maxWidth * 0.35;
+        return Padding(
+          padding: EdgeInsets.only(bottom: isLast ? 0 : 9),
+          child: Row(
+            crossAxisAlignment: isMultiline ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: labelWidth,
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey[600],
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              value ?? '-',
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
+              const SizedBox(width: 7),
+              Expanded(
+                child: Text(
+                  value ?? '-',
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: isMultiline ? 4 : 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-              maxLines: isMultiline ? 4 : 2,
-              overflow: TextOverflow.ellipsis,
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -318,21 +323,21 @@ class _ProfilPageState extends State<ProfilPage> {
       children: [
         // Primary class badge
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
           decoration: BoxDecoration(
             color: Colors.white.withValues(alpha: 0.2),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(15),
             border: Border.all(color: Colors.white.withValues(alpha: 0.3), width: 1.5),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.school, color: Colors.white, size: 16),
-              const SizedBox(width: 6),
+              const Icon(Icons.school, color: Colors.white, size: 12),
+              const SizedBox(width: 5),
               Text(
                 kelasName,
                 style: const TextStyle(
-                  fontSize: 13,
+                  fontSize: 11,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
@@ -342,11 +347,11 @@ class _ProfilPageState extends State<ProfilPage> {
         ),
         // Class count hint
         if (totalKelas > 1) ...[
-          const SizedBox(height: 6),
+          const SizedBox(height: 5),
           Text(
             '+${totalKelas - 1} kelas lainnya',
             style: TextStyle(
-              fontSize: 11,
+              fontSize: 8,
               color: Colors.white.withValues(alpha: 0.8),
             ),
           ),
@@ -366,12 +371,12 @@ class _ProfilPageState extends State<ProfilPage> {
         children: [
           Center(
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(12),
               child: Text(
                 'Belum mengikuti kelas apapun',
                 style: TextStyle(
                   color: Colors.grey[600],
-                  fontSize: 14,
+                  fontSize: 11,
                 ),
               ),
             ),
@@ -383,29 +388,29 @@ class _ProfilPageState extends State<ProfilPage> {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Section Title
             Row(
               children: [
-                const Icon(Icons.class_, size: 20, color: Color(0xFF7C3AED)),
-                const SizedBox(width: 8),
+                const Icon(Icons.class_, size: 15, color: Color(0xFF6FBA9D)),
+                const SizedBox(width: 7),
                 const Text(
                   'Kelas yang Diikuti',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 12,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF7C3AED),
+                    color: Color(0xFF6FBA9D),
                   ),
                 ),
               ],
             ),
-            const Divider(height: 24),
+            const Divider(height: 19),
             // Kelompok list
             ...kelasList.asMap().entries.map((entry) {
               final index = entry.key;
@@ -415,7 +420,7 @@ class _ProfilPageState extends State<ProfilPage> {
               
               return Column(
                 children: [
-                  if (index > 0) const SizedBox(height: 8),
+                  if (index > 0) const SizedBox(height: 7),
                   _buildKelompokExpansionTile(kelompokName, kelasItems),
                 ],
               );
@@ -434,25 +439,25 @@ class _ProfilPageState extends State<ProfilPage> {
     return Container(
 decoration: BoxDecoration(
         border: Border.all(color: color.withValues(alpha: 0.3)),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(9),
       ),
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
-          tilePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          childrenPadding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+          tilePadding: const EdgeInsets.symmetric(horizontal: 9, vertical: 2),
+          childrenPadding: const EdgeInsets.fromLTRB(9, 0, 9, 7),
           leading: Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(7),
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(7),
             ),
-            child: Icon(icon, color: color, size: 20),
+            child: Icon(icon, color: color, size: 15),
           ),
           title: Text(
             kelompokName,
             style: TextStyle(
-              fontSize: 15,
+              fontSize: 11,
               fontWeight: FontWeight.bold,
               color: color,
             ),
@@ -460,7 +465,7 @@ decoration: BoxDecoration(
           subtitle: Text(
             '${kelasItems.length} kelas',
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 9,
               color: Colors.grey[600],
             ),
           ),
@@ -470,13 +475,13 @@ decoration: BoxDecoration(
             final isPrimary = kelas['is_primary'] == true;
 
             return Container(
-              margin: const EdgeInsets.only(top: 8),
-              padding: const EdgeInsets.all(12),
+              margin: const EdgeInsets.only(top: 7),
+              padding: const EdgeInsets.all(9),
               decoration: BoxDecoration(
                 color: isPrimary 
                     ? color.withValues(alpha: 0.1) 
                     : Colors.grey.withValues(alpha: 0.05),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(7),
                 border: isPrimary 
                     ? Border.all(color: color.withValues(alpha: 0.3), width: 1.5) 
                     : null,
@@ -490,7 +495,7 @@ decoration: BoxDecoration(
                         Text(
                           namaKelas,
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 11,
                             fontWeight: isPrimary ? FontWeight.bold : FontWeight.w600,
                             color: isPrimary ? color : Colors.black87,
                           ),
@@ -499,7 +504,7 @@ decoration: BoxDecoration(
                         Text(
                           kodeKelas,
                           style: TextStyle(
-                            fontSize: 11,
+                            fontSize: 8,
                             color: Colors.grey[600],
                           ),
                         ),
@@ -507,22 +512,22 @@ decoration: BoxDecoration(
                     ),
                   ),
                   if (isPrimary) ...[
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 7),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                       decoration: BoxDecoration(
                         color: const Color(0xFFfbbf24),
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(7),
                       ),
                       child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.star, color: Colors.white, size: 12),
-                          SizedBox(width: 4),
+                          Icon(Icons.star, color: Colors.white, size: 9),
+                          SizedBox(width: 2),
                           Text(
                             'Utama',
                             style: TextStyle(
-                              fontSize: 10,
+                              fontSize: 8,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),
@@ -550,7 +555,7 @@ decoration: BoxDecoration(
     } else if (name.contains('cepatan')) {
       return const Color(0xFF10b981); // Green
     } else if (name.contains('tahfidz') || name.contains('tahfid')) {
-      return const Color(0xFF7C3AED); // Purple
+      return const Color(0xFF6FBA9D); // Green
     } else if (name.contains('hadist') || name.contains('hadis')) {
       return const Color(0xFF14b8a6); // Teal
     } else {

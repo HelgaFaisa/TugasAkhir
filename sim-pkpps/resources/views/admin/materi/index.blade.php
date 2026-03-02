@@ -19,7 +19,7 @@
 @endif
 
 {{-- Filter Kategori Buttons --}}
-<div class="content-box" style="margin-bottom: 20px;">
+<div class="content-box" style="margin-bottom: 14px;">
     <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
         <a href="{{ route('admin.materi.index', ['kategori' => 'Al-Qur\'an'] + request()->except('kategori')) }}" 
            class="btn {{ request('kategori') == 'Al-Qur\'an' ? 'btn-primary' : 'btn-outline-primary' }}" 
@@ -47,7 +47,7 @@
 </div>
 
 {{-- Filter & Search Section --}}
-<div class="content-box" style="margin-bottom: 20px;">
+<div class="content-box" style="margin-bottom: 14px;">
     <form method="GET" action="{{ route('admin.materi.index') }}" class="filter-form-inline">
         <input type="hidden" name="kategori" value="{{ request('kategori') }}">
         
@@ -141,7 +141,7 @@
         </table>
 
         {{-- Pagination --}}
-        <div style="margin-top: 20px;">
+        <div style="margin-top: 14px;">
             {{ $materis->links() }}
         </div>
     @else

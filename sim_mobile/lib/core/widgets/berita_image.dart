@@ -41,8 +41,8 @@ class BeritaImage extends StatelessWidget {
             color: Colors.grey[100],
             child: const Center(
               child: SizedBox(
-                width: 20,
-                height: 20,
+                width: 15,
+                height: 15,
                 child: CircularProgressIndicator(strokeWidth: 2),
               ),
             ),
@@ -51,7 +51,7 @@ class BeritaImage extends StatelessWidget {
         
         // Error handler
         errorBuilder: (context, error, stackTrace) {
-          debugPrint('🔴 Image error: $imageUrl');
+          debugPrint('ðŸ”´ Image error: $imageUrl');
           return Container(
             height: height,
             color: Colors.grey[200],

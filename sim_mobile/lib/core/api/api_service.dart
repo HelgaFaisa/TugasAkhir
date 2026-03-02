@@ -696,6 +696,25 @@ class ApiService {
     }
   }
 
+  /// GET NOTIFIKASI KEPULANGAN
+  Future<Map<String, dynamic>> getNotifikasiKepulangan() async {
+    try {
+      final url = Uri.parse('${AppConfig.baseUrl}/kepulangan/notifikasi');
+
+      final response = await http
+          .get(url, headers: await _headers(needsAuth: true))
+          .timeout(AppConfig.timeout);
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        return {'success': false};
+      }
+    } catch (e) {
+      return {'success': false, 'message': 'Error: ${e.toString()}'};
+    }
+  }
+
   // Tambahkan di akhir class ApiService, sebelum closing bracket
 
 /// ==========================================

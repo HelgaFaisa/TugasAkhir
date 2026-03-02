@@ -14,10 +14,10 @@
 @endif
 
 <div class="content-box">
-    <div style="margin-bottom: 30px;">
+    <div style="margin-bottom: 22px;">
         <h3 style="color: var(--primary-color); margin-bottom: 15px;">Informasi Riwayat</h3>
         
-        <table style="width: 100%; margin-bottom: 20px;">
+        <table style="width: 100%; margin-bottom: 14px;">
             <tr>
                 <td style="width: 200px; padding: 10px 0; font-weight: 600;">ID Riwayat</td>
                 <td style="padding: 10px 0;">
@@ -139,7 +139,7 @@
     </div>
 
     <!-- Tombol Aksi -->
-    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+    <div style="background: #f8f9fa; padding: 14px; border-radius: 8px; margin-bottom: 22px;">
         <h4 style="margin-bottom: 15px; color: var(--primary-color);">
             <i class="fas fa-cogs"></i> Aksi
         </h4>
@@ -214,7 +214,7 @@
         </table>
     @endif
 
-    <div class="btn-group" style="margin-top: 30px;">
+    <div class="btn-group" style="margin-top: 22px;">
         <a href="{{ route('admin.riwayat-pelanggaran.edit', $riwayatPelanggaran) }}" class="btn btn-warning">
             <i class="fas fa-edit"></i> Edit
         </a>
@@ -226,15 +226,15 @@
 
 <!-- Modal Selesaikan Kafaroh -->
 <div id="modal-kafaroh" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
-    <div style="background-color: white; margin: 10% auto; padding: 30px; border-radius: 10px; width: 90%; max-width: 500px;">
-        <h3 style="margin-bottom: 20px; color: var(--primary-color);">
+    <div style="background-color: white; margin: 10% auto; padding: 22px; border-radius: 10px; width: 90%; max-width: 500px;">
+        <h3 style="margin-bottom: 14px; color: var(--primary-color);">
             <i class="fas fa-check-circle"></i> Selesaikan Kafaroh
         </h3>
         
         <form action="{{ route('admin.riwayat-pelanggaran.selesaikan-kafaroh', $riwayatPelanggaran) }}" method="POST">
             @csrf
             
-            <p style="margin-bottom: 20px; color: var(--text-color);">
+            <p style="margin-bottom: 14px; color: var(--text-color);">
                 Dengan menyelesaikan kafaroh, poin pelanggaran akan <strong>dilebur menjadi 0</strong>.
             </p>
             
@@ -247,7 +247,7 @@
                           placeholder="Contoh: Santri telah menyelesaikan kafaroh dengan baik..."></textarea>
             </div>
             
-            <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <div style="display: flex; gap: 10px; margin-top: 14px;">
                 <button type="submit" class="btn btn-success">
                     <i class="fas fa-save"></i> Simpan
                 </button>

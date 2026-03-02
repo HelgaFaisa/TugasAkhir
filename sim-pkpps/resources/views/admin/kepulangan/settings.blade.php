@@ -56,7 +56,7 @@
     </div>
 </div>
 
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 14px;">
     {{-- Settings Form --}}
     <div class="content-box">
         <h3 style="margin-top: 0; color: #2C3E50; border-bottom: 2px solid #6FBA9D; padding-bottom: 10px;">
@@ -111,8 +111,8 @@
                        required>
             </div>
             
-            <div style="background: #E8F7F2; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #6FBA9D;">
-                <strong>ℹ️ Informasi:</strong>
+            <div style="background: #E8F7F2; padding: 15px; border-radius: 8px; margin-bottom: 14px; border-left: 4px solid #6FBA9D;">
+                <strong>â„¹ï¸ Informasi:</strong>
                 <ul style="margin: 10px 0 0 20px; padding: 0;">
                     <li>Periode ini menentukan rentang waktu perhitungan kuota</li>
                     <li>Perubahan periode akan mempengaruhi perhitungan kuota santri</li>
@@ -132,8 +132,8 @@
             <i class="fas fa-sync-alt"></i> Reset Kuota
         </h3>
         
-        <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #ffc107;">
-            <strong>⚠️ PERHATIAN:</strong>
+        <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 14px; border-left: 4px solid #ffc107;">
+            <strong>âš ï¸ PERHATIAN:</strong>
             <p style="margin: 10px 0 0 0;">
                 Reset kuota akan mengubah status semua izin yang "Disetujui" dalam periode saat ini menjadi "Selesai". 
                 Ini akan mereset perhitungan kuota untuk memulai periode baru.
@@ -141,7 +141,7 @@
         </div>
 
         {{-- Reset Semua Santri --}}
-        <div style="background: #ffebee; padding: 20px; border-radius: 8px; border: 2px solid #dc3545; margin-bottom: 20px;">
+        <div style="background: #ffebee; padding: 14px; border-radius: 8px; border: 2px solid #dc3545; margin-bottom: 14px;">
             <h4 style="margin: 0 0 10px 0; color: #dc3545;">
                 <i class="fas fa-users"></i> Reset Kuota Semua Santri
             </h4>
@@ -175,7 +175,7 @@
 
         {{-- Info Tambahan --}}
         <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; border-left: 4px solid #2196f3;">
-            <strong>💡 Tips:</strong>
+            <strong>ðŸ’¡ Tips:</strong>
             <ul style="margin: 10px 0 0 20px; padding: 0; font-size: 0.9rem;">
                 <li>Reset individual dapat dilakukan dari halaman detail santri</li>
                 <li>Reset massal sebaiknya dilakukan di akhir periode</li>
@@ -187,7 +187,7 @@
 </div>
 
 {{-- History Reset Logs --}}
-<div class="content-box" style="margin-top: 20px;">
+<div class="content-box" style="margin-top: 14px;">
     <h3 style="margin-top: 0; color: #2C3E50; border-bottom: 2px solid #6FBA9D; padding-bottom: 10px;">
         <i class="fas fa-history"></i> History Reset Kuota
     </h3>
@@ -214,7 +214,7 @@
                             <td>
                                 <span style="display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; font-weight: 600; 
                                     {{ $log->jenis_reset == 'massal' ? 'background: #dc3545; color: white;' : 'background: #ffc107; color: #000;' }}">
-                                    {{ $log->jenis_reset == 'massal' ? '👥 Massal' : '👤 Individual' }}
+                                    {{ $log->jenis_reset == 'massal' ? 'ðŸ‘¥ Massal' : 'ðŸ‘¤ Individual' }}
                                 </span>
                             </td>
                             <td>
@@ -250,8 +250,8 @@
             </table>
         </div>
     @else
-        <div style="text-align: center; padding: 40px; color: #7F8C8D;">
-            <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 15px; display: block;"></i>
+        <div style="text-align: center; padding: 22px; color: #7F8C8D;">
+            <i class="fas fa-inbox" style="font-size: 2.2rem; margin-bottom: 15px; display: block;"></i>
             <p>Belum ada history reset kuota</p>
         </div>
     @endif
@@ -260,26 +260,26 @@
 {{-- Modal Konfirmasi Reset Semua --}}
 <div class="modal fade" id="confirmResetSemuaModal" tabindex="-1" style="display: none;">
     <div class="modal-dialog">
-        <div class="modal-content" style="background: white; border-radius: 12px; padding: 20px;">
-            <div style="margin-bottom: 20px;">
+        <div class="modal-content" style="background: white; border-radius: 12px; padding: 14px;">
+            <div style="margin-bottom: 14px;">
                 <h3 style="margin: 0; color: #dc3545;">
                     <i class="fas fa-exclamation-triangle"></i> KONFIRMASI RESET MASSAL
                 </h3>
             </div>
-            <div style="padding: 20px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 6px; margin-bottom: 15px;">
-                <h4 style="margin: 0 0 10px 0; color: #856404;">⚠️ PERINGATAN PENTING!</h4>
+            <div style="padding: 14px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 6px; margin-bottom: 15px;">
+                <h4 style="margin: 0 0 10px 0; color: #856404;">âš ï¸ PERINGATAN PENTING!</h4>
                 <p style="margin: 0; color: #856404;">
                     Anda akan mereset kuota untuk <strong>{{ $totalSantri }} santri aktif</strong>. 
                     Semua izin yang berstatus "Disetujui" akan diubah menjadi "Selesai".
                 </p>
             </div>
-            <div style="background: #e3f2fd; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+            <div style="background: #e3f2fd; padding: 15px; border-radius: 6px; margin-bottom: 14px;">
                 <p style="margin: 0; font-size: 0.9rem;">
                     <strong>Yang akan terjadi:</strong>
                 </p>
                 <ul style="margin: 10px 0 0 20px; padding: 0; font-size: 0.9rem;">
                     <li>Semua perhitungan kuota akan direset ke 0</li>
-                    <li>Status izin "Disetujui" → "Selesai"</li>
+                    <li>Status izin "Disetujui" â†’ "Selesai"</li>
                     <li>Data arsip tetap tersimpan</li>
                     <li>Aktivitas tercatat dalam log</li>
                 </ul>
@@ -291,7 +291,7 @@
                    id="confirmationText" 
                    class="form-control" 
                    placeholder="Ketik: RESET SEMUA"
-                   style="margin-bottom: 20px;">
+                   style="margin-bottom: 14px;">
             <div style="display: flex; gap: 10px; justify-content: flex-end;">
                 <button type="button" class="btn btn-secondary" onclick="closeModal('confirmResetSemuaModal')">Batal</button>
                 <button type="button" class="btn btn-danger" id="executeResetSemuaBtn" disabled>

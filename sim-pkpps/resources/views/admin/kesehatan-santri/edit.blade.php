@@ -9,7 +9,7 @@
 
 <!-- Content Box -->
 <div class="content-box">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
         <h3 style="margin: 0; color: var(--primary-color);">
             <i class="fas fa-file-medical"></i> Form Edit Data Kesehatan
         </h3>
@@ -122,7 +122,7 @@
         </div>
 
         <!-- Buttons -->
-        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 30px;">
+        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 22px;">
             <a href="{{ route('admin.kesehatan-santri.index') }}" class="btn btn-secondary">
                 <i class="fas fa-times"></i> Batal
             </a>

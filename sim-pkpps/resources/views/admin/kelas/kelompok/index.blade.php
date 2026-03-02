@@ -13,6 +13,9 @@ CATATAN: Buat folder "kelompok" di dalam folder "kelas" terlebih dahulu
 @section('content')
 <div class="page-header">
     <h2><i class="fas fa-folder"></i> Kelola Kelompok Kelas</h2>
+    <a href="{{ route('admin.kelas.index') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Kembali ke Kelola Kelas
+    </a>    
 </div>
 
 <!-- Flash Messages -->
@@ -35,30 +38,21 @@ CATATAN: Buat folder "kelompok" di dalam folder "kelas" terlebih dahulu
 @endif
 
 <!-- Quick Navigation -->
-<div class="content-box" style="margin-bottom: 20px; background: linear-gradient(135deg, #E8F7F2 0%, #D4F1E3 100%); border: 2px solid var(--primary-color);">
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+<div class="content-box" style="margin-bottom: 14px; background: linear-gradient(135deg, #E8F7F2 0%, #D4F1E3 100%); border: 2px solid var(--primary-color);">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 11px;">
         <div>
             <h4 style="margin: 0; color: var(--primary-dark);">
                 <i class="fas fa-layer-group"></i> Menu Manajemen Kelas
             </h4>
         </div>
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <a href="{{ route('admin.kelas.kelompok.index') }}" class="btn btn-primary">
-                <i class="fas fa-folder"></i> Kelompok Kelas
-            </a>
-            <a href="{{ route('admin.kelas.index') }}" class="btn btn-info">
-                <i class="fas fa-chalkboard"></i> Daftar Kelas
-            </a>
-            <a href="{{ route('admin.kelas.kenaikan.index') }}" class="btn btn-success">
-                <i class="fas fa-graduation-cap"></i> Kenaikan Kelas
-            </a>
         </div>
     </div>
 </div>
 
 <!-- Header Actions -->
-<div class="content-box" style="margin-bottom: 20px;">
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+<div class="content-box" style="margin-bottom: 14px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 11px;">
         <!-- Search Form -->
         <form method="GET" action="{{ route('admin.kelas.kelompok.index') }}" style="display: flex; gap: 10px; flex-wrap: wrap; flex-grow: 1;">
             <input type="text" 
@@ -164,7 +158,7 @@ CATATAN: Buat folder "kelompok" di dalam folder "kelas" terlebih dahulu
 
         <!-- Pagination -->
         @if ($kelompokKelas->hasPages())
-            <div style="margin-top: 20px;">
+            <div style="margin-top: 14px;">
                 {{ $kelompokKelas->links('vendor.pagination.custom') }}
             </div>
         @endif

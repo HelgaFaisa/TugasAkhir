@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('title', 'Data Kesehatan Santri'); ?>
 
 <?php $__env->startSection('content'); ?>
@@ -25,7 +23,7 @@
 <!-- Content Box -->
 <div class="content-box">
     <!-- Header Actions -->
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 11px;">
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
             <a href="<?php echo e(route('admin.kesehatan-santri.create')); ?>" class="btn btn-primary">
                 <i class="fas fa-plus"></i> Tambah Data Kesehatan
@@ -34,8 +32,8 @@
     </div>
 
     <!-- Filter Section -->
-    <form method="GET" action="<?php echo e(route('admin.kesehatan-santri.index')); ?>" id="filterForm" style="margin-bottom: 20px;">
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; align-items: end;">
+    <form method="GET" action="<?php echo e(route('admin.kesehatan-santri.index')); ?>" id="filterForm" style="margin-bottom: 14px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 11px; align-items: end;">
             <div class="form-group" style="margin-bottom: 0;">
                 <input type="text" 
                        name="search" 
@@ -192,12 +190,12 @@
         </table>
         
         <!-- Pagination -->
-        <div style="margin-top: 20px; display: flex; justify-content: center;">
+        <div style="margin-top: 14px; display: flex; justify-content: center;">
             <?php echo e($kesehatanSantri->appends(request()->query())->links()); ?>
 
         </div>
     <?php else: ?>
-        <div style="text-align: center; padding: 50px; color: #7F8C8D;">
+        <div style="text-align: center; padding: 36px; color: #7F8C8D;">
             <i class="fas fa-search" style="font-size: 3em; margin-bottom: 15px; color: #BDC3C7;"></i>
             <h3>Tidak ada data kesehatan santri</h3>
             <p>Belum ada data kesehatan santri yang tercatat atau sesuai dengan filter yang dipilih.</p>
@@ -210,8 +208,8 @@
 
 <!-- Modal Keluar UKP -->
 <div id="keluarUkpModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000;">
-    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 12px; min-width: 400px; max-width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
-        <h3 style="margin-bottom: 20px; color: var(--primary-color);">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 22px; border-radius: 12px; min-width: 300px; max-width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+        <h3 style="margin-bottom: 14px; color: var(--primary-color);">
             <i class="fas fa-sign-out-alt"></i> Keluar dari UKP
         </h3>
         
@@ -238,7 +236,7 @@
                 </select>
             </div>
             
-            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px;">
                 <button type="button" class="btn btn-secondary" onclick="closeKeluarUkpModal()">
                     <i class="fas fa-times"></i> Batal
                 </button>

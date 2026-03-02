@@ -139,7 +139,7 @@
 
 <!-- Loading Overlay -->
 <div id="loading-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; justify-content: center; align-items: center;">
-    <div style="background: white; padding: 40px; border-radius: 15px; text-align: center; max-width: 400px;">
+    <div style="background: white; padding: 22px; border-radius: 15px; text-align: center; max-width: 400px;">
         <div style="border: 4px solid var(--primary-light); border-top: 4px solid var(--primary-color); border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
         <h3 style="color: var(--primary-color); margin-bottom: 10px;">Generating SPP...</h3>
         <p style="color: var(--text-light); margin: 0;">Mohon tunggu, proses sedang berjalan.</p>
@@ -222,7 +222,7 @@ function confirmGenerate() {
     let warningText = '';
     
     if (sudahDiGenerate) {
-        warningText = `\n⚠️ PERINGATAN: Periode ${bulanText} ${tahunValue} sudah pernah di-generate!\nData yang sudah ada akan di-skip (tidak akan duplikat).\n`;
+        warningText = `\nâš ï¸ PERINGATAN: Periode ${bulanText} ${tahunValue} sudah pernah di-generate!\nData yang sudah ada akan di-skip (tidak akan duplikat).\n`;
     }
     
     const message = `Anda akan generate SPP untuk semua santri aktif dengan detail:\n\n` +

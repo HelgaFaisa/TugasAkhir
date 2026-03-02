@@ -1,6 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
+{{-- Select2 CSS --}}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+
 <div class="page-header">
     <h2><i class="fas fa-plus-circle"></i> Tambah Transaksi Uang Saku</h2>
 </div>
@@ -29,7 +32,7 @@
         </div>
 
         {{-- Info Card Santri (AJAX) --}}
-        <div id="santri-info" style="display:none; margin-bottom:20px;">
+        <div id="santri-info" style="display:none; margin-bottom: 14px;">
             <div class="content-box" style="padding:16px; background:var(--primary-light);">
                 <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin-bottom:12px;">
                     <div>
@@ -100,7 +103,7 @@
                 Keterangan
             </label>
             <textarea name="keterangan" id="keterangan" class="form-control @error('keterangan') is-invalid @enderror" 
-                      rows="4" placeholder="Contoh: Uang saku bulan Januari 2025">{{ old('keterangan') }}</textarea>
+                      rows="4" placeholder="Tuliskan Nama Petugas disini">{{ old('keterangan') }}</textarea>
             @error('keterangan')
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
@@ -118,40 +121,57 @@
     </form>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
-document.getElementById('id_santri').addEventListener('change', function() {
-    var infoBox = document.getElementById('santri-info');
-    var val = this.value;
-    if (!val) { infoBox.style.display = 'none'; return; }
+$(document).ready(function() {
+    // Inisialisasi Select2
+    $('#id_santri').select2({
+        placeholder: '-- Pilih Santri --',
+        allowClear: true,
+        width: '100%'
+    });
+    $('#jenis_transaksi').select2({
+        placeholder: '-- Pilih Jenis --',
+        allowClear: true,
+        width: '100%'
+    });
 
-    fetch('{{ url("admin/uang-saku/santri-info") }}/' + val)
-        .then(function(r) { return r.json(); })
-        .then(function(d) {
-            var saldoColor = d.saldo_raw >= 0 ? '#6FBA9D' : '#FF8B94';
-            document.getElementById('info-saldo').innerHTML = '<span style="color:' + saldoColor + '">Rp ' + d.saldo_terakhir + '</span>';
-            document.getElementById('info-masuk').textContent = 'Rp ' + d.total_pemasukan_bulan_ini;
-            document.getElementById('info-keluar').textContent = 'Rp ' + d.total_pengeluaran_bulan_ini;
+    // Info santri via AJAX – pakai jQuery .on('change') agar kompatibel dengan Select2
+    $('#id_santri').on('change', function() {
+        var infoBox = document.getElementById('santri-info');
+        var val = this.value;
+        if (!val) { infoBox.style.display = 'none'; return; }
 
-            var html = '';
-            if (d.transaksi_terakhir.length > 0) {
-                html = '<small class="text-muted">3 Transaksi Terakhir:</small><table class="data-table" style="margin-top:6px;font-size:.85rem;"><thead><tr><th>Tanggal</th><th>Jenis</th><th>Nominal</th><th>Ket</th></tr></thead><tbody>';
-                d.transaksi_terakhir.forEach(function(t) {
-                    var badge = t.jenis === 'pemasukan'
-                        ? '<span class="badge badge-success">Masuk</span>'
-                        : '<span class="badge badge-danger">Keluar</span>';
-                    html += '<tr><td>' + t.tanggal + '</td><td>' + badge + '</td><td>Rp ' + t.nominal + '</td><td>' + t.keterangan + '</td></tr>';
-                });
-                html += '</tbody></table>';
-            }
-            document.getElementById('info-riwayat').innerHTML = html;
-            infoBox.style.display = 'block';
-        })
-        .catch(function() { infoBox.style.display = 'none'; });
+        fetch('{{ url("admin/uang-saku/santri-info") }}/' + val)
+            .then(function(r) { return r.json(); })
+            .then(function(d) {
+                var saldoColor = d.saldo_raw >= 0 ? '#6FBA9D' : '#FF8B94';
+                document.getElementById('info-saldo').innerHTML = '<span style="color:' + saldoColor + '">Rp ' + d.saldo_terakhir + '</span>';
+                document.getElementById('info-masuk').textContent = 'Rp ' + d.total_pemasukan_bulan_ini;
+                document.getElementById('info-keluar').textContent = 'Rp ' + d.total_pengeluaran_bulan_ini;
+
+                var html = '';
+                if (d.transaksi_terakhir.length > 0) {
+                    html = '<small class="text-muted">3 Transaksi Terakhir:</small><table class="data-table" style="margin-top:6px;font-size:.85rem;"><thead><tr><th>Tanggal</th><th>Jenis</th><th>Nominal</th><th>Ket</th></tr></thead><tbody>';
+                    d.transaksi_terakhir.forEach(function(t) {
+                        var badge = t.jenis === 'pemasukan'
+                            ? '<span class="badge badge-success">Masuk</span>'
+                            : '<span class="badge badge-danger">Keluar</span>';
+                        html += '<tr><td>' + t.tanggal + '</td><td>' + badge + '</td><td>Rp ' + t.nominal + '</td><td>' + t.keterangan + '</td></tr>';
+                    });
+                    html += '</tbody></table>';
+                }
+                document.getElementById('info-riwayat').innerHTML = html;
+                infoBox.style.display = 'block';
+            })
+            .catch(function() { infoBox.style.display = 'none'; });
+    });
+
+    // Trigger on page load if santri pre-selected
+    if ($('#id_santri').val()) {
+        $('#id_santri').trigger('change');
+    }
 });
-
-// Trigger on page load if santri pre-selected
-if (document.getElementById('id_santri').value) {
-    document.getElementById('id_santri').dispatchEvent(new Event('change'));
-}
 </script>
 @endsection

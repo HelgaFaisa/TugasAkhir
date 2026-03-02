@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('content'); ?>
 <div class="page-header">
     <h2><i class="fas fa-book-open"></i> Master Materi Al-Qur'an & Hadist</h2>
@@ -21,7 +19,7 @@
 <?php endif; ?>
 
 
-<div class="content-box" style="margin-bottom: 20px;">
+<div class="content-box" style="margin-bottom: 14px;">
     <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
         <a href="<?php echo e(route('admin.materi.index', ['kategori' => 'Al-Qur\'an'] + request()->except('kategori'))); ?>" 
            class="btn <?php echo e(request('kategori') == 'Al-Qur\'an' ? 'btn-primary' : 'btn-outline-primary'); ?>" 
@@ -49,7 +47,7 @@
 </div>
 
 
-<div class="content-box" style="margin-bottom: 20px;">
+<div class="content-box" style="margin-bottom: 14px;">
     <form method="GET" action="<?php echo e(route('admin.materi.index')); ?>" class="filter-form-inline">
         <input type="hidden" name="kategori" value="<?php echo e(request('kategori')); ?>">
         
@@ -144,7 +142,7 @@
         </table>
 
         
-        <div style="margin-top: 20px;">
+        <div style="margin-top: 14px;">
             <?php echo e($materis->links()); ?>
 
         </div>

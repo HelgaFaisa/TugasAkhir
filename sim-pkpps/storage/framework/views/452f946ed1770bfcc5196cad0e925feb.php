@@ -22,7 +22,7 @@
             <?php if(is_array($element)): ?>
                 <?php $__currentLoopData = $element; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $page => $url): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                     <?php if($page == $paginator->currentPage()): ?>
-                        <span class="active"><span><?php echo e($page); ?></span></span>
+                        <span class="active" aria-current="page"><?php echo e($page); ?></span>
                     <?php else: ?>
                         <a href="<?php echo e($url); ?>"><?php echo e($page); ?></a>
                     <?php endif; ?>

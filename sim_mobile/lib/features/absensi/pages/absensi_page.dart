@@ -1,4 +1,4 @@
-// lib/features/absensi/pages/absensi_page.dart
+﻿// lib/features/absensi/pages/absensi_page.dart
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -117,7 +117,7 @@ class _AbsensiPageState extends State<AbsensiPage> {
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: const Text('Absensi Kegiatan'),
-        backgroundColor: const Color(0xFF7C3AED),
+        backgroundColor: const Color(0xFF6FBA9D),
         foregroundColor: Colors.white,
         elevation: 0,
       ),
@@ -135,22 +135,22 @@ class _AbsensiPageState extends State<AbsensiPage> {
                         // Header dengan Summary Hari Ini
                         _buildHeaderSection(),
 
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 12),
 
                         // Summary Minggu Ini Card
                         if (_weekData != null) _buildWeekSummaryCard(),
 
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 12),
 
                         // Date Navigation
                         _buildDateNavigation(),
 
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 12),
 
                         // Timeline Absensi Hari Ini
                         _buildTimelineSection(),
 
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 19),
                       ],
                     ),
                   ),
@@ -161,22 +161,22 @@ class _AbsensiPageState extends State<AbsensiPage> {
   Widget _buildError() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(19),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Icon(
               Icons.error_outline,
-              size: 64,
+              size: 48,
               color: Colors.red,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             Text(
               _errorMessage ?? 'Terjadi kesalahan',
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 16),
+              style: const TextStyle(fontSize: 12),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 19),
             ElevatedButton.icon(
               onPressed: _loadData,
               icon: const Icon(Icons.refresh),
@@ -198,8 +198,8 @@ class _AbsensiPageState extends State<AbsensiPage> {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Color(0xFF7C3AED),
-            Color(0xFF5B21B6),
+            Color(0xFF6FBA9D),
+            Color(0xFF4D987B),
           ],
         ),
         borderRadius: BorderRadius.only(
@@ -210,7 +210,7 @@ class _AbsensiPageState extends State<AbsensiPage> {
       child: SafeArea(
         top: false,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+          padding: const EdgeInsets.fromLTRB(12, 0, 12, 15),
           child: Column(
             children: [
               // Label Tanggal
@@ -218,11 +218,11 @@ class _AbsensiPageState extends State<AbsensiPage> {
                 _tanggalLabel,
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 16,
+                  fontSize: 12,
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
 
               // Summary Cards Grid
               SummaryCard(summary: _summaryToday!),
@@ -238,19 +238,19 @@ class _AbsensiPageState extends State<AbsensiPage> {
     final periode = _weekData!['periode'] ?? '';
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Card(
         elevation: 2,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(9),
         ),
         child: InkWell(
           onTap: () {
             Navigator.pushNamed(context, '/absensi/detail-minggu');
           },
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(9),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -262,15 +262,15 @@ class _AbsensiPageState extends State<AbsensiPage> {
                         children: [
                           Icon(
                             Icons.calendar_today,
-                            size: 18,
+                            size: 15,
                             color: Colors.blue[700],
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: 7),
                           Flexible(
                             child: Text(
                               'Ringkasan Minggu Ini',
                               style: TextStyle(
-                                fontSize: 15,
+                                fontSize: 11,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.blue[700],
                               ),
@@ -282,20 +282,20 @@ class _AbsensiPageState extends State<AbsensiPage> {
                     ),
                     const Icon(
                       Icons.arrow_forward_ios,
-                      size: 16,
+                      size: 12,
                       color: Colors.grey,
                     ),
                   ],
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 2),
                 Text(
                   periode,
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: 11,
                     color: Colors.grey[600],
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
 
                 // Summary Stats
                 Row(
@@ -323,11 +323,11 @@ class _AbsensiPageState extends State<AbsensiPage> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 9),
 
                 // Progress Bar
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(7),
                   child: LinearProgressIndicator(
                     value: summary.percentage / 100,
                     minHeight: 8,
@@ -337,11 +337,11 @@ class _AbsensiPageState extends State<AbsensiPage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 5),
                 Text(
                   'Kehadiran: ${summary.percentage.toStringAsFixed(1)}%',
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: 9,
                     fontWeight: FontWeight.w600,
                     color: _getColorByPercentage(summary.percentage),
                   ),
@@ -363,7 +363,7 @@ class _AbsensiPageState extends State<AbsensiPage> {
             child: Text(
               value,
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 15,
                 fontWeight: FontWeight.bold,
                 color: color,
                 height: 1.0,
@@ -376,7 +376,7 @@ class _AbsensiPageState extends State<AbsensiPage> {
             child: Text(
               label,
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 9,
                 color: Colors.grey[600],
                 height: 1.0,
               ),
@@ -392,62 +392,62 @@ class _AbsensiPageState extends State<AbsensiPage> {
         DateFormat('yyyy-MM-dd').format(DateTime.now());
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 9),
       child: Row(
         children: [
           // Previous Day
           IconButton(
             onPressed: () => _changeDate(-1),
-            icon: const Icon(Icons.chevron_left, size: 20),
+            icon: const Icon(Icons.chevron_left, size: 15),
             style: IconButton.styleFrom(
               backgroundColor: Colors.white,
-              foregroundColor: const Color(0xFF7C3AED),
-              padding: const EdgeInsets.all(8),
+              foregroundColor: const Color(0xFF6FBA9D),
+              padding: const EdgeInsets.all(7),
               minimumSize: const Size(40, 40),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 7),
 
           // Date Picker Button
           Expanded(
             child: ElevatedButton.icon(
               onPressed: _pickDate,
-              icon: const Icon(Icons.calendar_month, size: 16),
+              icon: const Icon(Icons.calendar_month, size: 12),
               label: Text(
                 DateFormat('dd MMM yyyy').format(_selectedDate),
-                style: const TextStyle(fontSize: 13),
+                style: const TextStyle(fontSize: 11),
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
                 foregroundColor: Colors.black87,
                 elevation: 1,
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 10,
+                  horizontal: 9,
+                  vertical: 8,
                 ),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(7),
                 ),
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 7),
 
           // Next Day
           IconButton(
             onPressed: () => _changeDate(1),
-            icon: const Icon(Icons.chevron_right, size: 20),
+            icon: const Icon(Icons.chevron_right, size: 15),
             style: IconButton.styleFrom(
               backgroundColor: Colors.white,
-              foregroundColor: const Color(0xFF7C3AED),
-              padding: const EdgeInsets.all(8),
+              foregroundColor: const Color(0xFF6FBA9D),
+              padding: const EdgeInsets.all(7),
               minimumSize: const Size(40, 40),
             ),
           ),
 
           // Today Button (conditional)
           if (!isToday) ...[
-            const SizedBox(width: 8),
+            const SizedBox(width: 7),
             ElevatedButton(
               onPressed: () {
                 setState(() {
@@ -456,18 +456,18 @@ class _AbsensiPageState extends State<AbsensiPage> {
                 _loadData();
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF7C3AED),
+                backgroundColor: const Color(0xFF6FBA9D),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 10,
+                  horizontal: 9,
+                  vertical: 8,
                 ),
                 minimumSize: const Size(65, 40),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(7),
                 ),
               ),
-              child: const Text('Hari Ini', style: TextStyle(fontSize: 12)),
+              child: const Text('Hari Ini', style: TextStyle(fontSize: 9)),
             ),
           ],
         ],
@@ -478,20 +478,20 @@ class _AbsensiPageState extends State<AbsensiPage> {
   Widget _buildTimelineSection() {
     if (_timeline.isEmpty) {
       return Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(19),
         child: Center(
           child: Column(
             children: [
               Icon(
                 Icons.calendar_today_outlined,
-                size: 64,
+                size: 48,
                 color: Colors.grey[400],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               Text(
                 'Tidak ada kegiatan dijadwalkan',
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 12,
                   color: Colors.grey[600],
                 ),
               ),
@@ -502,7 +502,7 @@ class _AbsensiPageState extends State<AbsensiPage> {
     }
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -512,7 +512,7 @@ class _AbsensiPageState extends State<AbsensiPage> {
               const Text(
                 'Daftar Kegiatan',
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 15,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -520,12 +520,12 @@ class _AbsensiPageState extends State<AbsensiPage> {
                 onPressed: () {
                   Navigator.pushNamed(context, '/absensi/riwayat-bulan');
                 },
-                icon: const Icon(Icons.history, size: 18),
+                icon: const Icon(Icons.history, size: 15),
                 label: const Text('Riwayat'),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 9),
 
           // Timeline List
           ListView.builder(

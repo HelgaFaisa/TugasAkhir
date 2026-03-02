@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'core/widgets/android_frame_wrapper.dart';
 import 'features/splash/splash_screen.dart';
 import 'features/auth/login_page.dart';
-import 'features/dashboard/dashboard_page.dart';
+import 'features/main_shell.dart';
 import 'features/profil/profil_page.dart';
 import 'features/uang_saku/uang_saku_page.dart';
 import 'features/berita/berita_page.dart';
@@ -48,24 +48,27 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.deepPurple,
+          seedColor: const Color(0xFF6FBA9D),
           brightness: Brightness.light,
         ),
         platform: TargetPlatform.android,
         fontFamily: 'Roboto',
-        cardTheme: CardTheme(
+        cardTheme: CardThemeData(
           elevation: 2,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(9),
           ),
         ),
         appBarTheme: const AppBarTheme(centerTitle: true, elevation: 0),
       ),
-      // 🔥 KUNCI SOLUSI: Wrap builder dengan AndroidFrameWrapper
+      // ðŸ”¥ KUNCI SOLUSI: Wrap builder dengan AndroidFrameWrapper + TextScaler fix
       builder: (context, child) {
-        return AndroidFrameWrapper(
-          showFrame: true,
-          child: child ?? const SizedBox(),
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(textScaler: TextScaler.noScaling),
+          child: AndroidFrameWrapper(
+            showFrame: true,
+            child: child ?? const SizedBox(),
+          ),
         );
       },
       // Named Routes
@@ -73,7 +76,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const SplashScreen(),
         '/login': (context) => const LoginPage(),
-        '/dashboard': (context) => const DashboardPage(),
+        '/dashboard': (context) => const MainShell(),
         '/profil': (context) => const ProfilPage(),
         '/uang-saku': (context) => const UangSakuPage(),
         '/berita': (context) => const BeritaPage(),

@@ -8,10 +8,10 @@
 </div>
 
 <div class="content-box">
-    <div style="margin-bottom: 30px;">
+    <div style="margin-bottom: 22px;">
         <h3 style="color: var(--primary-color); margin-bottom: 15px;">Informasi Klasifikasi</h3>
         
-        <table style="width: 100%; margin-bottom: 20px;">
+        <table style="width: 100%; margin-bottom: 14px;">
             <tr>
                 <td style="width: 200px; padding: 10px 0; font-weight: 600;">ID Klasifikasi</td>
                 <td style="padding: 10px 0;">
@@ -91,7 +91,7 @@
         </div>
     @endif
 
-    <div class="btn-group" style="margin-top: 30px;">
+    <div class="btn-group" style="margin-top: 22px;">
         <a href="{{ route('admin.klasifikasi-pelanggaran.edit', $klasifikasi) }}" class="btn btn-warning">
             <i class="fas fa-edit"></i> Edit
         </a>

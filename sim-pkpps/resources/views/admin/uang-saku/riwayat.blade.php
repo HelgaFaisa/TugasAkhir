@@ -6,9 +6,9 @@
 </div>
 
 {{-- Filter Periode --}}
-<div class="content-box" style="margin-bottom: 20px;">
+<div class="content-box" style="margin-bottom: 14px;">
     <form method="GET" action="{{ route('admin.uang-saku.riwayat', $santri->id_santri) }}" id="filterPeriode">
-        <div style="display: flex; align-items: end; gap: 15px; flex-wrap: wrap;">
+        <div style="display: flex; align-items: end; gap: 11px; flex-wrap: wrap;">
             <div class="form-group" style="margin-bottom: 0; flex: 1; min-width: 200px;">
                 <label for="tanggal_dari" style="display: block; margin-bottom: 5px; font-weight: 600;">
                     <i class="fas fa-calendar-alt"></i> Dari Tanggal
@@ -51,7 +51,7 @@
 </div>
 
 {{-- Info Periode --}}
-<div class="info-box" style="margin-bottom: 20px;">
+<div class="info-box" style="margin-bottom: 14px;">
     <p style="margin: 0;">
         <i class="fas fa-info-circle"></i> 
         <strong>Periode:</strong> 
@@ -104,16 +104,16 @@
 </div>
 
 <!-- Grafik -->
-<div class="content-box" style="margin-bottom: 30px;">
-    <h3 style="margin-bottom: 20px; color: var(--primary-color);">
+<div class="content-box" style="margin-bottom: 22px;">
+    <h3 style="margin-bottom: 14px; color: var(--primary-color);">
         <i class="fas fa-chart-line"></i> Grafik Arus Uang Saku
     </h3>
     <canvas id="chartUangSaku" style="max-height: 400px;"></canvas>
 </div>
 
 <!-- Action Buttons -->
-<div class="content-box" style="margin-bottom: 20px;">
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+<div class="content-box" style="margin-bottom: 14px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 11px;">
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
             <a href="{{ route('admin.uang-saku.index') }}" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Kembali ke Daftar
@@ -206,7 +206,7 @@
             </tbody>
         </table>
 
-        <div style="margin-top: 20px;">
+        <div style="margin-top: 14px;">
             {{ $transaksi->links() }}
         </div>
     @else

@@ -8,8 +8,8 @@
 </div>
 
 <!-- Header Actions -->
-<div class="content-box" style="margin-bottom: 20px;">
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+<div class="content-box" style="margin-bottom: 14px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 11px;">
         <!-- Search & Filter Form -->
         <form method="GET" action="{{ route('admin.berita.index') }}" style="display: flex; gap: 10px; flex-wrap: wrap; flex-grow: 1;">
             <input type="text" 
@@ -144,12 +144,12 @@
         </table>
 
         <!-- Pagination -->
-        <div style="margin-top: 20px; display: flex; justify-content: center;">
+        <div style="margin-top: 14px; display: flex; justify-content: center;">
             {{ $berita->appends(request()->query())->links() }}
         </div>
     @else
-        <div style="text-align: center; padding: 60px 20px;">
-            <i class="fas fa-newspaper" style="font-size: 4em; color: #ccc; margin-bottom: 20px;"></i>
+        <div style="text-align: center; padding: 44px 14px;">
+            <i class="fas fa-newspaper" style="font-size: 4em; color: #ccc; margin-bottom: 14px;"></i>
             <h3 style="color: var(--text-light);">Belum Ada Berita</h3>
             <p style="color: var(--text-light); margin-bottom: 25px;">
                 Mulai tambahkan berita pertama untuk santri pesantren.

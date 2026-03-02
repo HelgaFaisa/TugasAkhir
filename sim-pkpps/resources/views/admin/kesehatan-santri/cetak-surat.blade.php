@@ -3,158 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Surat Izin Sakit - {{ $kesehatanSantri->santri->nama_lengkap }}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Times New Roman', serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 20px;
+            line-height: 1.4;
+            padding: 12px 25px 5px;
             color: #000;
-            font-size: 12pt;
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 3px double #000;
-            padding-bottom: 20px;
-        }
-        
-        .header h1 {
-            font-size: 18pt;
-            font-weight: bold;
-            margin: 0;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .header h2 {
-            font-size: 14pt;
-            font-weight: normal;
-            margin: 5px 0;
-            color: #333;
-        }
-        
-        .header p {
-            margin: 2px 0;
             font-size: 11pt;
         }
-        
-        .clear {
-            clear: both;
-        }
-        
-        .title {
-            text-align: center;
-            margin: 30px 0 20px 0;
-        }
-        
-        .title h3 {
-            font-size: 16pt;
-            font-weight: bold;
-            text-decoration: underline;
-            margin: 0;
-            text-transform: uppercase;
-        }
-        
-        .content {
-            margin: 20px 0;
-            text-align: justify;
-        }
-        
-        .content p {
-            margin: 10px 0;
-            text-indent: 30px;
-        }
-        
-        .data-table {
-            width: 100%;
-            margin: 20px 0;
-            border-collapse: collapse;
-        }
-        
-        .data-table td {
-            padding: 5px 10px;
-            vertical-align: top;
-        }
-        
-        .data-table .label {
-            width: 180px;
-            font-weight: bold;
-        }
-        
-        .data-table .colon {
-            width: 20px;
-            text-align: center;
-        }
-        
-        .signature {
-            margin-top: 40px;
-            display: flex;
-            justify-content: space-between;
-        }
-        
-        .signature-block {
-            width: 45%;
-            text-align: center;
-        }
-        
-        .signature-space {
-            height: 60px;
-            margin: 15px 0;
-        }
-        
-        .date {
-            text-align: right;
-            margin: 20px 0;
-        }
-        
-        @media print {
-            body {
-                margin: 0;
-                padding: 15px;
-            }
-            
-            .no-print {
-                display: none;
-            }
-        }
-        
-        .stamp-area {
-            border: 2px solid #000;
-            width: 150px;
-            height: 100px;
-            margin: 10px auto;
+
+        /* ── KOP SURAT ── */
+        .kop {
+            position: relative;
+            padding-bottom: 10px;
+            border-bottom: 4px double #000;
+            margin-bottom: 6px;
+            min-height: 75px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10pt;
-            color: #666;
         }
-        
-        .reference-number {
-            text-align: left;
-            margin-bottom: 20px;
-            font-weight: bold;
+        .kop img {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
         }
-        
+        .kop-text { text-align: center; }
+        .kop-text .nama-lembaga { font-size: 16pt; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        .kop-text .unit { font-size: 11pt; margin: 1px 0; color: #222; }
+        .kop-text .alamat { font-size: 9pt; color: #333; line-height: 15px; margin-top: 3px; }
+
+        .reference-number { margin: 5px 0 0; font-weight: bold; font-size: 10.5pt; }
+
+        .title { text-align: center; margin: 7px 0 6px; }
+        .title h3 { font-size: 13pt; font-weight: bold; text-decoration: underline; text-transform: uppercase; letter-spacing: 1px; }
+
+        .content { margin: 5px 0; text-align: justify; font-size: 11pt; }
+        .content p { margin: 5px 0; text-indent: 25px; }
+
+        .data-table { width: 100%; margin: 6px 0; border-collapse: collapse; font-size: 11pt; }
+        .data-table td { padding: 2px 8px; vertical-align: top; }
+        .data-table .label { width: 170px; font-weight: bold; }
+        .data-table .colon { width: 15px; text-align: center; }
+
         .recommendation-box {
-            margin-left: 30px;
-            padding: 15px;
-            border-left: 4px solid #6FBA9D;
+            margin: 4px 0 4px 25px;
+            padding: 8px 12px;
+            border-left: 3px solid #6FBA9D;
             background-color: #F8FBF9;
+            font-size: 10.5pt;
+            line-height: 1.5;
+        }
+
+        .date { text-align: right; margin: 6px 0 2px; font-size: 11pt; }
+
+        .ttd { margin-top: 5px; display: flex; justify-content: flex-end; }
+        .ttd-block { text-align: center; width: 42%; font-size: 11pt; }
+        .ttd-space { height: 45px; }
+
+        .footer-note {
+            margin-top: 5px;
+            text-align: center;
+            font-size: 9pt;
+            color: #666;
+            border-top: 1px solid #ccc;
+            padding-top: 6px;
+        }
+
+        @media print {
+            body { padding: 8px 18px; }
+            .no-print { display: none; }
+            @page { margin: 0.8cm; size: A4; }
         }
     </style>
 </head>
 <body>
-    <!-- Header Surat -->
-    <div class="header">
-        <h1>Pondok Pesantren [Nama Pesantren]</h1>
-        <h2>Unit Kesehatan Pesantren (UKP)</h2>
-        <p>Alamat: [Alamat Lengkap Pesantren]</p>
-        <p>Telepon: [Nomor Telepon] | Email: [Email Pesantren]</p>
+
+    <!-- KOP SURAT -->
+    <div class="kop">
+        <img src="{{ asset('images/logo.png') }}" alt="Logo PKPPS Riyadlul Jannah">
+        <div class="kop-text">
+            <div class="nama-lembaga">PKPPS Riyadlul Jannah</div>
+            <div class="unit">Unit Kesehatan Pesantren (UKP)</div>
+            <div class="alamat">
+                Jl. Raya Brangkal No. 42 RT. 02 RW. 01, Desa Brangkal, Kec. Sooko, Kab. Mojokerto, Prov. Jawa Timur
+            </div>
+        </div>
     </div>
 
     <!-- Nomor Surat -->
@@ -162,15 +102,14 @@
         Nomor: UKP/{{ str_pad($kesehatanSantri->id, 3, '0', STR_PAD_LEFT) }}/{{ $kesehatanSantri->tanggal_masuk->format('m/Y') }}
     </div>
 
-    <!-- Judul Surat -->
+    <!-- Judul -->
     <div class="title">
         <h3>Surat Keterangan Sakit</h3>
     </div>
 
-    <!-- Isi Surat -->
+    <!-- Isi -->
     <div class="content">
-        <p>Yang bertanda tangan di bawah ini, Petugas Unit Kesehatan Pesantren (UKP) 
-           Pondok Pesantren [Nama Pesantren], dengan ini menerangkan bahwa:</p>
+        <p>Yang bertanda tangan di bawah ini, Petugas Unit Kesehatan Pesantren (UKP) PKPPS Riyadlul Jannah, dengan ini menerangkan bahwa:</p>
 
         <table class="data-table">
             <tr>
@@ -179,19 +118,9 @@
                 <td><strong>{{ $kesehatanSantri->santri->nama_lengkap }}</strong></td>
             </tr>
             <tr>
-                <td class="label">ID Santri</td>
-                <td class="colon">:</td>
-                <td>{{ $kesehatanSantri->santri->id_santri }}</td>
-            </tr>
-            <tr>
                 <td class="label">NIS</td>
                 <td class="colon">:</td>
                 <td>{{ $kesehatanSantri->santri->nis ?: '-' }}</td>
-            </tr>
-            <tr>
-                <td class="label">Kelas</td>
-                <td class="colon">:</td>
-                <td>{{ $kesehatanSantri->santri->kelas }}</td>
             </tr>
             <tr>
                 <td class="label">Jenis Kelamin</td>
@@ -217,92 +146,66 @@
             </tr>
         </table>
 
-        <p><strong>Keluhan/Diagnosa:</strong></p>
-        <p style="margin-left: 30px; border-left: 3px solid #ccc; padding-left: 15px; font-style: italic;">
-            {{ $kesehatanSantri->keluhan }}
-        </p>
+        <p><strong>Keluhan:</strong> <em>{{ $kesehatanSantri->keluhan }}</em></p>
 
         @if($kesehatanSantri->catatan)
-        <p><strong>Catatan Petugas:</strong></p>
-        <p style="margin-left: 30px; border-left: 3px solid #ccc; padding-left: 15px; font-style: italic;">
-            {{ $kesehatanSantri->catatan }}
-        </p>
+        <p><strong>Catatan Petugas:</strong> <em>{{ $kesehatanSantri->catatan }}</em></p>
         @endif
 
-        <p>Berdasarkan kondisi kesehatan santri tersebut, kami merekomendasikan untuk:</p>
-        
+        <p>Berdasarkan kondisi kesehatan santri tersebut, kami merekomendasikan:</p>
+
         <div class="recommendation-box">
             @if($kesehatanSantri->status == 'izin')
-                ✓ <strong>Diberikan izin untuk istirahat/pulang</strong> selama masa pemulihan<br>
-                ✓ Tidak mengikuti kegiatan fisik yang berat<br>
-                ✓ Kontrol kembali jika gejala memburuk
+                &#10003; <strong>Diberikan izin istirahat/pulang</strong> selama masa pemulihan<br>
+                &#10003; Tidak mengikuti kegiatan fisik berat<br>
+                &#10003; Kontrol kembali jika gejala memburuk
             @elseif($kesehatanSantri->status == 'sembuh')
-                ✓ <strong>Sudah sembuh dan dapat mengikuti kegiatan normal</strong><br>
-                ✓ Tetap menjaga kesehatan dan istirahat yang cukup<br>
-                ✓ Konsultasi jika ada keluhan lanjutan
+                &#10003; <strong>Sudah sembuh dan dapat mengikuti kegiatan normal</strong><br>
+                &#10003; Tetap jaga kesehatan dan istirahat cukup<br>
+                &#10003; Konsultasi jika ada keluhan lanjutan
             @else
-                ✓ <strong>Masih dalam perawatan di UKP</strong><br>
-                ✓ Memerlukan istirahat dan pengobatan lanjutan<br>
-                ✓ Belum diperkenankan mengikuti kegiatan normal
+                &#10003; <strong>Masih dalam perawatan UKP</strong><br>
+                &#10003; Memerlukan istirahat dan pengobatan lanjutan<br>
+                &#10003; Izin tidak mengikuti kegiatan normal
             @endif
         </div>
 
-        <p>Demikian surat keterangan ini dibuat dengan sebenarnya untuk dapat digunakan sebagaimana mestinya.</p>
+        <p>Demikian surat keterangan ini dibuat dengan sebenarnya untuk digunakan sebagaimana mestinya.</p>
     </div>
 
-    <!-- Tanggal dan Tanda Tangan -->
+    <!-- Tanggal -->
     <div class="date">
-        {{ $kesehatanSantri->tanggal_masuk->locale('id')->isoFormat('dddd, D MMMM Y') }}
+        Mojokerto, {{ $kesehatanSantri->tanggal_masuk->locale('id')->isoFormat('D MMMM Y') }}
     </div>
 
-    <div class="signature">
-        <div class="signature-block">
-            <p><strong>Wali Santri/Keluarga</strong></p>
-            <div class="signature-space"></div>
-            <p><strong>{{ $kesehatanSantri->santri->nama_orang_tua ?: '(...............................)' }}</strong></p>
-            <hr style="width: 150px; margin: 0 auto;">
-        </div>
-        
-        <div class="signature-block">
+    <!-- Tanda Tangan -->
+    <div class="ttd">
+        <div class="ttd-block">
             <p><strong>Petugas UKP</strong></p>
-            <div class="signature-space"></div>
-            <div class="stamp-area">
-                <span>Cap & Tanda Tangan</span>
-            </div>
-            <p><strong>[Nama Petugas UKP]</strong></p>
-            <hr style="width: 150px; margin: 0 auto;">
+            <div class="ttd-space"></div>
+            <p><strong>(&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)</strong></p>
         </div>
     </div>
 
     <!-- Footer -->
-    <div style="margin-top: 30px; text-align: center; font-size: 10pt; color: #666; border-top: 1px solid #ccc; padding-top: 10px;">
-        <p>Surat ini dibuat secara elektronis dan sah tanpa tanda tangan basah</p>
-        <p>Dicetak pada: {{ now()->locale('id')->isoFormat('D MMMM Y HH:mm:ss') }} WIB</p>
+    <div class="footer-note">
+        &nbsp; Dicetak: {{ now()->locale('id')->isoFormat('D MMMM Y') }} WIB
     </div>
 
-    <!-- Print Button (tidak akan tercetak) -->
-    <div class="no-print" style="position: fixed; top: 10px; right: 10px; z-index: 1000;">
-        <button onclick="window.print()" style="background: #6FBA9D; color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+
+    <!-- Tombol Print -->
+    <div class="no-print" style="position:fixed; top:10px; right:10px; z-index:1000;">
+        <button onclick="window.print()" style="background:#6FBA9D; color:white; border:none; padding:10px 15px; border-radius:8px; cursor:pointer; font-size:14px; box-shadow:0 2px 4px rgba(0,0,0,.2);">
             <i class="fas fa-print"></i> Cetak
         </button>
-        <button onclick="window.close()" style="background: #E74C3C; color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-size: 14px; margin-left: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+        <button onclick="window.close()" style="background:#E74C3C; color:white; border:none; padding:10px 15px; border-radius:8px; cursor:pointer; font-size:14px; margin-left:5px; box-shadow:0 2px 4px rgba(0,0,0,.2);">
             <i class="fas fa-times"></i> Tutup
         </button>
     </div>
 
     <script>
-        // Print function
-        function printSurat() {
-            window.print();
-        }
-        
-        // Keyboard shortcuts
         document.addEventListener('keydown', function(e) {
-            // Ctrl+P or Cmd+P for print
-            if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
-                e.preventDefault();
-                window.print();
-            }
+            if ((e.ctrlKey || e.metaKey) && e.key === 'p') { e.preventDefault(); window.print(); }
         });
     </script>
 </body>

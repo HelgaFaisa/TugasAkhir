@@ -95,20 +95,20 @@
         </div>
 
         @if($riwayatPelanggaran->is_kafaroh_selesai)
-            <div style="background: #d4edda; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid var(--success-color);">
+            <div style="background: #d4edda; padding: 15px; border-radius: 8px; margin-bottom: 14px; border-left: 4px solid var(--success-color);">
                 <i class="fas fa-info-circle"></i> 
                 <strong>Info:</strong> Kafaroh sudah diselesaikan pada {{ $riwayatPelanggaran->tanggal_kafaroh_selesai->format('d M Y H:i') }}
             </div>
         @endif
 
         @if($riwayatPelanggaran->is_published_to_parent)
-            <div style="background: #d1ecf1; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid var(--info-color);">
+            <div style="background: #d1ecf1; padding: 15px; border-radius: 8px; margin-bottom: 14px; border-left: 4px solid var(--info-color);">
                 <i class="fas fa-info-circle"></i> 
                 <strong>Info:</strong> Riwayat ini sudah dikirim ke wali santri pada {{ $riwayatPelanggaran->tanggal_published->format('d M Y H:i') }}
             </div>
         @endif
 
-        <div class="btn-group" style="margin-top: 30px;">
+        <div class="btn-group" style="margin-top: 22px;">
             <button type="submit" class="btn btn-primary">
                 <i class="fas fa-save"></i> Update
             </button>

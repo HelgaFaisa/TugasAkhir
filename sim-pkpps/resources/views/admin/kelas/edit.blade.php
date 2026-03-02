@@ -102,7 +102,7 @@
                        id="is_active" 
                        name="is_active"
                        value="1"
-                       {{ old('is_active', $kelas->is_active) ? 'checked' : '' }}>
+                       {{ old('is_active', $kela->is_active) ? 'checked' : '' }}>
                 <label class="form-check-label" for="is_active">
                     Status Aktif
                 </label>

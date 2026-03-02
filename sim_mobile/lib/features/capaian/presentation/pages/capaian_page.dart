@@ -1,4 +1,4 @@
-// lib/features/capaian/presentation/pages/capaian_page.dart
+﻿// lib/features/capaian/presentation/pages/capaian_page.dart
 // REDESIGNED: Comprehensive capaian dashboard with new kelas system support
 
 import 'dart:math';
@@ -13,10 +13,9 @@ import 'semester_report_page.dart';
 // ============================================
 // COLOR CONSTANTS
 // ============================================
-const _kPurple = Color(0xFF7C3AED);
-const _kPurpleDark = Color(0xFF5B21B6);
-const _kPurpleLight = Color(0xFFEDE9FE);
-const _kGreen = Color(0xFF10B981);
+const _kPrimary = Color(0xFF6FBA9D);
+const _kPrimaryDark = Color(0xFF4D987B);
+const _kPrimaryLight = Color(0xFFE8F7F2);
 const _kOrange = Color(0xFFF59E0B);
 const _kRed = Color(0xFFEF4444);
 const _kBlue = Color(0xFF3B82F6);
@@ -95,11 +94,11 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
     return Scaffold(
       backgroundColor: const Color(0xFFF5F3FF),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: _kPurple))
+          ? const Center(child: CircularProgressIndicator(color: _kPrimary))
           : _data == null
               ? _buildError()
               : RefreshIndicator(
-                  color: _kPurple,
+                  color: _kPrimary,
                   onRefresh: _loadData,
                   child: CustomScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
@@ -118,11 +117,11 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
   Widget _buildSliverAppBar() {
     final d = _data!;
     return SliverAppBar(
-      expandedHeight: 220,
+      expandedHeight: MediaQuery.of(context).size.height * 0.28,
       pinned: true,
-      backgroundColor: _kPurple,
+      backgroundColor: _kPrimary,
       foregroundColor: Colors.white,
-      title: const Text('Capaian Santri', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+      title: const Text('Capaian Santri', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
       actions: [
         IconButton(
           icon: const Icon(Icons.calendar_month_rounded),
@@ -136,12 +135,12 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [_kPurple, _kPurpleDark, Color(0xFF4C1D95)],
+              colors: [_kPrimary, _kPrimaryDark, Color(0xFF3D8A6B)],
             ),
           ),
           child: SafeArea(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(24, 56, 24, 16),
+              padding: const EdgeInsets.fromLTRB(19, 43, 19, 12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -149,18 +148,18 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
                   Text(
                     d.santri.namaLengkap,
                     style: const TextStyle(
-                      fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white,
+                      fontSize: 17, fontWeight: FontWeight.bold, color: Colors.white,
                     ),
                     maxLines: 1, overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 5),
                   Row(
                     children: [
                       // Kelas Primary Badge
                       _buildKelasChip(d.santri),
                       // "+X kelas lainnya" chip
                       if (d.santri.hasMultipleKelas) ...[
-                        const SizedBox(width: 6),
+                        const SizedBox(width: 5),
                         GestureDetector(
                           onTap: () => KelasListModal.show(
                             context,
@@ -168,21 +167,21 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
                             santriName: d.santri.namaLengkap,
                           ),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                             decoration: BoxDecoration(
                               color: Colors.white.withValues(alpha: 0.2),
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: BorderRadius.circular(15),
                             ),
                             child: Text(
                               '+${d.santri.kelasLainnyaCount} kelas lainnya',
-                              style: const TextStyle(fontSize: 11, color: Colors.white70, fontWeight: FontWeight.w500),
+                              style: const TextStyle(fontSize: 8, color: Colors.white70, fontWeight: FontWeight.w500),
                             ),
                           ),
                         ),
                       ],
                     ],
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 2),
                   _chip(d.semester.namaSemester, Icons.date_range_rounded),
                 ],
               ),
@@ -199,24 +198,24 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
     final kelompokColor = KelasBadge.getKelompokColor(kelasPrimary?.kelompok);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
         color: kelompokColor.withValues(alpha: 0.25),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(15),
         border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.school_rounded, size: 14, color: Colors.white),
-          const SizedBox(width: 4),
+          const Icon(Icons.school_rounded, size: 11, color: Colors.white),
+          const SizedBox(width: 2),
           Text(
             kelasPrimary != null
                 ? (kelasPrimary.kelompok != null
                     ? '${kelasPrimary.kelompok}: ${kelasPrimary.namaKelas}'
                     : kelasPrimary.namaKelas)
                 : santri.kelasDisplayName,
-            style: const TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.w600),
+            style: const TextStyle(fontSize: 9, color: Colors.white, fontWeight: FontWeight.w600),
           ),
         ],
       ),
@@ -225,17 +224,17 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
 
   Widget _chip(String label, IconData icon) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(15),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: Colors.white70),
-          const SizedBox(width: 4),
-          Text(label, style: const TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.w500)),
+          Icon(icon, size: 11, color: Colors.white70),
+          const SizedBox(width: 2),
+          Text(label, style: const TextStyle(fontSize: 9, color: Colors.white, fontWeight: FontWeight.w500)),
         ],
       ),
     );
@@ -249,11 +248,11 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
     final isWali = d.role == 'wali';
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 32),
+      padding: const EdgeInsets.only(bottom: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 8. Parent Summary (if wali) — shown first and prominent
+          // 8. Parent Summary (if wali) â€” shown first and prominent
           if (isWali) _buildParentSummary(d),
 
           // Summary Stats Cards (2x2 grid)
@@ -307,7 +306,7 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
     final aspectRatio = screenWidth < 360 ? 1.1 : (screenWidth < 400 ? 1.2 : 1.35);
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+      padding: const EdgeInsets.fromLTRB(15, 12, 15, 0),
       child: GridView.count(
         crossAxisCount: 2,
         shrinkWrap: true,
@@ -320,7 +319,7 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
             icon: Icons.book_rounded,
             label: 'Total Capaian',
             value: '${progress.totalMateri}',
-            color: _kPurple,
+            color: _kPrimary,
           ),
           _summaryCard(
             icon: Icons.trending_up_rounded,
@@ -332,7 +331,7 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
             icon: Icons.check_circle_rounded,
             label: 'Materi Selesai',
             value: '${progress.materiSelesai}',
-            color: _kGreen,
+            color: _kPrimary,
           ),
           _summaryCard(
             icon: Icons.emoji_events_rounded,
@@ -358,33 +357,33 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(11),
         border: Border.all(color: color.withValues(alpha: 0.15)),
       ),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(9),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Container(
-            padding: const EdgeInsets.all(6),
+            padding: const EdgeInsets.all(5),
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(7),
             ),
-            child: Icon(icon, size: 16, color: color),
+            child: Icon(icon, size: 12, color: color),
           ),
           const Spacer(),
           Text(
             value,
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color),
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: color),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 2),
           Text(
             label,
-            style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+            style: TextStyle(fontSize: 8, color: Colors.grey[600]),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -398,15 +397,15 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.cloud_off_rounded, size: 72, color: Colors.grey),
-          const SizedBox(height: 16),
-          const Text('Gagal memuat data', style: TextStyle(fontSize: 16, color: Colors.grey)),
-          const SizedBox(height: 16),
+          const Icon(Icons.cloud_off_rounded, size: 55, color: Colors.grey),
+          const SizedBox(height: 12),
+          const Text('Gagal memuat data', style: TextStyle(fontSize: 12, color: Colors.grey)),
+          const SizedBox(height: 12),
           ElevatedButton.icon(
             onPressed: _loadData,
             icon: const Icon(Icons.refresh),
             label: const Text('Coba Lagi'),
-            style: ElevatedButton.styleFrom(backgroundColor: _kPurple, foregroundColor: Colors.white),
+            style: ElevatedButton.styleFrom(backgroundColor: _kPrimary, foregroundColor: Colors.white),
           ),
         ],
       ),
@@ -415,19 +414,19 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
 
   Widget _buildSectionTitle(String title, IconData icon) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
+      padding: const EdgeInsets.fromLTRB(15, 19, 15, 9),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(6),
+            padding: const EdgeInsets.all(5),
             decoration: BoxDecoration(
-              color: _kPurpleLight,
-              borderRadius: BorderRadius.circular(8),
+              color: _kPrimaryLight,
+              borderRadius: BorderRadius.circular(7),
             ),
-            child: Icon(icon, size: 18, color: _kPurple),
+            child: Icon(icon, size: 15, color: _kPrimary),
           ),
-          const SizedBox(width: 10),
-          Text(title, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Color(0xFF1E1B4B))),
+          const SizedBox(width: 8),
+          Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF1E1B4B))),
         ],
       ),
     );
@@ -442,7 +441,7 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
     if (history.isEmpty) {
       // Show just current progress as single card
       return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 15),
         child: _SemesterProgressCard(
           semesterName: d.semester.namaSemester,
           totalProgress: d.currentProgress.totalProgress,
@@ -455,7 +454,7 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
     return Column(
       children: [
         SizedBox(
-          height: 220,
+          height: MediaQuery.of(context).size.height * 0.28,
           child: PageView.builder(
             controller: _semesterPageController,
             itemCount: history.length,
@@ -465,7 +464,7 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
               // If this is the current semester, use detailed per_kategori data
               final isCurrentSem = sem.isCurrent;
               return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 2),
                 child: _SemesterProgressCard(
                   semesterName: sem.namaSemester,
                   totalProgress: isCurrentSem ? d.currentProgress.totalProgress : sem.rataRataProgress,
@@ -478,19 +477,19 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
             },
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 7),
         // Dot indicators
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(history.length, (i) {
             return AnimatedContainer(
               duration: const Duration(milliseconds: 300),
-              margin: const EdgeInsets.symmetric(horizontal: 3),
+              margin: const EdgeInsets.symmetric(horizontal: 2),
               width: _currentSemesterPage == i ? 24 : 8,
-              height: 8,
+              height: 7,
               decoration: BoxDecoration(
-                color: _currentSemesterPage == i ? _kPurple : Colors.grey[300],
-                borderRadius: BorderRadius.circular(4),
+                color: _currentSemesterPage == i ? _kPrimary : Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
               ),
             );
           }),
@@ -505,14 +504,14 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
   Widget _buildProgressTimeline(List<SemesterHistoryItem> history) {
     final reversed = history.reversed.toList();
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 12, offset: const Offset(0, 4))],
         ),
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         child: Column(
           children: List.generate(reversed.length, (i) {
             final item = reversed[i];
@@ -527,27 +526,27 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
               children: [
                 // Timeline line + dot
                 SizedBox(
-                  width: 36,
+                  width: 27,
                   child: Column(
                     children: [
                       Container(
-                        width: 14,
-                        height: 14,
+                        width: 11,
+                        height: 11,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: item.isCurrent ? _kPurple : Colors.grey[300],
-                          border: Border.all(color: item.isCurrent ? _kPurpleDark : Colors.grey[400]!, width: 2),
+                          color: item.isCurrent ? _kPrimary : Colors.grey[300],
+                          border: Border.all(color: item.isCurrent ? _kPrimaryDark : Colors.grey[400]!, width: 2),
                         ),
                       ),
                       if (!isLast)
-                        Container(width: 2, height: 48, color: Colors.grey[300]),
+                        Container(width: 2, height: 36, color: Colors.grey[300]),
                     ],
                   ),
                 ),
                 // Content
                 Expanded(
                   child: Padding(
-                    padding: EdgeInsets.only(bottom: isLast ? 0 : 16),
+                    padding: EdgeInsets.only(bottom: isLast ? 0 : 12),
                     child: Row(
                       children: [
                         Expanded(
@@ -557,28 +556,28 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
                               Text(
                                 item.namaSemester,
                                 style: TextStyle(
-                                  fontSize: 14,
+                                  fontSize: 11,
                                   fontWeight: item.isCurrent ? FontWeight.bold : FontWeight.w500,
-                                  color: item.isCurrent ? _kPurple : Colors.grey[800],
+                                  color: item.isCurrent ? _kPrimary : Colors.grey[800],
                                 ),
                               ),
                               if (item.isCurrent)
-                                const Text('Saat Ini', style: TextStyle(fontSize: 11, color: _kPurple)),
+                                const Text('Saat Ini', style: TextStyle(fontSize: 8, color: _kPrimary)),
                             ],
                           ),
                         ),
                         Text(
                           '${item.rataRataProgress.toStringAsFixed(1)}%',
                           style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold,
-                            color: item.isCurrent ? _kPurple : Colors.grey[700],
+                            fontSize: 12, fontWeight: FontWeight.bold,
+                            color: item.isCurrent ? _kPrimary : Colors.grey[700],
                           ),
                         ),
-                        const SizedBox(width: 6),
+                        const SizedBox(width: 5),
                         if (change != null)
                           _trendBadge(change)
                         else
-                          const SizedBox(width: 36),
+                          const SizedBox(width: 27),
                       ],
                     ),
                   ),
@@ -595,23 +594,23 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
     final isUp = change > 0;
     final isNeutral = change == 0;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
       decoration: BoxDecoration(
-        color: isNeutral ? Colors.grey[100] : (isUp ? _kGreen.withValues(alpha: 0.1) : _kRed.withValues(alpha: 0.1)),
-        borderRadius: BorderRadius.circular(8),
+        color: isNeutral ? Colors.grey[100] : (isUp ? _kPrimary.withValues(alpha: 0.1) : _kRed.withValues(alpha: 0.1)),
+        borderRadius: BorderRadius.circular(7),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
             isNeutral ? Icons.remove : (isUp ? Icons.arrow_upward : Icons.arrow_downward),
-            size: 12,
-            color: isNeutral ? Colors.grey : (isUp ? _kGreen : _kRed),
+            size: 9,
+            color: isNeutral ? Colors.grey : (isUp ? _kPrimary : _kRed),
           ),
           if (!isNeutral)
             Text(
               '${change.abs().toStringAsFixed(1)}%',
-              style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: isUp ? _kGreen : _kRed),
+              style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: isUp ? _kPrimary : _kRed),
             ),
         ],
       ),
@@ -623,29 +622,29 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
   // ============================================
   Widget _buildAchievements(List<AchievementItem> achvs) {
     return SizedBox(
-      height: 56,
+      height: 43,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 15),
         itemCount: achvs.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 10),
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
         itemBuilder: (ctx, i) {
           final a = achvs[i];
           return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: _achvGradient(a.type),
               ),
-              borderRadius: BorderRadius.circular(28),
+              borderRadius: BorderRadius.circular(21),
               boxShadow: [BoxShadow(color: _achvGradient(a.type)[0].withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 3))],
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(_achvEmoji(a.type), style: const TextStyle(fontSize: 20)),
-                const SizedBox(width: 8),
-                Text(a.text, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
+                Text(_achvEmoji(a.type), style: const TextStyle(fontSize: 15)),
+                const SizedBox(width: 7),
+                Text(a.text, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.white)),
               ],
             ),
           );
@@ -657,8 +656,8 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
   List<Color> _achvGradient(String type) {
     switch (type) {
       case 'khatam': return [const Color(0xFFFFB020), const Color(0xFFFF8C00)];
-      case 'growth': return [_kGreen, const Color(0xFF059669)];
-      case 'rank': return [_kPurple, _kPurpleDark];
+      case 'growth': return [_kPrimary, const Color(0xFF059669)];
+      case 'rank': return [_kPrimary, _kPrimaryDark];
       case 'decline': return [_kOrange, _kRed];
       default: return [_kBlue, const Color(0xFF2563EB)];
     }
@@ -666,11 +665,11 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
 
   String _achvEmoji(String type) {
     switch (type) {
-      case 'khatam': return '🏆';
-      case 'growth': return '📈';
-      case 'rank': return '⭐';
-      case 'decline': return '📉';
-      default: return '🎯';
+      case 'khatam': return 'ðŸ†';
+      case 'growth': return 'ðŸ“ˆ';
+      case 'rank': return 'â­';
+      case 'decline': return 'ðŸ“‰';
+      default: return 'ðŸŽ¯';
     }
   }
 
@@ -680,10 +679,10 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
   Widget _buildMateriStatus(List<MateriStatusItem> items) {
     if (items.isEmpty) {
       return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 15),
         child: Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+          padding: const EdgeInsets.all(19),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
           child: const Center(child: Text('Belum ada data materi', style: TextStyle(color: Colors.grey))),
         ),
       );
@@ -694,24 +693,24 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
     final belum = items.where((m) => m.status == 'belum_mulai').toList();
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 12, offset: const Offset(0, 4))],
         ),
         child: Column(
           children: [
             // Summary row
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(12),
               child: Row(
                 children: [
-                  _statusChip('Selesai', selesai.length, _kGreen),
-                  const SizedBox(width: 8),
+                  _statusChip('Selesai', selesai.length, _kPrimary),
+                  const SizedBox(width: 7),
                   _statusChip('Progres', progres.length, _kOrange),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 7),
                   _statusChip('Belum', belum.length, Colors.grey),
                 ],
               ),
@@ -721,8 +720,8 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
             ...items.take(10).map((m) => _materiTile(m)),
             if (items.length > 10)
               Padding(
-                padding: const EdgeInsets.all(12),
-                child: Text('+ ${items.length - 10} materi lainnya', style: TextStyle(fontSize: 13, color: Colors.grey[500])),
+                padding: const EdgeInsets.all(9),
+                child: Text('+ ${items.length - 10} materi lainnya', style: TextStyle(fontSize: 11, color: Colors.grey[500])),
               ),
           ],
         ),
@@ -733,15 +732,15 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
   Widget _statusChip(String label, int count, Color color) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.symmetric(vertical: 7),
         decoration: BoxDecoration(
           color: color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(8),
         ),
         child: Column(
           children: [
-            Text('$count', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color)),
-            Text(label, style: TextStyle(fontSize: 11, color: color)),
+            Text('$count', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: color)),
+            Text(label, style: TextStyle(fontSize: 8, color: color)),
           ],
         ),
       ),
@@ -758,40 +757,40 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
         );
       },
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         child: Row(
           children: [
             Container(
-              width: 36, height: 36,
+              width: 27, height: 27,
               decoration: BoxDecoration(
                 color: _parseColor(m.color).withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(7),
               ),
-              child: Icon(_getIconData(m.icon), size: 18, color: _parseColor(m.color)),
+              child: Icon(_getIconData(m.icon), size: 15, color: _parseColor(m.color)),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 9),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(m.namaKitab, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
-                  Text(m.kategori, style: TextStyle(fontSize: 11, color: Colors.grey[500])),
+                  Text(m.namaKitab, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
+                  Text(m.kategori, style: TextStyle(fontSize: 8, color: Colors.grey[500])),
                 ],
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 7),
             SizedBox(
-              width: 48,
+              width: 36,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
                     '${m.persentase.toStringAsFixed(0)}%',
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: statusColor),
+                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: statusColor),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 2),
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(3),
+                    borderRadius: BorderRadius.circular(2),
                     child: LinearProgressIndicator(
                       value: m.persentase / 100,
                       backgroundColor: Colors.grey[200],
@@ -802,8 +801,8 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
                 ],
               ),
             ),
-            const SizedBox(width: 4),
-            Icon(Icons.chevron_right, size: 18, color: Colors.grey[400]),
+            const SizedBox(width: 2),
+            Icon(Icons.chevron_right, size: 15, color: Colors.grey[400]),
           ],
         ),
       ),
@@ -815,19 +814,19 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
   // ============================================
   Widget _buildRaporButton(CapaianDashboard d) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+      padding: const EdgeInsets.fromLTRB(15, 19, 15, 0),
       child: Container(
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-            colors: [_kPurple, _kPurpleDark],
+            colors: [_kPrimary, _kPrimaryDark],
           ),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [BoxShadow(color: _kPurple.withValues(alpha: 0.3), blurRadius: 12, offset: const Offset(0, 4))],
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [BoxShadow(color: _kPrimary.withValues(alpha: 0.3), blurRadius: 12, offset: const Offset(0, 4))],
         ),
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(12),
             onTap: () {
               Navigator.push(
                 context,
@@ -835,29 +834,29 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
               );
             },
             child: Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(15),
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(9),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(9),
                     ),
-                    child: const Icon(Icons.description_rounded, color: Colors.white, size: 28),
+                    child: const Icon(Icons.description_rounded, color: Colors.white, size: 21),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 12),
                   const Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Lihat Rapor Semester', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
-                        SizedBox(height: 4),
-                        Text('Summary lengkap capaian semester ini', style: TextStyle(fontSize: 13, color: Colors.white70)),
+                        Text('Lihat Rapor Semester', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white)),
+                        SizedBox(height: 2),
+                        Text('Summary lengkap capaian semester ini', style: TextStyle(fontSize: 11, color: Colors.white70)),
                       ],
                     ),
                   ),
-                  const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white70, size: 18),
+                  const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white70, size: 15),
                 ],
               ),
             ),
@@ -872,26 +871,26 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
   // ============================================
   Widget _buildPeerComparison(CapaianDashboard d) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 12, offset: const Offset(0, 4))],
         ),
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         child: Column(
           children: [
             // Legend
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _legendDot(_kPurple, d.santri.namaLengkap.split(' ').first),
-                const SizedBox(width: 16),
+                _legendDot(_kPrimary, d.santri.namaLengkap.split(' ').first),
+                const SizedBox(width: 12),
                 _legendDot(Colors.grey[400]!, 'Rata-rata Kelas'),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             ...d.peerComparison.map((p) => _peerBar(p, d.santri.namaLengkap.split(' ').first)),
           ],
         ),
@@ -903,9 +902,9 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(width: 10, height: 10, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
-        const SizedBox(width: 6),
-        Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+        Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+        const SizedBox(width: 5),
+        Text(label, style: TextStyle(fontSize: 9, color: Colors.grey[600])),
       ],
     );
   }
@@ -916,26 +915,26 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
     final isAhead = p.santriProgress >= p.kelasAvg;
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.only(bottom: 11),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(_getIconData(p.icon), size: 16, color: catColor),
-              const SizedBox(width: 6),
-              Text(p.kategori, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.grey[800])),
+              Icon(_getIconData(p.icon), size: 12, color: catColor),
+              const SizedBox(width: 5),
+              Text(p.kategori, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.grey[800])),
               const Spacer(),
               if (isAhead && p.santriProgress > 0)
-                Text('🟢', style: TextStyle(fontSize: 10))
+                Text('ðŸŸ¢', style: TextStyle(fontSize: 8))
               else if (!isAhead && p.kelasAvg > 0)
-                Text('🔴', style: TextStyle(fontSize: 10)),
+                Text('ðŸ”´', style: TextStyle(fontSize: 8)),
             ],
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 5),
           // Santri bar
-          _dualBar(santriName, p.santriProgress, maxVal, _kPurple),
-          const SizedBox(height: 3),
+          _dualBar(santriName, p.santriProgress, maxVal, _kPrimary),
+          const SizedBox(height: 2),
           // Kelas avg bar
           _dualBar('Kelas', p.kelasAvg, maxVal, Colors.grey[400]!),
         ],
@@ -947,33 +946,33 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
     return Row(
       children: [
         SizedBox(
-          width: 40,
-          child: Text(label, style: TextStyle(fontSize: 10, color: Colors.grey[500]), overflow: TextOverflow.ellipsis),
+          width: 31,
+          child: Text(label, style: TextStyle(fontSize: 8, color: Colors.grey[500]), overflow: TextOverflow.ellipsis),
         ),
         Expanded(
           child: Stack(
             children: [
               Container(
-                height: 14,
-                decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(7)),
+                height: 11,
+                decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(5)),
               ),
               FractionallySizedBox(
                 widthFactor: maxVal > 0 ? (value / 100).clamp(0.0, 1.0) : 0,
                 child: Container(
-                  height: 14,
+                  height: 11,
                   decoration: BoxDecoration(
                     color: color,
-                    borderRadius: BorderRadius.circular(7),
+                    borderRadius: BorderRadius.circular(5),
                   ),
                 ),
               ),
             ],
           ),
         ),
-        const SizedBox(width: 6),
+        const SizedBox(width: 5),
         SizedBox(
-          width: 38,
-          child: Text('${value.toStringAsFixed(1)}%', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: color), textAlign: TextAlign.right),
+          width: 29,
+          child: Text('${value.toStringAsFixed(1)}%', style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: color), textAlign: TextAlign.right),
         ),
       ],
     );
@@ -984,19 +983,19 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
   // ============================================
   Widget _buildHistoricalGraph(List<SemesterHistoryItem> history) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 12, offset: const Offset(0, 4))],
         ),
-        padding: const EdgeInsets.fromLTRB(12, 16, 16, 16),
+        padding: const EdgeInsets.fromLTRB(9, 12, 12, 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(
-              height: 180,
+              height: MediaQuery.of(context).size.height * 0.22,
               child: _LineChart(
                 data: history.map((h) => h.rataRataProgress).toList(),
                 labels: history.map((h) => _shortSemLabel(h.namaSemester)).toList(),
@@ -1006,11 +1005,11 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
                 },
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 7),
             Center(
               child: Text(
                 'Tap titik untuk detail semester',
-                style: TextStyle(fontSize: 11, color: Colors.grey[400], fontStyle: FontStyle.italic),
+                style: TextStyle(fontSize: 8, color: Colors.grey[400], fontStyle: FontStyle.italic),
               ),
             ),
           ],
@@ -1035,37 +1034,37 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) => SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(19),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  const Icon(Icons.calendar_month_rounded, color: _kPurple),
-                  const SizedBox(width: 8),
-                  Text(item.namaSemester, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  const Icon(Icons.calendar_month_rounded, color: _kPrimary),
+                  const SizedBox(width: 7),
+                  Text(item.namaSemester, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                   if (item.isCurrent) ...[
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 7),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(color: _kGreen, borderRadius: BorderRadius.circular(10)),
-                      child: const Text('Saat Ini', style: TextStyle(fontSize: 10, color: Colors.white, fontWeight: FontWeight.bold)),
+                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                      decoration: BoxDecoration(color: _kPrimary, borderRadius: BorderRadius.circular(8)),
+                      child: const Text('Saat Ini', style: TextStyle(fontSize: 8, color: Colors.white, fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ],
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 15),
               Row(
                 children: [
-                  _detailStat('Rata-rata', '${item.rataRataProgress.toStringAsFixed(1)}%', _kPurple),
-                  const SizedBox(width: 16),
+                  _detailStat('Rata-rata', '${item.rataRataProgress.toStringAsFixed(1)}%', _kPrimary),
+                  const SizedBox(width: 12),
                   _detailStat('Total Materi', '${item.totalMateri}', _kBlue),
-                  const SizedBox(width: 16),
-                  _detailStat('Selesai', '${item.materiSelesai}', _kGreen),
+                  const SizedBox(width: 12),
+                  _detailStat('Selesai', '${item.materiSelesai}', _kPrimary),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
             ],
           ),
         ),
@@ -1076,13 +1075,13 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
   Widget _detailStat(String label, String value, Color color) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
+        padding: const EdgeInsets.all(9),
+        decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(9)),
         child: Column(
           children: [
-            Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: color)),
-            const SizedBox(height: 4),
-            Text(label, style: TextStyle(fontSize: 11, color: color), textAlign: TextAlign.center),
+            Text(value, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: color)),
+            const SizedBox(height: 2),
+            Text(label, style: TextStyle(fontSize: 8, color: color), textAlign: TextAlign.center),
           ],
         ),
       ),
@@ -1096,19 +1095,19 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
     final rapor = d.raporSummary;
     final isNaik = rapor.trend == 'naik';
     final isTurun = rapor.trend == 'turun';
-    final trendColor = isNaik ? _kGreen : (isTurun ? _kRed : _kOrange);
+    final trendColor = isNaik ? _kPrimary : (isTurun ? _kRed : _kOrange);
     final trendIcon = isNaik ? Icons.trending_up_rounded : (isTurun ? Icons.trending_down_rounded : Icons.trending_flat_rounded);
 
     Color predikatColor;
     switch (rapor.predikat) {
-      case 'Baik Sekali': predikatColor = _kGreen; break;
+      case 'Baik Sekali': predikatColor = _kPrimary; break;
       case 'Baik': predikatColor = _kBlue; break;
       case 'Cukup': predikatColor = _kOrange; break;
       default: predikatColor = _kRed;
     }
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+      padding: const EdgeInsets.fromLTRB(15, 12, 15, 0),
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -1116,39 +1115,39 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(15),
           border: Border.all(color: predikatColor.withValues(alpha: 0.2)),
         ),
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(15),
         child: Column(
           children: [
-            const Text('Progress Semester Ini', style: TextStyle(fontSize: 14, color: Colors.grey)),
-            const SizedBox(height: 8),
+            const Text('Progress Semester Ini', style: TextStyle(fontSize: 11, color: Colors.grey)),
+            const SizedBox(height: 7),
             Text(
               '${rapor.totalProgress.toStringAsFixed(1)}%',
-              style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: predikatColor),
+              style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: predikatColor),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(trendIcon, size: 18, color: trendColor),
-                const SizedBox(width: 4),
+                Icon(trendIcon, size: 15, color: trendColor),
+                const SizedBox(width: 2),
                 Text(
                   rapor.perubahan != 0
                       ? '${rapor.perubahan > 0 ? '+' : ''}${rapor.perubahan.toStringAsFixed(1)}% dari semester lalu'
                       : 'Semester pertama',
-                  style: TextStyle(fontSize: 13, color: trendColor, fontWeight: FontWeight.w500),
+                  style: TextStyle(fontSize: 11, color: trendColor, fontWeight: FontWeight.w500),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 9),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(color: predikatColor.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(20)),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+              decoration: BoxDecoration(color: predikatColor.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(15)),
               child: Text(
                 'Status: ${rapor.predikat}',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: predikatColor),
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: predikatColor),
               ),
             ),
           ],
@@ -1206,18 +1205,18 @@ class _SemesterProgressCard extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isCurrent
-              ? [_kPurple, _kPurpleDark]
+              ? [_kPrimary, _kPrimaryDark]
               : [Colors.grey[600]!, Colors.grey[800]!],
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: (isCurrent ? _kPurple : Colors.grey).withValues(alpha: 0.3),
+            color: (isCurrent ? _kPrimary : Colors.grey).withValues(alpha: 0.3),
             blurRadius: 12, offset: const Offset(0, 6),
           ),
         ],
       ),
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(15),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1230,33 +1229,33 @@ class _SemesterProgressCard extends StatelessWidget {
                   children: [
                     Text(
                       semesterName,
-                      style: const TextStyle(fontSize: 14, color: Colors.white70, fontWeight: FontWeight.w500),
+                      style: const TextStyle(fontSize: 11, color: Colors.white70, fontWeight: FontWeight.w500),
                       maxLines: 1, overflow: TextOverflow.ellipsis,
                     ),
                     if (isCurrent)
-                      const Text('Semester Aktif', style: TextStyle(fontSize: 11, color: Colors.white38)),
+                      const Text('Semester Aktif', style: TextStyle(fontSize: 8, color: Colors.white38)),
                   ],
                 ),
               ),
               // Big percentage
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(11),
                 ),
                 child: Text(
                   '${totalProgress.toStringAsFixed(1)}%',
-                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.white),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 9),
 
           // Progress bar
           ClipRRect(
-            borderRadius: BorderRadius.circular(6),
+            borderRadius: BorderRadius.circular(5),
             child: LinearProgressIndicator(
               value: (totalProgress / 100).clamp(0.0, 1.0),
               backgroundColor: Colors.white.withValues(alpha: 0.15),
@@ -1264,7 +1263,7 @@ class _SemesterProgressCard extends StatelessWidget {
               minHeight: 8,
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 11),
 
           // Per kategori or simple stats
           if (perKategori != null && perKategori!.isNotEmpty)
@@ -1273,27 +1272,27 @@ class _SemesterProgressCard extends StatelessWidget {
                 final c = _parseHex(k.color);
                 return Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 3),
+                    padding: const EdgeInsets.symmetric(horizontal: 2),
                     child: Column(
                       children: [
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Container(width: 6, height: 6, decoration: BoxDecoration(color: c, shape: BoxShape.circle)),
-                            const SizedBox(width: 4),
+                            Container(width: 5, height: 5, decoration: BoxDecoration(color: c, shape: BoxShape.circle)),
+                            const SizedBox(width: 2),
                             Flexible(
                               child: Text(
                                 k.kategori.replaceAll('Materi ', ''),
-                                style: const TextStyle(fontSize: 10, color: Colors.white60),
+                                style: const TextStyle(fontSize: 8, color: Colors.white60),
                                 maxLines: 1, overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 2),
                         Text(
                           '${k.rataRataProgress.toStringAsFixed(0)}%',
-                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white),
                         ),
                       ],
                     ),
@@ -1305,7 +1304,7 @@ class _SemesterProgressCard extends StatelessWidget {
             Row(
               children: [
                 _miniStat('Materi', '${totalMateri ?? 0}'),
-                const SizedBox(width: 16),
+                const SizedBox(width: 12),
                 _miniStat('Selesai', '${materiSelesai ?? 0}'),
               ],
             ),
@@ -1318,8 +1317,8 @@ class _SemesterProgressCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 11, color: Colors.white54)),
-        Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+        Text(label, style: const TextStyle(fontSize: 8, color: Colors.white54)),
+        Text(value, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white)),
       ],
     );
   }
@@ -1347,14 +1346,14 @@ class _SemesterPickerSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        padding: const EdgeInsets.symmetric(vertical: 12),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2))),
-            const SizedBox(height: 16),
-            const Text('Pilih Semester', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const Divider(height: 24),
+            Container(width: 31, height: 2, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2))),
+            const SizedBox(height: 12),
+            const Text('Pilih Semester', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+            const Divider(height: 19),
             Flexible(
               child: ListView.builder(
                 shrinkWrap: true,
@@ -1365,14 +1364,14 @@ class _SemesterPickerSheet extends StatelessWidget {
                   return ListTile(
                     leading: Icon(
                       isSel ? Icons.check_circle_rounded : Icons.circle_outlined,
-                      color: isSel ? _kPurple : Colors.grey,
+                      color: isSel ? _kPrimary : Colors.grey,
                     ),
                     title: Text(s.namaSemester, style: TextStyle(fontWeight: isSel ? FontWeight.bold : FontWeight.normal)),
                     trailing: s.isAktif
                         ? Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(color: _kGreen, borderRadius: BorderRadius.circular(12)),
-                            child: const Text('Aktif', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                            decoration: BoxDecoration(color: _kPrimary, borderRadius: BorderRadius.circular(9)),
+                            child: const Text('Aktif', style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold)),
                           )
                         : null,
                     selected: isSel,
@@ -1471,7 +1470,7 @@ class _LineChartPainter extends CustomPainter {
 
     // Grid lines
     final gridPaint = Paint()..color = Colors.grey.withValues(alpha: 0.15)..strokeWidth = 1;
-    final textStyle = TextStyle(fontSize: 10, color: Colors.grey[500]);
+    final textStyle = TextStyle(fontSize: 8, color: Colors.grey[500]);
 
     for (int pct = 0; pct <= 100; pct += 25) {
       final y = topPad + chartH * (1 - pct / 100);
@@ -1500,13 +1499,13 @@ class _LineChartPainter extends CustomPainter {
       ..shader = LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
-        colors: [_kPurple.withValues(alpha: 0.3), _kPurple.withValues(alpha: 0.0)],
+        colors: [_kPrimary.withValues(alpha: 0.3), _kPrimary.withValues(alpha: 0.0)],
       ).createShader(Rect.fromLTWH(leftPad, topPad, chartW, chartH));
     canvas.drawPath(gradPath, gradPaint);
 
     // Line
     final linePaint = Paint()
-      ..color = _kPurple
+      ..color = _kPrimary
       ..strokeWidth = 2.5
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
@@ -1531,12 +1530,12 @@ class _LineChartPainter extends CustomPainter {
 
       // Dot
       canvas.drawCircle(Offset(x, y), isHovered ? 7 : 5, Paint()..color = Colors.white);
-      canvas.drawCircle(Offset(x, y), isHovered ? 6 : 4, Paint()..color = _kPurple);
+      canvas.drawCircle(Offset(x, y), isHovered ? 6 : 4, Paint()..color = _kPrimary);
 
       // Value label on hover
       if (isHovered) {
         final tp = TextPainter(
-          text: TextSpan(text: '${data[i].toStringAsFixed(1)}%', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: _kPurple)),
+          text: TextSpan(text: '${data[i].toStringAsFixed(1)}%', style: const TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: _kPrimary)),
           textDirection: TextDirection.ltr,
         );
         tp.layout();
@@ -1546,7 +1545,7 @@ class _LineChartPainter extends CustomPainter {
       // Bottom label
       if (i < labels.length) {
         final tp = TextPainter(
-          text: TextSpan(text: labels[i], style: TextStyle(fontSize: 9, color: Colors.grey[500])),
+          text: TextSpan(text: labels[i], style: TextStyle(fontSize: 7, color: Colors.grey[500])),
           textDirection: TextDirection.ltr,
         );
         tp.layout(maxWidth: stepX + 10);

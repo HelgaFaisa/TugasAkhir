@@ -1,4 +1,4 @@
-// lib/features/absensi/pages/detail_minggu_page.dart
+﻿// lib/features/absensi/pages/detail_minggu_page.dart
 
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -72,7 +72,7 @@ class _DetailMingguPageState extends State<DetailMingguPage> {
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: const Text('Detail Minggu Ini'),
-        backgroundColor: const Color(0xFF7C3AED),
+        backgroundColor: const Color(0xFF6FBA9D),
         foregroundColor: Colors.white,
         elevation: 0,
       ),
@@ -84,21 +84,21 @@ class _DetailMingguPageState extends State<DetailMingguPage> {
                   onRefresh: _loadData,
                   child: SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(12),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Header Card
                         _buildHeaderCard(),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 15),
 
                         // Trend Chart
                         _buildTrendChart(),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 15),
 
                         // Pie Chart Distribusi
                         _buildPieChart(),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 15),
 
                         // Breakdown Per Kategori
                         _buildKategoriBreakdown(),
@@ -112,17 +112,17 @@ class _DetailMingguPageState extends State<DetailMingguPage> {
   Widget _buildError() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(19),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, size: 64, color: Colors.red),
-            const SizedBox(height: 16),
+            const Icon(Icons.error_outline, size: 48, color: Colors.red),
+            const SizedBox(height: 12),
             Text(
               _errorMessage ?? 'Terjadi kesalahan',
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 19),
             ElevatedButton.icon(
               onPressed: _loadData,
               icon: const Icon(Icons.refresh),
@@ -139,14 +139,14 @@ class _DetailMingguPageState extends State<DetailMingguPage> {
 
     return Card(
       elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-            colors: [Color(0xFF7C3AED), Color(0xFF5B21B6)],
+            colors: [Color(0xFF6FBA9D), Color(0xFF4D987B)],
           ),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(9),
         ),
         child: Column(
           children: [
@@ -154,18 +154,18 @@ class _DetailMingguPageState extends State<DetailMingguPage> {
               _periode,
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 16,
+                fontSize: 12,
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 15),
 
             // Big Percentage
             Text(
               '${_summary!.percentage.toStringAsFixed(1)}%',
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 48,
+                fontSize: 36,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -173,10 +173,10 @@ class _DetailMingguPageState extends State<DetailMingguPage> {
               'Rata-rata Kehadiran',
               style: TextStyle(
                 color: Colors.white.withOpacity(0.9),
-                fontSize: 14,
+                fontSize: 11,
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 15),
 
             // Stats Row
             Row(
@@ -201,7 +201,7 @@ class _DetailMingguPageState extends State<DetailMingguPage> {
           value,
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 24,
+            fontSize: 19,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -209,7 +209,7 @@ class _DetailMingguPageState extends State<DetailMingguPage> {
           label,
           style: TextStyle(
             color: Colors.white.withOpacity(0.8),
-            fontSize: 12,
+            fontSize: 9,
           ),
         ),
       ],
@@ -219,31 +219,31 @@ class _DetailMingguPageState extends State<DetailMingguPage> {
   Widget _buildTrendChart() {
     return Card(
       elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                Icon(Icons.trending_up, color: Colors.blue[700], size: 20),
-                const SizedBox(width: 8),
+                Icon(Icons.trending_up, color: Colors.blue[700], size: 15),
+                const SizedBox(width: 7),
                 Text(
                   'Trend Kehadiran Harian',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 12,
                     fontWeight: FontWeight.bold,
                     color: Colors.blue[700],
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 15),
 
             // Line Chart
             SizedBox(
-              height: 200,
+              height: MediaQuery.of(context).size.height * 0.25,
               child: LineChart(
                 LineChartData(
                   gridData: FlGridData(
@@ -261,12 +261,12 @@ class _DetailMingguPageState extends State<DetailMingguPage> {
                     leftTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
-                        reservedSize: 40,
+                        reservedSize: 31,
                         interval: 25,
                         getTitlesWidget: (value, meta) {
                           return Text(
                             '${value.toInt()}%',
-                            style: const TextStyle(fontSize: 10),
+                            style: const TextStyle(fontSize: 8),
                           );
                         },
                       ),
@@ -278,10 +278,10 @@ class _DetailMingguPageState extends State<DetailMingguPage> {
                           if (value.toInt() >= 0 &&
                               value.toInt() < _trend.length) {
                             return Padding(
-                              padding: const EdgeInsets.only(top: 8),
+                              padding: const EdgeInsets.only(top: 7),
                               child: Text(
                                 _trend[value.toInt()]['day_name'] ?? '',
-                                style: const TextStyle(fontSize: 10),
+                                style: const TextStyle(fontSize: 8),
                               ),
                             );
                           }
@@ -310,7 +310,7 @@ class _DetailMingguPageState extends State<DetailMingguPage> {
                         );
                       }).toList(),
                       isCurved: true,
-                      color: const Color(0xFF7C3AED),
+                      color: const Color(0xFF6FBA9D),
                       barWidth: 3,
                       dotData: FlDotData(
                         show: true,
@@ -319,13 +319,13 @@ class _DetailMingguPageState extends State<DetailMingguPage> {
                             radius: 4,
                             color: Colors.white,
                             strokeWidth: 2,
-                            strokeColor: const Color(0xFF7C3AED),
+                            strokeColor: const Color(0xFF6FBA9D),
                           );
                         },
                       ),
                       belowBarData: BarAreaData(
                         show: true,
-                        color: const Color(0xFF7C3AED).withOpacity(0.2),
+                        color: const Color(0xFF6FBA9D).withOpacity(0.2),
                       ),
                     ),
                   ],
@@ -346,34 +346,34 @@ class _DetailMingguPageState extends State<DetailMingguPage> {
 
     return Card(
       elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                Icon(Icons.pie_chart, color: Colors.orange[700], size: 20),
-                const SizedBox(width: 8),
+                Icon(Icons.pie_chart, color: Colors.orange[700], size: 15),
+                const SizedBox(width: 7),
                 Text(
                   'Distribusi Status',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 12,
                     fontWeight: FontWeight.bold,
                     color: Colors.orange[700],
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 15),
 
             Row(
               children: [
                 // Pie Chart
                 SizedBox(
-                  width: 150,
-                  height: 150,
+                  width: MediaQuery.of(context).size.width * 0.38,
+                  height: MediaQuery.of(context).size.width * 0.38,
                   child: PieChart(
                     PieChartData(
                       sectionsSpace: 2,
@@ -386,7 +386,7 @@ class _DetailMingguPageState extends State<DetailMingguPage> {
                           color: Colors.green,
                           radius: 50,
                           titleStyle: const TextStyle(
-                            fontSize: 12,
+                            fontSize: 9,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
@@ -398,7 +398,7 @@ class _DetailMingguPageState extends State<DetailMingguPage> {
                           color: Colors.orange,
                           radius: 50,
                           titleStyle: const TextStyle(
-                            fontSize: 12,
+                            fontSize: 9,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
@@ -410,7 +410,7 @@ class _DetailMingguPageState extends State<DetailMingguPage> {
                           color: Colors.blue,
                           radius: 50,
                           titleStyle: const TextStyle(
-                            fontSize: 12,
+                            fontSize: 9,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
@@ -422,7 +422,7 @@ class _DetailMingguPageState extends State<DetailMingguPage> {
                           color: Colors.red,
                           radius: 50,
                           titleStyle: const TextStyle(
-                            fontSize: 12,
+                            fontSize: 9,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
@@ -431,7 +431,7 @@ class _DetailMingguPageState extends State<DetailMingguPage> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 20),
+                const SizedBox(width: 15),
 
                 // Legend
                 Expanded(
@@ -471,27 +471,27 @@ class _DetailMingguPageState extends State<DetailMingguPage> {
 
   Widget _buildLegendItem(String label, String value, Color color) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: 7),
       child: Row(
         children: [
           Container(
-            width: 16,
-            height: 16,
+            width: 12,
+            height: 12,
             decoration: BoxDecoration(
               color: color,
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: BorderRadius.circular(2),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 7),
           Text(
             label,
-            style: const TextStyle(fontSize: 13),
+            style: const TextStyle(fontSize: 11),
           ),
           const Spacer(),
           Text(
             value,
             style: TextStyle(
-              fontSize: 13,
+              fontSize: 11,
               fontWeight: FontWeight.bold,
               color: color,
             ),
@@ -506,33 +506,33 @@ class _DetailMingguPageState extends State<DetailMingguPage> {
 
     return Card(
       elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                Icon(Icons.category, color: Colors.purple[700], size: 20),
-                const SizedBox(width: 8),
+                Icon(Icons.category, color: const Color(0xFF4D987B), size: 15),
+                const SizedBox(width: 7),
                 Text(
                   'Kehadiran Per Kategori',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 12,
                     fontWeight: FontWeight.bold,
-                    color: Colors.purple[700],
+                    color: const Color(0xFF4D987B),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
 
             ListView.separated(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: _perKategori.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 12),
+              separatorBuilder: (context, index) => const SizedBox(height: 9),
               itemBuilder: (context, index) {
                 final item = _perKategori[index];
                 final percentage = _toDouble(item['percentage']);
@@ -553,23 +553,23 @@ class _DetailMingguPageState extends State<DetailMingguPage> {
                         Text(
                           item['nama_kategori'] ?? '',
                           style: const TextStyle(
-                            fontSize: 14,
+                            fontSize: 11,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                         Text(
                           '$hadir/$total (${percentage.toStringAsFixed(1)}%)',
                           style: TextStyle(
-                            fontSize: 13,
+                            fontSize: 11,
                             fontWeight: FontWeight.bold,
                             color: color,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 5),
                     ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(7),
                       child: LinearProgressIndicator(
                         value: percentage / 100,
                         minHeight: 8,

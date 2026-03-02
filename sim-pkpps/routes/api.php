@@ -46,6 +46,7 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     // Kepulangan
     Route::get('/kepulangan', [App\Http\Controllers\Api\ApiKepulanganController::class, 'index']);
     Route::get('/kepulangan/kuota', [App\Http\Controllers\Api\ApiKepulanganController::class, 'kuota']);
+    Route::get('/kepulangan/notifikasi', [App\Http\Controllers\Api\ApiKepulanganController::class, 'notifikasiKepulangan']);
     Route::get('/kepulangan/{id_kepulangan}', [App\Http\Controllers\Api\ApiKepulanganController::class, 'show']);
     // Pengajuan Kepulangan (Submit dari mobile)
     Route::post('/kepulangan/pengajuan', [ApiPengajuanKepulanganController::class, 'store']);

@@ -51,7 +51,7 @@
         <div class="form-group">
             <label><i class="fas fa-book form-icon"></i> Nama Kitab / Materi <span style="color: red;">*</span></label>
             <input type="text" name="nama_kitab" class="form-control @error('nama_kitab') is-invalid @enderror" 
-                   value="{{ old('nama_kitab') }}" placeholder="Contoh: K. Sholah, Tafsir Jalalain, Khotbah" required>
+                   value="{{ old('nama_kitab') }}" placeholder="Contoh: K. Sholah, Al Quran" required>
             @error('nama_kitab')
                 <span class="invalid-feedback">{{ $message }}</span>
             @enderror

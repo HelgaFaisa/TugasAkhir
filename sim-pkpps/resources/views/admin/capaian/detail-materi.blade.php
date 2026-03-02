@@ -6,7 +6,7 @@
 </div>
 
 {{-- Materi Info Card --}}
-<div class="content-box" style="margin-bottom: 20px;">
+<div class="content-box" style="margin-bottom: 14px;">
     <div style="display: flex; align-items: center; gap: 20px;">
         <div class="icon-wrapper icon-wrapper-lg">
             <i class="fas fa-book"></i>
@@ -28,13 +28,13 @@
 </div>
 
 {{-- Filter Semester --}}
-<div class="content-box" style="margin-bottom: 20px;">
+<div class="content-box" style="margin-bottom: 14px;">
     <form method="GET" action="{{ route('admin.capaian.detail-materi', $materi->id_materi) }}" class="filter-form-inline">
         <select name="id_semester" class="form-control" style="width: 250px;">
             <option value="">Semua Semester</option>
             @foreach($semesters as $semester)
                 <option value="{{ $semester->id_semester }}" {{ $selectedSemester == $semester->id_semester ? 'selected' : '' }}>
-                    {{ $semester->nama_semester }} @if($semester->is_active) ★ @endif
+                    {{ $semester->nama_semester }} @if($semester->is_active) â˜… @endif
                 </option>
             @endforeach
         </select>
@@ -74,7 +74,7 @@
 </div>
 
 {{-- Grafik Distribusi --}}
-<div class="content-box" style="margin-bottom: 20px;">
+<div class="content-box" style="margin-bottom: 14px;">
     <h4 style="margin: 0 0 20px 0; color: var(--primary-dark);">
         <i class="fas fa-chart-bar"></i> Distribusi Progress Santri
     </h4>

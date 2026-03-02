@@ -19,7 +19,7 @@
 @endif
 
 <!-- Info Cards -->
-<div class="content-box" style="margin-bottom: 20px;">
+<div class="content-box" style="margin-bottom: 14px;">
     <div class="row-cards">
         <div class="card card-info">
             <h3>Kelas Asal</h3>

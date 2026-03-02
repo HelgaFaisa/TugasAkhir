@@ -72,14 +72,14 @@ class SummaryCard extends StatelessWidget {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(8),
         side: BorderSide(
           color: color.withOpacity(0.3),
           width: 1.5,
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
@@ -91,7 +91,7 @@ class SummaryCard extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(4),
+                    padding: const EdgeInsets.all(2),
                     decoration: BoxDecoration(
                       color: color.withOpacity(0.1),
                       shape: BoxShape.circle,
@@ -99,17 +99,17 @@ class SummaryCard extends StatelessWidget {
                     child: Icon(
                       icon,
                       color: color,
-                      size: 14,
+                      size: 11,
                     ),
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: 2),
                   Flexible(
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
                       child: Text(
                         count.toString(),
                         style: TextStyle(
-                          fontSize: 22,
+                          fontSize: 17,
                           fontWeight: FontWeight.bold,
                           color: color,
                           height: 1.0,
@@ -126,7 +126,7 @@ class SummaryCard extends StatelessWidget {
               child: Text(
                 label,
                 style: TextStyle(
-                  fontSize: 11,
+                  fontSize: 8,
                   color: Colors.grey[700],
                   fontWeight: FontWeight.w500,
                   height: 1.2,
@@ -140,7 +140,7 @@ class SummaryCard extends StatelessWidget {
               child: Text(
                 '$percentage%',
                 style: TextStyle(
-                  fontSize: 9,
+                  fontSize: 7,
                   color: Colors.grey[600],
                   fontWeight: FontWeight.w400,
                   height: 1.0,

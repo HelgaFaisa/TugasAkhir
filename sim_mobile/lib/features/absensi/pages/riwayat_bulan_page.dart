@@ -1,4 +1,4 @@
-// lib/features/absensi/pages/riwayat_bulan_page.dart
+﻿// lib/features/absensi/pages/riwayat_bulan_page.dart
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -91,7 +91,7 @@ class _RiwayatBulanPageState extends State<RiwayatBulanPage> {
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: const Text('Riwayat Bulan'),
-        backgroundColor: const Color(0xFF7C3AED),
+        backgroundColor: const Color(0xFF6FBA9D),
         foregroundColor: Colors.white,
         elevation: 0,
       ),
@@ -103,21 +103,21 @@ class _RiwayatBulanPageState extends State<RiwayatBulanPage> {
                   onRefresh: _loadData,
                   child: SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(12),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Month Picker Button
                         _buildMonthPicker(),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 12),
 
                         // Summary Card
                         _buildSummaryCard(),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 15),
 
                         // Heatmap Calendar
                         _buildHeatmapCalendar(),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 15),
 
                         // Riwayat List
                         _buildRiwayatList(),
@@ -131,17 +131,17 @@ class _RiwayatBulanPageState extends State<RiwayatBulanPage> {
   Widget _buildError() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(19),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, size: 64, color: Colors.red),
-            const SizedBox(height: 16),
+            const Icon(Icons.error_outline, size: 48, color: Colors.red),
+            const SizedBox(height: 12),
             Text(
               _errorMessage ?? 'Terjadi kesalahan',
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 19),
             ElevatedButton.icon(
               onPressed: _loadData,
               icon: const Icon(Icons.refresh),
@@ -161,9 +161,9 @@ class _RiwayatBulanPageState extends State<RiwayatBulanPage> {
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 11),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(9),
         ),
       ),
     );
@@ -174,19 +174,19 @@ class _RiwayatBulanPageState extends State<RiwayatBulanPage> {
 
     return Card(
       elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         child: Column(
           children: [
             Text(
               'Ringkasan $_periode',
               style: const TextStyle(
-                fontSize: 15,
+                fontSize: 11,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
 
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -197,10 +197,10 @@ class _RiwayatBulanPageState extends State<RiwayatBulanPage> {
                 Flexible(child: _buildSummaryItem('Alpa', _summary!.alpa.toString())),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
 
             ClipRRect(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(7),
               child: LinearProgressIndicator(
                 value: _summary!.percentage / 100,
                 minHeight: 12,
@@ -210,11 +210,11 @@ class _RiwayatBulanPageState extends State<RiwayatBulanPage> {
                 ),
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 7),
             Text(
               'Kehadiran: ${_summary!.percentage.toStringAsFixed(1)}%',
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 11,
                 fontWeight: FontWeight.bold,
                 color: _getColorByPercentage(_summary!.percentage),
               ),
@@ -234,7 +234,7 @@ class _RiwayatBulanPageState extends State<RiwayatBulanPage> {
           child: Text(
             value,
             style: const TextStyle(
-              fontSize: 22,
+              fontSize: 17,
               fontWeight: FontWeight.bold,
               height: 1.0,
             ),
@@ -246,7 +246,7 @@ class _RiwayatBulanPageState extends State<RiwayatBulanPage> {
           child: Text(
             label,
             style: TextStyle(
-              fontSize: 11,
+              fontSize: 8,
               color: Colors.grey[600],
               height: 1.0,
             ),
@@ -288,28 +288,28 @@ class _RiwayatBulanPageState extends State<RiwayatBulanPage> {
 
     return Card(
       elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 Icon(Icons.calendar_view_month,
-                    color: Colors.indigo[700], size: 20),
-                const SizedBox(width: 8),
+                    color: Colors.indigo[700], size: 15),
+                const SizedBox(width: 7),
                 Text(
                   'Kalender Kehadiran',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 12,
                     fontWeight: FontWeight.bold,
                     color: Colors.indigo[700],
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
 
             // Day Labels
             Row(
@@ -320,7 +320,7 @@ class _RiwayatBulanPageState extends State<RiwayatBulanPage> {
                           day,
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 10,
+                            fontSize: 8,
                             fontWeight: FontWeight.w600,
                             color: Colors.grey[600],
                           ),
@@ -328,7 +328,7 @@ class _RiwayatBulanPageState extends State<RiwayatBulanPage> {
                       ))
                   .toList(),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 7),
 
             // Calendar Grid
             LayoutBuilder(
@@ -337,7 +337,7 @@ class _RiwayatBulanPageState extends State<RiwayatBulanPage> {
                 return Column(
                   children: weeks.map((week) {
                     return Padding(
-                      padding: const EdgeInsets.only(bottom: 4),
+                      padding: const EdgeInsets.only(bottom: 2),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: week.map((day) {
@@ -356,10 +356,10 @@ class _RiwayatBulanPageState extends State<RiwayatBulanPage> {
                             height: cellSize,
                             decoration: BoxDecoration(
                               color: _getHeatmapColor(level),
-                              borderRadius: BorderRadius.circular(6),
+                              borderRadius: BorderRadius.circular(5),
                               border: isToday
                                   ? Border.all(
-                                      color: const Color(0xFF7C3AED),
+                                      color: const Color(0xFF6FBA9D),
                                       width: 2,
                                     )
                                   : null,
@@ -370,7 +370,7 @@ class _RiwayatBulanPageState extends State<RiwayatBulanPage> {
                                 child: Text(
                                   day['day'].toString(),
                                   style: TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 9,
                                     fontWeight: isToday
                                         ? FontWeight.bold
                                         : FontWeight.normal,
@@ -389,7 +389,7 @@ class _RiwayatBulanPageState extends State<RiwayatBulanPage> {
                 );
               },
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 9),
 
             // Legend
             Row(
@@ -397,25 +397,25 @@ class _RiwayatBulanPageState extends State<RiwayatBulanPage> {
               children: [
                 Text('Rendah',
                     style:
-                        TextStyle(fontSize: 9, color: Colors.grey[600])),
-                const SizedBox(width: 4),
+                        TextStyle(fontSize: 7, color: Colors.grey[600])),
+                const SizedBox(width: 2),
                 ...List.generate(5, (index) {
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 1.5),
                     child: Container(
-                      width: 14,
-                      height: 14,
+                      width: 11,
+                      height: 11,
                       decoration: BoxDecoration(
                         color: _getHeatmapColor(index),
-                        borderRadius: BorderRadius.circular(3),
+                        borderRadius: BorderRadius.circular(2),
                       ),
                     ),
                   );
                 }),
-                const SizedBox(width: 4),
+                const SizedBox(width: 2),
                 Text('Tinggi',
                     style:
-                        TextStyle(fontSize: 9, color: Colors.grey[600])),
+                        TextStyle(fontSize: 7, color: Colors.grey[600])),
               ],
             ),
           ],
@@ -428,7 +428,7 @@ class _RiwayatBulanPageState extends State<RiwayatBulanPage> {
     if (_riwayat.isEmpty) {
       return Card(
         child: Padding(
-          padding: const EdgeInsets.all(40),
+          padding: const EdgeInsets.all(31),
           child: Center(
             child: Text(
               'Belum ada riwayat absensi',
@@ -441,20 +441,20 @@ class _RiwayatBulanPageState extends State<RiwayatBulanPage> {
 
     return Card(
       elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(12),
             child: Row(
               children: [
-                Icon(Icons.history, color: Colors.teal[700], size: 20),
-                const SizedBox(width: 8),
+                Icon(Icons.history, color: Colors.teal[700], size: 15),
+                const SizedBox(width: 7),
                 Text(
                   'Riwayat Harian',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 12,
                     fontWeight: FontWeight.bold,
                     color: Colors.teal[700],
                   ),
@@ -478,25 +478,25 @@ class _RiwayatBulanPageState extends State<RiwayatBulanPage> {
                 title: Text(
                   item['tanggal'] ?? '',
                   style: const TextStyle(
-                    fontSize: 14,
+                    fontSize: 11,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 subtitle: Text(
                   '$hadir/$total kegiatan (${percentage.toStringAsFixed(1)}%)',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: 9, color: Colors.grey[600]),
                 ),
                 trailing: Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
                     color: _getColorByPercentage(percentage).withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(9),
                   ),
                   child: Text(
                     '${percentage.toStringAsFixed(0)}%',
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 9,
                       fontWeight: FontWeight.bold,
                       color: _getColorByPercentage(percentage),
                     ),
@@ -505,30 +505,30 @@ class _RiwayatBulanPageState extends State<RiwayatBulanPage> {
                 children: [
                   Padding(
                     padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
                     child: Column(
                       children: (item['items'] as List?)?.map<Widget>((kegiatan) {
                             return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              padding: const EdgeInsets.symmetric(vertical: 2),
                               child: Row(
                                 children: [
                                   Icon(
                                     _getStatusIcon(kegiatan['status']),
-                                    size: 16,
+                                    size: 12,
                                     color: _getStatusColor(kegiatan['status']),
                                   ),
-                                  const SizedBox(width: 8),
+                                  const SizedBox(width: 7),
                                   Expanded(
                                     child: Text(
                                       kegiatan['kegiatan'] ?? '',
-                                      style: const TextStyle(fontSize: 12),
+                                      style: const TextStyle(fontSize: 9),
                                     ),
                                   ),
                                   if (kegiatan['waktu_absen'] != null)
                                     Text(
                                       kegiatan['waktu_absen'],
                                       style: TextStyle(
-                                        fontSize: 11,
+                                        fontSize: 8,
                                         color: Colors.grey[600],
                                       ),
                                     ),

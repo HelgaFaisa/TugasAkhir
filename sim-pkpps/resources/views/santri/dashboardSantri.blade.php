@@ -15,7 +15,7 @@
     </p>
 </div>
 
-{{-- ✅ ALERTS (Kesehatan & Kepulangan) --}}
+{{-- âœ… ALERTS (Kesehatan & Kepulangan) --}}
 @if(isset($statusKesehatan) && $statusKesehatan)
 <div class="alert alert-danger">
     <i class="fas fa-exclamation-triangle"></i>
@@ -86,7 +86,7 @@
     </div>
 </div>
 
-{{-- ✅ BERITA TERBARU --}}
+{{-- âœ… BERITA TERBARU --}}
 @if($beritaTerbaru->isNotEmpty())
 <div class="content-box" style="margin-top: 25px;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
@@ -124,7 +124,7 @@
 
 {{-- Card Poin Pelanggaran --}}
 <div class="content-box" style="margin-top: 25px;">
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 11px;">
         <div style="flex: 1;">
             <h3 style="margin: 0 0 5px 0; color: var(--{{ $data['poin_pelanggaran'] > 0 ? 'danger' : 'success' }}-color);">
                 <i class="fas fa-exclamation-triangle"></i> Total Poin Pelanggaran: <strong>{{ $data['poin_pelanggaran'] }}</strong>
@@ -145,18 +145,18 @@
     </div>
 </div>
 
-{{-- ✅ SECTION GRAFIK (2 Grafik Berdampingan: Pie & Line) --}}
+{{-- âœ… SECTION GRAFIK (2 Grafik Berdampingan: Pie & Line) --}}
 @if($capaianPerMateri->count() > 0 || array_sum($distribusiStatus) > 0)
 <div class="content-box" style="margin-top: 25px;">
-    <h3 style="margin-bottom: 20px; color: var(--primary-dark);">
+    <h3 style="margin-bottom: 14px; color: var(--primary-dark);">
         <i class="fas fa-chart-line"></i> Visualisasi Capaian Pembelajaran
     </h3>
     
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 25px; margin-bottom: 30px;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 25px; margin-bottom: 22px;">
         
 {{-- GRAFIK 1: Distribusi Status (PIE CHART) --}}
         @if(array_sum($distribusiStatus) > 0)
-        <div style="background: white; padding: 25px; border-radius: var(--border-radius); box-shadow: var(--shadow-md); border: 2px solid var(--primary-light);">
+        <div style="background: white; padding: 18px; border-radius: var(--border-radius); box-shadow: var(--shadow-md); border: 2px solid var(--primary-light);">
             <h4 style="margin: 0 0 20px 0; font-size: 1.1rem; color: var(--text-color); text-align: center; font-weight: 700;">
                 <i class="fas fa-chart-pie"></i> Distribusi Status Pembelajaran
             </h4>
@@ -205,7 +205,7 @@
             </div>
             
             {{-- 4 Kotak Statistik Berjejer Horizontal (Di Bawah) --}}
-            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #f0f0f0; display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
+            <div style="margin-top: 14px; padding-top: 20px; border-top: 1px solid #f0f0f0; display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
                 <div style="flex: 1; min-width: 70px; text-align: center; padding: 10px 8px; background: linear-gradient(135deg, #E8F7F2 0%, #D4F1E3 100%); border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
                     <div style="font-size: 1.3rem; font-weight: 700; color: var(--success-color); line-height: 1;">{{ $distribusiStatus['selesai'] }}</div>
                     <div style="font-size: 0.75rem; color: var(--text-color); font-weight: 600; margin-top: 4px; line-height: 1.2;">Selesai</div>
@@ -227,14 +227,14 @@
         @endif
         
         {{-- GRAFIK 2: Perbandingan Kategori (LINE CHART) --}}
-        <div style="background: white; padding: 25px; border-radius: var(--border-radius); box-shadow: var(--shadow-md); border: 2px solid var(--primary-light);">
+        <div style="background: white; padding: 18px; border-radius: var(--border-radius); box-shadow: var(--shadow-md); border: 2px solid var(--primary-light);">
             <h4 style="margin: 0 0 20px 0; font-size: 1.1rem; color: var(--text-color); text-align: center; font-weight: 700;">
                 <i class="fas fa-chart-line"></i> Perbandingan Progress Kategori
             </h4>
             <div style="max-width: 450px; margin: 0 auto;">
                 <canvas id="chartLineKategori" style="max-height: 300px;"></canvas>
             </div>
-            <div style="margin-top: 20px; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+            <div style="margin-top: 14px; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
                 <div style="text-align: center;">
                     <div style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--success-color), #5EA98C); display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; color: white; font-size: 1.1rem; font-weight: 700; box-shadow: 0 4px 8px rgba(111, 186, 157, 0.3);">
                         {{ $data['progres_quran'] }}%
@@ -259,18 +259,18 @@
 </div>
 @endif
 
-{{-- ✅ GRAFIK BATANG: Progress per Materi (SEBELUM TIPS) --}}
+{{-- âœ… GRAFIK BATANG: Progress per Materi (SEBELUM TIPS) --}}
 @if($capaianPerMateri->count() > 0)
 <div class="content-box" style="margin-top: 25px;">
-    <h3 style="margin-bottom: 20px; color: var(--primary-dark);">
+    <h3 style="margin-bottom: 14px; color: var(--primary-dark);">
         <i class="fas fa-chart-bar"></i> Progress per Materi (Top 10)
     </h3>
     
-    <div style="background: white; padding: 25px; border-radius: var(--border-radius); box-shadow: var(--shadow-sm); border: 2px solid var(--primary-light);">
+    <div style="background: white; padding: 18px; border-radius: var(--border-radius); box-shadow: var(--shadow-sm); border: 2px solid var(--primary-light);">
         <canvas id="chartBarMateri" style="max-height: 450px;"></canvas>
     </div>
     
-    <div style="margin-top: 20px; text-align: center;">
+    <div style="margin-top: 14px; text-align: center;">
         <a href="{{ route('santri.capaian.index') }}" class="btn btn-primary">
             <i class="fas fa-list"></i> Lihat Semua Capaian Detail
         </a>
@@ -278,13 +278,13 @@
 </div>
 @endif
 
-{{-- ✅ TIPS HARI INI (PALING BAWAH SENDIRI) --}}
+{{-- âœ… TIPS HARI INI (PALING BAWAH SENDIRI) --}}
 <div class="content-box" style="margin-top: 25px; background: linear-gradient(135deg, #E8F7F2 0%, #D4F1E3 100%); border: 2px solid var(--primary-color);">
     <h4 style="margin: 0 0 15px 0; color: var(--primary-dark);">
         <i class="fas fa-lightbulb"></i> Tips Hari Ini
     </h4>
     <p style="margin: 0; color: var(--text-color); line-height: 1.6;">
-        💡 <strong>Jaga Kedisiplinan:</strong> Hindari pelanggaran dengan mematuhi tata tertib pondok. 
+        ðŸ’¡ <strong>Jaga Kedisiplinan:</strong> Hindari pelanggaran dengan mematuhi tata tertib pondok. 
         Lihat <strong><a href="{{ route('santri.pelanggaran.kategori') }}" style="color: var(--primary-color);">Daftar Kategori Pelanggaran</a></strong> 
         untuk mengetahui peraturan yang berlaku.
     </p>

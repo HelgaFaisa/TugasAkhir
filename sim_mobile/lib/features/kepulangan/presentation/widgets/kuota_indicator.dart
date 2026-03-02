@@ -17,11 +17,11 @@ class KuotaIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(9),
           gradient: _getGradient(),
         ),
         child: Column(
@@ -30,14 +30,14 @@ class KuotaIndicator extends StatelessWidget {
             // Header
             Row(
               children: [
-                Icon(_getIcon(), color: Colors.white, size: 24),
-                const SizedBox(width: 8),
+                Icon(_getIcon(), color: Colors.white, size: 19),
+                const SizedBox(width: 7),
                 Expanded(
                   child: Text(
                     'Kuota Kepulangan Tahunan',
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 16,
+                      fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -46,11 +46,11 @@ class KuotaIndicator extends StatelessWidget {
               ],
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
 
             // Progress Bar
             ClipRRect(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(7),
               child: LinearProgressIndicator(
                 value: kuotaInfo.persentase / 100,
                 backgroundColor: Colors.white.withValues(alpha: 0.3),
@@ -61,7 +61,7 @@ class KuotaIndicator extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 12),
+            const SizedBox(height: 9),
 
             // Info
             Row(
@@ -88,44 +88,44 @@ class KuotaIndicator extends StatelessWidget {
             ),
 
             if (showDetail) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: 9),
               const Divider(color: Colors.white38, height: 1),
-              const SizedBox(height: 12),
+              const SizedBox(height: 9),
 
               // Periode
               Row(
                 children: [
-                  const Icon(Icons.date_range, color: Colors.white70, size: 16),
-                  const SizedBox(width: 8),
+                  const Icon(Icons.date_range, color: Colors.white70, size: 12),
+                  const SizedBox(width: 7),
                   Text(
                     'Periode: ${_formatDate(kuotaInfo.periodeMulai)} - ${_formatDate(kuotaInfo.periodeAkhir)}',
-                    style: const TextStyle(color: Colors.white70, fontSize: 12),
+                    style: const TextStyle(color: Colors.white70, fontSize: 9),
                   ),
                 ],
               ),
 
               if (kuotaInfo.isOverLimit) ...[
-                const SizedBox(height: 8),
+                const SizedBox(height: 7),
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(7),
                   decoration: BoxDecoration(
                     color: Colors.red.shade900.withValues(alpha: 0.5),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(7),
                   ),
                   child: Row(
                     children: [
                       const Icon(
                         Icons.error_outline,
                         color: Colors.white,
-                        size: 16,
+                        size: 12,
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 7),
                       Expanded(
                         child: Text(
-                          '⚠️ Kuota kepulangan sudah melebihi batas maksimal',
+                          'âš ï¸ Kuota kepulangan sudah melebihi batas maksimal',
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 12,
+                            fontSize: 9,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -144,19 +144,19 @@ class KuotaIndicator extends StatelessWidget {
   Widget _buildInfoItem(String label, String value, IconData icon) {
     return Column(
       children: [
-        Icon(icon, color: Colors.white70, size: 20),
-        const SizedBox(height: 4),
+        Icon(icon, color: Colors.white70, size: 15),
+        const SizedBox(height: 2),
         Text(
           value,
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 16,
+            fontSize: 12,
             fontWeight: FontWeight.bold,
           ),
         ),
         Text(
           label,
-          style: const TextStyle(color: Colors.white70, fontSize: 12),
+          style: const TextStyle(color: Colors.white70, fontSize: 9),
         ),
       ],
     );
@@ -178,16 +178,16 @@ class KuotaIndicator extends StatelessWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
         text,
         style: const TextStyle(
           color: Colors.white,
-          fontSize: 11,
+          fontSize: 8,
           fontWeight: FontWeight.bold,
         ),
       ),

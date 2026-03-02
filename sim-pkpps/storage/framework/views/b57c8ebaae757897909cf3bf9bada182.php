@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('content'); ?>
 <div class="page-header">
     <h2><i class="fas fa-cash-register"></i> Kas & Keuangan Pondok</h2>
@@ -10,7 +8,7 @@
 <?php endif; ?>
 
 <div class="content-box">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
         <a href="<?php echo e(route('admin.keuangan.create')); ?>" class="btn btn-primary">
             <i class="fas fa-plus"></i> Tambah Transaksi
         </a>
@@ -20,7 +18,7 @@
     </div>
 
     
-    <form method="GET" action="<?php echo e(route('admin.keuangan.index')); ?>" id="filterForm" style="margin-bottom: 20px;">
+    <form method="GET" action="<?php echo e(route('admin.keuangan.index')); ?>" id="filterForm" style="margin-bottom: 14px;">
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; align-items: end;">
             <div class="form-group" style="margin-bottom:0;">
                 <input type="text" name="search" class="form-control" placeholder="Cari ID / keterangan..."
@@ -99,7 +97,7 @@
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </tbody>
         </table>
-        <div style="margin-top:20px;"><?php echo e($transaksi->links()); ?></div>
+        <div style="margin-top: 14px;"><?php echo e($transaksi->links()); ?></div>
     <?php else: ?>
         <div class="empty-state">
             <i class="fas fa-cash-register"></i>

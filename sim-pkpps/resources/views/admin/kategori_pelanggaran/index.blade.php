@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="page-header">
-    <h2><i class="fas fa-list-ul"></i> Master Pelanggaran</h2>
+    <h2><i class="fas fa-list-ul"></i> Kategori Pelanggaran</h2>
 </div>
 
 @if(session('success'))
@@ -20,9 +20,9 @@
 @endif
 
 <!-- Filter -->
-<div class="content-box" style="margin-bottom: 20px;">
+<div class="content-box" style="margin-bottom: 14px;">
     <form method="GET" action="{{ route('admin.kategori-pelanggaran.index') }}">
-        <div style="display: grid; grid-template-columns: 2fr 1fr auto; gap: 15px; align-items: end;">
+        <div style="display: grid; grid-template-columns: 2fr 1fr auto; gap: 11px; align-items: end;">
             <div class="form-group" style="margin-bottom: 0;">
                 <label for="id_klasifikasi">
                     <i class="fas fa-filter form-icon"></i>
@@ -65,16 +65,13 @@
 
 <!-- Tabel Data -->
 <div class="content-box">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
         <h3 style="margin: 0; color: var(--primary-color);">
             <i class="fas fa-table"></i> Daftar Pelanggaran
         </h3>
         <div style="display: flex; gap: 10px;">
             <a href="{{ route('admin.klasifikasi-pelanggaran.index') }}" class="btn btn-warning">
                 <i class="fas fa-tags"></i> Klasifikasi Pelanggaran
-            </a>
-            <a href="{{ route('admin.pembinaan-sanksi.index') }}" class="btn btn-success">
-                <i class="fas fa-book-open"></i> Pembinaan & Sanksi
             </a>
             <a href="{{ route('admin.kategori-pelanggaran.create') }}" class="btn btn-primary">
                 <i class="fas fa-plus-circle"></i> Tambah Pelanggaran

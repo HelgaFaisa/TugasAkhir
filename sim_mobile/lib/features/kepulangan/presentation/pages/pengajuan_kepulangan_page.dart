@@ -1,4 +1,4 @@
-// lib/features/kepulangan/presentation/pages/pengajuan_kepulangan_form_page.dart
+﻿// lib/features/kepulangan/presentation/pages/pengajuan_kepulangan_form_page.dart
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -73,7 +73,7 @@ class _PengajuanKepulanganFormPageState
     if (!mounted) return;
 
     if (result['success'] == true) {
-      _showSnackBar('✅ Pengajuan berhasil dikirim! Menunggu persetujuan admin.');
+      _showSnackBar('âœ… Pengajuan berhasil dikirim! Menunggu persetujuan admin.');
       
       // Reset form & kembali
       controller.reset();
@@ -93,11 +93,11 @@ class _PengajuanKepulanganFormPageState
     return showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: Row(
           children: [
             Icon(Icons.warning_amber_rounded, color: Colors.red.shade700),
-            const SizedBox(width: 8),
+            const SizedBox(width: 7),
             const Expanded(child: Text('Konfirmasi Over Limit')),
           ],
         ),
@@ -106,27 +106,27 @@ class _PengajuanKepulanganFormPageState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(9),
               decoration: BoxDecoration(
                 color: Colors.red.shade50,
                 border: Border.all(color: Colors.red.shade200),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(7),
               ),
               child: Text(
                 controller.warningMessage,
-                style: TextStyle(color: Colors.red.shade900, fontSize: 14),
+                style: TextStyle(color: Colors.red.shade900, fontSize: 11),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             const Text(
               'Pengajuan tetap bisa diproses, tetapi Anda akan melebihi kuota maksimal.',
-              style: TextStyle(fontSize: 14),
+              style: TextStyle(fontSize: 11),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 7),
             Text(
               'Apakah Anda yakin ingin melanjutkan?',
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 11,
                 fontWeight: FontWeight.bold,
                 color: Colors.grey.shade700,
               ),
@@ -169,7 +169,7 @@ class _PengajuanKepulanganFormPageState
         backgroundColor: Colors.grey[100],
         appBar: AppBar(
           title: const Text('Ajukan Izin Kepulangan'),
-          backgroundColor: Colors.deepPurple,
+          backgroundColor: const Color(0xFF6FBA9D),
           foregroundColor: Colors.white,
           elevation: 0,
         ),
@@ -187,10 +187,10 @@ class _PengajuanKepulanganFormPageState
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline, size: 64, color: Colors.red.shade300),
-          const SizedBox(height: 16),
+          Icon(Icons.error_outline, size: 48, color: Colors.red.shade300),
+          const SizedBox(height: 12),
           const Text('Gagal memuat data kuota'),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           ElevatedButton.icon(
             onPressed: _loadKuotaInfo,
             icon: const Icon(Icons.refresh),
@@ -205,34 +205,34 @@ class _PengajuanKepulanganFormPageState
     return Consumer<PengajuanKepulanganController>(
       builder: (context, controller, _) {
         return SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Kuota Indicator
               KuotaIndicator(kuotaInfo: _kuotaInfo!, showDetail: false),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 19),
 
               // Form Card
               Card(
                 elevation: 2,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(9),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(12),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
                         'Form Pengajuan',
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 15,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 12),
 
                       // Tanggal Pulang
                       _buildDateField(
@@ -247,7 +247,7 @@ class _PengajuanKepulanganFormPageState
                         firstDate: DateTime.now(),
                       ),
 
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 12),
 
                       // Tanggal Kembali
                       _buildDateField(
@@ -265,7 +265,7 @@ class _PengajuanKepulanganFormPageState
                             DateTime.now(),
                       ),
 
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 12),
 
                       // Alasan
                       TextField(
@@ -277,7 +277,7 @@ class _PengajuanKepulanganFormPageState
                           hintText: 'Jelaskan alasan kepulangan...',
                           prefixIcon: const Icon(Icons.subject),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(7),
                           ),
                         ),
                         onChanged: controller.setAlasan,
@@ -287,7 +287,7 @@ class _PengajuanKepulanganFormPageState
                 ),
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
 
               // Durasi Preview
               DurasiPreviewWidget(
@@ -298,7 +298,7 @@ class _PengajuanKepulanganFormPageState
                 isOverLimit: controller.isOverLimit,
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
 
               // Warning
               if (controller.warningMessage.isNotEmpty)
@@ -307,7 +307,7 @@ class _PengajuanKepulanganFormPageState
                   isOverLimit: controller.isOverLimit,
                 ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 19),
 
               // Submit Button
               SizedBox(
@@ -317,17 +317,17 @@ class _PengajuanKepulanganFormPageState
                       ? () => _handleSubmit(context)
                       : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple,
+                    backgroundColor: const Color(0xFF6FBA9D),
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(7),
                     ),
                   ),
                   child: controller.isSubmitting
                       ? const SizedBox(
-                          height: 20,
-                          width: 20,
+                          height: 15,
+                          width: 15,
                           child: CircularProgressIndicator(
                             color: Colors.white,
                             strokeWidth: 2,
@@ -336,14 +336,14 @@ class _PengajuanKepulanganFormPageState
                       : const Text(
                           'Ajukan Izin Kepulangan',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 12,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                 ),
               ),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
             ],
           ),
         );
@@ -375,14 +375,14 @@ class _PengajuanKepulanganFormPageState
         decoration: InputDecoration(
           labelText: label,
           prefixIcon: Icon(icon),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(7)),
         ),
         child: Text(
           selectedDate != null
               ? '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}'
               : 'Pilih tanggal',
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 12,
             color: selectedDate != null ? Colors.black : Colors.grey,
           ),
         ),

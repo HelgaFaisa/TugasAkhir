@@ -149,8 +149,8 @@
                 <i class="fas fa-graduation-cap form-icon"></i>
                 Pilih Kelas yang Akan Menerima Berita <span style="color: var(--danger-color);">*</span>
             </label>
-            <div style="border: 2px solid var(--primary-light); border-radius: var(--border-radius-sm); padding: 20px; background-color: var(--primary-light);">
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px;">
+            <div style="border: 2px solid var(--primary-light); border-radius: var(--border-radius-sm); padding: 14px; background-color: var(--primary-light);">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 11px;">
                     @foreach($kelasOptions as $kelas)
                     <div style="background: white; padding: 12px; border-radius: var(--border-radius-sm); box-shadow: var(--shadow-sm);">
                         <label style="display: flex; align-items: center; margin: 0; cursor: pointer;">
@@ -176,7 +176,7 @@
         </div>
 
         <!-- Submit Buttons -->
-        <div style="display: flex; gap: 10px; margin-top: 30px; padding-top: 20px; border-top: 2px solid var(--primary-light);">
+        <div style="display: flex; gap: 10px; margin-top: 22px; padding-top: 20px; border-top: 2px solid var(--primary-light);">
             <button type="submit" class="btn btn-success">
                 <i class="fas fa-save"></i> Simpan Berita
             </button>
@@ -264,7 +264,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <style>
 .ql-toolbar { background-color: #f8f9fa; border-radius: 4px 4px 0 0; border-bottom: 2px solid #dee2e6; }
-.ql-container { font-size: 14px; font-family: Arial, sans-serif; min-height: 250px; }
+.ql-container { font-size: 11px; font-family: Arial, sans-serif; min-height: 250px; }
 .ql-editor { min-height: 250px; max-height: 500px; overflow-y: auto; }
 .ql-editor h1 { font-size: 2em; color: #2c3e50; }
 .ql-editor h2 { font-size: 1.5em; color: #34495e; }

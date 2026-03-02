@@ -8,8 +8,8 @@
 </div>
 
 <!-- Informasi Santri Card -->
-<div class="content-box" style="background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); color: white; margin-bottom: 30px;">
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; align-items: center;">
+<div class="content-box" style="background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); color: white; margin-bottom: 22px;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; align-items: center;">
         <div>
             <h3 style="margin: 0; font-size: 1.5em;">
                 <i class="fas fa-user-circle"></i> {{ $santri->nama_lengkap }}
@@ -35,7 +35,7 @@
 </div>
 
 <!-- Statistik Kesehatan -->
-<div class="row-cards" style="margin-bottom: 30px;">
+<div class="row-cards" style="margin-bottom: 22px;">
     <div class="card card-danger">
         <h3><i class="fas fa-bed"></i> Sedang Dirawat</h3>
         <p class="card-value">{{ $riwayatKesehatan->where('status', 'dirawat')->count() }}</p>
@@ -69,7 +69,7 @@
 
 <!-- Navigation Buttons -->
 <div class="content-box">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
         <h3 style="margin: 0; color: var(--primary-color);">
             <i class="fas fa-list"></i> Riwayat Kesehatan Lengkap
         </h3>
@@ -166,12 +166,12 @@
         </table>
         
         <!-- Pagination -->
-        <div style="margin-top: 20px; display: flex; justify-content: center;">
+        <div style="margin-top: 14px; display: flex; justify-content: center;">
             {{ $riwayatKesehatan->links() }}
         </div>
         
     @else
-        <div style="text-align: center; padding: 50px; color: #7F8C8D;">
+        <div style="text-align: center; padding: 36px; color: #7F8C8D;">
             <i class="fas fa-heartbeat" style="font-size: 3em; margin-bottom: 15px; color: #BDC3C7;"></i>
             <h3>Belum Ada Riwayat Kesehatan</h3>
             <p>Santri {{ $santri->nama_lengkap }} belum memiliki riwayat kesehatan.</p>
@@ -185,7 +185,7 @@
 <!-- Info Tambahan -->
 @if($riwayatKesehatan->count() > 0)
 <div class="content-box" style="background: linear-gradient(135deg, #F8FBF9 0%, #E8F7F2 100%); border-left: 4px solid var(--primary-color);">
-    <h4 style="color: var(--primary-color); margin-bottom: 20px;">
+    <h4 style="color: var(--primary-color); margin-bottom: 14px;">
         <i class="fas fa-info-circle"></i> Informasi Tambahan
     </h4>
     

@@ -18,7 +18,7 @@
 @endif
 
 <div class="content-box">
-    <div style="margin-bottom: 20px;">
+    <div style="margin-bottom: 14px;">
         <form method="GET" class="filter-form-inline">
             <select name="filter" class="form-control">
                 <option value="">-- Semua Santri --</option>
@@ -57,7 +57,7 @@
                     <td>{{ $santris->firstItem() + $index }}</td>
                     <td><strong>{{ $santri->id_santri }}</strong></td>
                     <td>{{ $santri->nama_lengkap }}</td>
-                    <td><span class="badge badge-secondary">{{ $santri->kelas }}</span></td>
+                    <td><span class="badge badge-secondary">{{ $santri->kelasSantri->first()?->kelas?->nama_kelas ?? '-' }}</span></td>
                     <td>
                         @if($santri->rfid_uid)
                             <code style="font-size: 0.85rem;">{{ $santri->rfid_uid }}</code>
@@ -95,7 +95,7 @@
             </tbody>
         </table>
 
-        <div style="margin-top: 20px;">
+        <div style="margin-top: 14px;">
             {{ $santris->links() }}
         </div>
     @else

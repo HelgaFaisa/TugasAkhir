@@ -56,11 +56,11 @@ class _KuotaWarningWidgetState extends State<KuotaWarningWidget>
     return ScaleTransition(
       scale: widget.isOverLimit ? _pulseAnimation : const AlwaysStoppedAnimation(1.0),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: bgColor,
           border: Border.all(color: borderColor, width: 2),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(9),
           boxShadow: [
             BoxShadow(
               color: borderColor.withValues(alpha: 0.3),
@@ -73,56 +73,56 @@ class _KuotaWarningWidgetState extends State<KuotaWarningWidget>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(7),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(7),
               ),
               child: Icon(
                 widget.isOverLimit
                     ? Icons.error_outline
                     : Icons.warning_amber_rounded,
                 color: iconColor,
-                size: 24,
+                size: 19,
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 9),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.isOverLimit ? '⚠️ OVER LIMIT!' : '⚠️ PERHATIAN',
+                    widget.isOverLimit ? 'âš ï¸ OVER LIMIT!' : 'âš ï¸ PERHATIAN',
                     style: TextStyle(
                       color: textColor,
-                      fontSize: 14,
+                      fontSize: 11,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 2),
                   Text(
                     widget.message,
                     style: TextStyle(
                       color: textColor,
-                      fontSize: 13,
+                      fontSize: 11,
                     ),
                   ),
                   if (widget.isOverLimit) ...[
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 7),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
+                        horizontal: 7,
+                        vertical: 2,
                       ),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(6),
+                        borderRadius: BorderRadius.circular(5),
                       ),
                       child: Text(
                         'Anda tetap bisa mengajukan, tapi akan melebihi batas',
                         style: TextStyle(
                           color: textColor,
-                          fontSize: 11,
+                          fontSize: 8,
                           fontStyle: FontStyle.italic,
                         ),
                       ),

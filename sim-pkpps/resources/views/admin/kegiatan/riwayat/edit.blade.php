@@ -1,3 +1,4 @@
+{{-- resources/views/admin/kegiatan/riwayat/edit.blade.php --}}
 @extends('layouts.app')
 
 @section('content')

@@ -20,8 +20,8 @@
     @endif
 
     {{-- Info Box: Data Santri yang Sedang Diedit --}}
-    <div style="background: linear-gradient(135deg, #E3F2FD 0%, #D1E9F9 100%); padding: 20px; border-radius: 8px; border-left: 4px solid #81C6E8; margin-bottom: 25px;">
-        <div style="display: flex; align-items: center; gap: 15px;">
+    <div style="background: linear-gradient(135deg, #E3F2FD 0%, #D1E9F9 100%); padding: 14px; border-radius: 8px; border-left: 4px solid #81C6E8; margin-bottom: 25px;">
+        <div style="display: flex; align-items: center; gap: 11px;">
             @if($santri->foto)
                 <img src="{{ asset('storage/' . $santri->foto) }}" 
                      alt="Foto {{ $santri->nama_lengkap }}" 

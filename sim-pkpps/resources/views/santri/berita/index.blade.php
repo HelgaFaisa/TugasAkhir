@@ -1,64 +1,78 @@
-{{-- Alternative dengan style yang lebih responsive --}}
+{{-- resources/views/santri/berita/index.blade.php --}}
 @extends('layouts.app')
 
-@section('title', 'Berita')
+@section('title', 'Berita & Pengumuman')
 
 @section('content')
 <div class="page-header">
     <h2><i class="fas fa-newspaper"></i> Berita & Pengumuman</h2>
-    <p style="margin: 5px 0 0 0; color: var(--text-light);">
-        Informasi terbaru untuk <strong>{{ $santri->kelas }}</strong>
-    </p>
 </div>
 
 @if($berita->isEmpty())
-    <div class="empty-state">
-        <i class="fas fa-newspaper"></i>
-        <h3>Belum Ada Berita</h3>
-        <p>Belum ada berita atau pengumuman yang dipublikasikan untuk Anda.</p>
+    <div class="content-box">
+        <div class="empty-state">
+            <i class="fas fa-newspaper" style="color: var(--primary-color); opacity: 0.3;"></i>
+            <h3>Belum Ada Berita</h3>
+            <p>Belum ada berita atau pengumuman yang dipublikasikan untuk Anda saat ini.</p>
+            <a href="{{ route('santri.dashboard') }}" class="btn btn-secondary">
+                <i class="fas fa-home"></i> Kembali ke Dashboard
+            </a>
+        </div>
     </div>
 @else
     <div class="content-box">
-        <div style="display: flex; flex-direction: column; gap: 15px;">
+        {{-- Header info --}}
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid #eee; flex-wrap: wrap; gap: 10px;">
+            <span style="color: var(--text-light); font-size: 0.9em;">
+                <i class="fas fa-list"></i>
+                Menampilkan {{ $berita->firstItem() }}–{{ $berita->lastItem() }} dari <strong>{{ $berita->total() }}</strong> berita
+            </span>
+            <span style="color: var(--text-light); font-size: 0.85em;">
+                <i class="fas fa-sort-amount-down"></i> Terbaru dahulu
+            </span>
+        </div>
+
+        {{-- Daftar berita --}}
+        <div style="display: flex; flex-direction: column; gap: 14px;">
             @foreach($berita as $item)
-            <a href="{{ route('santri.berita.show', $item->id_berita) }}" 
-               class="berita-list-item"
-               style="display: flex; gap: 15px; padding: 15px; background: linear-gradient(135deg, #FFFFFF 0%, #FEFFFE 100%); border-radius: var(--border-radius-sm); border: 2px solid transparent; text-decoration: none; transition: var(--transition-base); position: relative;"
-               onmouseover="this.style.borderColor='var(--primary-light)'; this.style.boxShadow='var(--shadow-md)'; this.style.transform='translateY(-2px)';"
-               onmouseout="this.style.borderColor='transparent'; this.style.boxShadow='none'; this.style.transform='translateY(0)';">
-                
-                {{-- Gambar Berita (Kiri - Kecil) --}}
-                <div class="berita-thumbnail" style="flex-shrink: 0; width: 120px; height: 120px; border-radius: var(--border-radius-sm); overflow: hidden; background: linear-gradient(135deg, var(--primary-light), var(--primary-color)); box-shadow: var(--shadow-sm);">
+            <a href="{{ route('santri.berita.show', $item->id_berita) }}"
+               style="display: flex; gap: 0; background: white; border: 1px solid #e8eaed;
+                      border-radius: var(--border-radius); text-decoration: none; color: inherit;
+                      overflow: hidden; transition: box-shadow 0.2s, transform 0.2s;"
+               onmouseover="this.style.boxShadow='0 4px 20px rgba(0,0,0,0.1)'; this.style.transform='translateY(-1px)';"
+               onmouseout="this.style.boxShadow='none'; this.style.transform='translateY(0)';">
+
+                {{-- Thumbnail --}}
+                <div style="flex-shrink: 0; width: 130px; min-height: 110px;
+                            background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-color) 100%);
+                            display: flex; align-items: center; justify-content: center; overflow: hidden;">
                     @if($item->gambar)
-                        <img src="{{ asset('storage/' . $item->gambar) }}" 
-                             alt="{{ $item->judul }}" 
-                             style="width: 100%; height: 100%; object-fit: cover;">
+                        <img src="{{ asset('storage/' . $item->gambar) }}"
+                             alt="{{ $item->judul }}"
+                             style="width: 100%; height: 100%; object-fit: cover; min-height: 110px;">
                     @else
-                        <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-newspaper" style="font-size: 2.5rem; color: var(--primary-dark); opacity: 0.3;"></i>
-                        </div>
+                        <i class="fas fa-newspaper" style="font-size: 2.5em; color: white; opacity: 0.4;"></i>
                     @endif
                 </div>
-                
-                {{-- Konten Berita (Kanan) --}}
-                <div class="berita-content" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; min-width: 0;">
-                    {{-- Judul --}}
+
+                {{-- Konten --}}
+                <div style="flex: 1; padding: 14px 18px; display: flex; flex-direction: column; justify-content: space-between; min-width: 0;">
                     <div>
-                        <h3 style="margin: 0 0 8px 0; font-size: 1.1rem; font-weight: 600; color: var(--text-color); line-height: 1.4; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+                        <h4 style="margin: 0 0 7px; color: var(--primary-color); font-size: 1.05em; line-height: 1.4;
+                                   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
                             {{ $item->judul }}
-                        </h3>
-                        
-                        {{-- Excerpt Konten --}}
-                        <p class="berita-excerpt" style="margin: 0 0 10px 0; font-size: 0.9rem; color: var(--text-light); line-height: 1.5; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
-                            {{ Str::limit(strip_tags($item->konten), 150) }}
+                        </h4>
+                        <p style="margin: 0; color: var(--text-light); font-size: 0.88em; line-height: 1.5;
+                                  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                            {{ \Illuminate\Support\Str::limit(strip_tags($item->konten), 150) }}
                         </p>
                     </div>
-                    
-                    {{-- Info Meta --}}
-                    <div class="berita-meta" style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center; font-size: 0.85rem; color: var(--text-light);">
-                        <span><i class="fas fa-user"></i> {{ $item->penulis }}</span>
-                        <span><i class="fas fa-calendar"></i> {{ $item->created_at->format('d M Y') }}</span>
-                        <span class="badge badge-primary badge-sm" style="margin-left: auto;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px; flex-wrap: wrap; gap: 8px;">
+                        <div style="display: flex; gap: 14px; font-size: 0.82em; color: var(--text-light);">
+                            <span><i class="fas fa-user"></i> {{ $item->penulis }}</span>
+                            <span><i class="fas fa-calendar"></i> {{ $item->created_at->isoFormat('D MMM YYYY') }}</span>
+                        </div>
+                        <span class="badge badge-primary" style="font-size: 0.78em;">
                             <i class="fas fa-arrow-right"></i> Baca
                         </span>
                     </div>
@@ -66,57 +80,26 @@
             </a>
             @endforeach
         </div>
-        
+
         {{-- Pagination --}}
-        <div style="margin-top: 25px;">
+        <div style="margin-top: 20px; padding-top: 14px; border-top: 1px solid #eee;
+                    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <p style="margin: 0; color: var(--text-light); font-size: 0.85em;">
+                Halaman {{ $berita->currentPage() }} dari {{ $berita->lastPage() }}
+            </p>
             {{ $berita->links() }}
         </div>
     </div>
 @endif
 
-{{-- Info Box --}}
-<div class="info-box" style="margin-top: 20px;">
-    <i class="fas fa-info-circle"></i>
-    <strong>Info:</strong> Berita yang ditandai dengan badge <span class="badge badge-danger badge-sm"><i class="fas fa-circle" style="font-size: 0.6em;"></i> Baru</span> adalah berita yang belum Anda baca. Klik pada berita untuk membaca selengkapnya.
-</div>
-
-{{-- Quick Actions --}}
-<div style="margin-top: 20px; text-align: center;">
-    <a href="{{ route('santri.dashboard') }}" class="btn btn-secondary hover-lift">
-        <i class="fas fa-home"></i> Kembali ke Dashboard
-    </a>
-</div>
-
-{{-- Responsive Style untuk Mobile --}}
 <style>
-@media (max-width: 768px) {
-    .berita-list-item {
+@media (max-width: 600px) {
+    a[style*="flex-shrink: 0; width: 130px"] {
         flex-direction: column !important;
     }
-    
-    .berita-thumbnail {
+    a[style*="flex-shrink: 0; width: 130px"] > div:first-child {
         width: 100% !important;
-        height: 180px !important;
-    }
-    
-    .berita-excerpt {
-        -webkit-line-clamp: 3 !important;
-    }
-    
-    .berita-meta {
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        gap: 8px !important;
-    }
-    
-    .berita-meta .badge {
-        margin-left: 0 !important;
-    }
-}
-
-@media (max-width: 480px) {
-    .berita-thumbnail {
-        height: 150px !important;
+        min-height: 160px !important;
     }
 }
 </style>

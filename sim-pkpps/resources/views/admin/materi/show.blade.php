@@ -108,7 +108,7 @@
     </div>
 
     {{-- Action Buttons --}}
-    <div style="margin-top: 30px; display: flex; gap: 10px; justify-content: flex-end;">
+    <div style="margin-top: 22px; display: flex; gap: 10px; justify-content: flex-end;">
         <a href="{{ route('admin.materi.edit', $materi) }}" class="btn btn-warning">
             <i class="fas fa-edit"></i> Edit Materi
         </a>

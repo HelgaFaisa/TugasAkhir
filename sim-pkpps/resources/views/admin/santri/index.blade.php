@@ -15,7 +15,7 @@
 
 <div class="content-box">
     <!-- Header Actions -->
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 11px; margin-bottom: 14px; flex-wrap: wrap;">
         <!-- Tombol Tambah -->
         <a href="{{ route('admin.santri.create') }}" class="btn btn-primary btn-sm">
             <i class="fas fa-plus"></i> Tambah Santri
@@ -26,14 +26,14 @@
             <input type="text" name="search" class="form-control" placeholder="Cari nama, NIS, atau ID..." value="{{ request('search') }}" style="width: 220px; height: 38px;">
             
             <select name="status" class="form-control" style="width: 150px; height: 38px;">
-                <option value="">⚪ Semua Status</option>
-                <option value="Aktif" {{ request('status') == 'Aktif' ? 'selected' : '' }}>✅ Aktif</option>
-                <option value="Lulus" {{ request('status') == 'Lulus' ? 'selected' : '' }}>🎓 Lulus</option>
-                <option value="Tidak Aktif" {{ request('status') == 'Tidak Aktif' ? 'selected' : '' }}>❌ Tidak Aktif</option>
+                <option value=""> Semua Status</option>
+                <option value="Aktif" {{ request('status') == 'Aktif' ? 'selected' : '' }}>Aktif</option>
+                <option value="Lulus" {{ request('status') == 'Lulus' ? 'selected' : '' }}>Lulus</option>
+                <option value="Tidak Aktif" {{ request('status') == 'Tidak Aktif' ? 'selected' : '' }}>Tidak Aktif</option>
             </select>
             
             <select name="id_kelas" class="form-control" style="width: 180px; height: 38px;">
-                <option value="">📚 Semua Kelas</option>
+                <option value=""> Semua Kelas</option>
                 @foreach($kelompokKelas as $kelompok)
                     @if($kelompok->kelas && $kelompok->kelas->count() > 0)
                         <optgroup label="{{ $kelompok->nama_kelompok }}">
@@ -124,8 +124,8 @@
             </tr>
             @empty
             <tr>
-                <td colspan="8" class="text-center" style="padding: 40px;">
-                    <i class="fas fa-inbox" style="font-size: 3rem; color: #ccc; margin-bottom: 15px; display: block;"></i>
+                <td colspan="8" class="text-center" style="padding: 22px;">
+                    <i class="fas fa-inbox" style="font-size: 2.2rem; color: #ccc; margin-bottom: 15px; display: block;"></i>
                     @if(request('search') || request('status') || request('id_kelas'))
                         <strong>Data tidak ditemukan.</strong><br>
                         <small>Coba ubah kata kunci pencarian atau filter yang digunakan.</small>
@@ -140,7 +140,7 @@
     </table>
 
     @if($santris->count() > 0)
-        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #E8F7F2;">
+        <div style="margin-top: 14px; padding-top: 20px; border-top: 1px solid #E8F7F2;">
             <p style="color: #7F8C8D; font-size: 0.9rem;">
                 <i class="fas fa-info-circle"></i> 
                 Menampilkan <strong>{{ $santris->count() }}</strong> dari <strong>{{ $santris->total() }}</strong> data santri
@@ -153,7 +153,7 @@
 
     <!-- Pagination -->
     @if(method_exists($santris, 'links'))
-        <div style="margin-top: 20px;">
+        <div style="margin-top: 14px;">
             {{ $santris->links() }}
         </div>
     @endif

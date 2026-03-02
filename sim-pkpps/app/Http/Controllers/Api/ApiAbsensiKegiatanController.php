@@ -23,7 +23,7 @@ class ApiAbsensiKegiatanController extends Controller
     {
         try {
             $user = $request->user();
-            $idSantri = $user->role_id; // Santri atau wali punya role_id = id_santri
+            $idSantri = $user->id_santri; // id_santri dari santri_accounts
             
             $tanggal = $request->get('tanggal', now()->format('Y-m-d'));
             $selectedDate = Carbon::parse($tanggal);
@@ -120,7 +120,7 @@ class ApiAbsensiKegiatanController extends Controller
     {
         try {
             $user = $request->user();
-            $idSantri = $user->role_id;
+            $idSantri = $user->id_santri;
             
             $startDate = Carbon::now()->startOfWeek();
             $endDate = Carbon::now()->endOfWeek();
@@ -221,7 +221,7 @@ class ApiAbsensiKegiatanController extends Controller
     {
         try {
             $user = $request->user();
-            $idSantri = $user->role_id;
+            $idSantri = $user->id_santri;
             
             $bulan = $request->get('bulan', now()->format('Y-m'));
             $date = Carbon::parse($bulan . '-01');

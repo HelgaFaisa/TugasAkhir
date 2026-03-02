@@ -8,12 +8,12 @@
 </div>
 
 <div class="content-box">
-    <div style="margin-bottom: 30px;">
+    <div style="margin-bottom: 22px;">
         <h3 style="color: var(--primary-color); margin-bottom: 15px;">
             <i class="fas fa-info-circle"></i> Informasi
         </h3>
         
-        <table style="width: 100%; margin-bottom: 20px;">
+        <table style="width: 100%; margin-bottom: 14px;">
             <tr>
                 <td style="width: 200px; padding: 10px 0; font-weight: 600;">ID Pembinaan</td>
                 <td style="padding: 10px 0;">
@@ -61,11 +61,11 @@
         </table>
     </div>
 
-    <div style="margin-bottom: 30px;">
+    <div style="margin-bottom: 22px;">
         <h3 style="color: var(--primary-color); margin-bottom: 15px;">
             <i class="fas fa-file-alt"></i> Konten
         </h3>
-        <div class="content-display" style="background: #ffffff; padding: 30px; border-radius: 8px; border: 2px solid #e9ecef; line-height: 1.8; min-height: 200px;">
+        <div class="content-display" style="background: #ffffff; padding: 22px; border-radius: 8px; border: 2px solid #e9ecef; line-height: 1.8; min-height: 150px;">
             {!! $pembinaan->konten !!}
         </div>
         <p style="margin-top: 10px; color: var(--text-light); font-size: 0.9em;">
@@ -87,7 +87,7 @@
     /* Styling untuk konten yang ditampilkan */
     .content-display h1, .content-display h2, .content-display h3 {
         color: var(--primary-color);
-        margin-top: 20px;
+        margin-top: 14px;
         margin-bottom: 15px;
     }
     
@@ -132,7 +132,7 @@
     .content-display table {
         width: 100%;
         border-collapse: collapse;
-        margin-bottom: 20px;
+        margin-bottom: 14px;
     }
     
     .content-display table td, .content-display table th {

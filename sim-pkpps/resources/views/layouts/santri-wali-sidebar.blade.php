@@ -28,7 +28,7 @@
     <li>
         <a href="{{ route('santri.capaian.index') }}" class="{{ request()->routeIs('santri.capaian.*') ? 'active' : '' }}">
             <i class="fas fa-book-reader"></i>
-            <span>Capaian Qur'an & Hadist</span>
+            <span>Capaian Materi</span>
         </a>
     </li>
 

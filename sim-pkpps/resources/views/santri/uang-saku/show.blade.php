@@ -12,35 +12,38 @@
     <div class="detail-header">
         <div>
             <h3><i class="fas fa-receipt"></i> Informasi Transaksi</h3>
-            <p class="text-muted">Detail lengkap transaksi uang saku</p>
+            <p style="color: var(--text-light); margin: 0;">Detail lengkap transaksi uang saku</p>
         </div>
-        <div style="display: flex; gap: 10px;">
+        <div>
             <a href="{{ route('santri.uang-saku.index') }}" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Kembali
             </a>
         </div>
     </div>
 
+    <hr style="border: none; border-top: 2px solid #E8F7F2; margin: 25px 0;">
+
+    {{-- DATA TRANSAKSI --}}
     <div class="detail-section">
         <h4><i class="fas fa-info-circle"></i> Data Transaksi</h4>
         <table class="detail-table">
             <tr>
-                <th><i class="fas fa-hashtag"></i> ID Transaksi</th>
+                <th width="200"><i class="fas fa-hashtag"></i> ID Transaksi</th>
                 <td><strong>{{ $transaksi->id_uang_saku }}</strong></td>
             </tr>
             <tr>
                 <th><i class="fas fa-calendar"></i> Tanggal Transaksi</th>
-                <td>{{ \Carbon\Carbon::parse($transaksi->tanggal_transaksi)->isoFormat('dddd, D MMMM YYYY') }}</td>
+                <td>{{ $transaksi->tanggal_transaksi->isoFormat('dddd, D MMMM YYYY') }}</td>
             </tr>
             <tr>
                 <th><i class="fas fa-exchange-alt"></i> Jenis Transaksi</th>
                 <td>
                     @if($transaksi->jenis_transaksi === 'pemasukan')
-                        <span class="badge badge-lg badge-success">
+                        <span class="badge badge-success" style="font-size: 0.9rem; padding: 6px 12px;">
                             <i class="fas fa-arrow-down"></i> Pemasukan
                         </span>
                     @else
-                        <span class="badge badge-lg badge-danger">
+                        <span class="badge badge-danger" style="font-size: 0.9rem; padding: 6px 12px;">
                             <i class="fas fa-arrow-up"></i> Pengeluaran
                         </span>
                     @endif
@@ -49,21 +52,9 @@
             <tr>
                 <th><i class="fas fa-money-bill-wave"></i> Nominal</th>
                 <td>
-                    <span style="font-size: 1.3rem; font-weight: 700; color: {{ $transaksi->jenis_transaksi === 'pemasukan' ? 'var(--success-color)' : 'var(--danger-color)' }}">
-                        {{ 'Rp ' . number_format($transaksi->nominal, 0, ',', '.') }}
+                    <span style="font-size: 1.4rem; font-weight: 700; color: {{ $transaksi->jenis_transaksi === 'pemasukan' ? '#6FBA9D' : '#FF8B94' }};">
+                        {{ $transaksi->nominal_format }}
                     </span>
-                </td>
-            </tr>
-            <tr>
-                <th><i class="fas fa-wallet"></i> Saldo Sebelum</th>
-                <td>{{ 'Rp ' . number_format($transaksi->saldo_sebelum, 0, ',', '.') }}</td>
-            </tr>
-            <tr>
-                <th><i class="fas fa-wallet"></i> Saldo Sesudah</th>
-                <td>
-                    <strong style="color: var(--primary-color); font-size: 1.1rem;">
-                        {{ 'Rp ' . number_format($transaksi->saldo_sesudah, 0, ',', '.') }}
-                    </strong>
                 </td>
             </tr>
             <tr>
@@ -72,105 +63,102 @@
             </tr>
             <tr>
                 <th><i class="fas fa-clock"></i> Dicatat Pada</th>
-                <td>{{ $transaksi->created_at->format('d/m/Y H:i:s') }}</td>
+                <td>{{ $transaksi->created_at->format('d/m/Y H:i:s') }} WIB</td>
             </tr>
         </table>
     </div>
 
+    {{-- RINCIAN SALDO --}}
     <div class="detail-section">
-        <h4><i class="fas fa-user-graduate"></i> Data Santri</h4>
+        <h4><i class="fas fa-calculator"></i> Rincian Saldo</h4>
         <table class="detail-table">
             <tr>
-                <th><i class="fas fa-id-card"></i> ID Santri</th>
-                <td>{{ $transaksi->santri->id_santri }}</td>
+                <th width="200"><i class="fas fa-wallet"></i> Saldo Sebelum</th>
+                <td><strong>Rp {{ number_format($transaksi->saldo_sebelum, 0, ',', '.') }}</strong></td>
             </tr>
             <tr>
-                <th><i class="fas fa-user"></i> Nama Lengkap</th>
-                <td>{{ $transaksi->santri->nama_lengkap }}</td>
+                <th>
+                    <i class="fas fa-{{ $transaksi->jenis_transaksi === 'pemasukan' ? 'plus' : 'minus' }}-circle"></i>
+                    {{ $transaksi->jenis_transaksi === 'pemasukan' ? 'Pemasukan' : 'Pengeluaran' }}
+                </th>
+                <td style="color: {{ $transaksi->jenis_transaksi === 'pemasukan' ? '#6FBA9D' : '#FF8B94' }}; font-weight: 700;">
+                    {{ $transaksi->jenis_transaksi === 'pemasukan' ? '+' : '-' }} {{ $transaksi->nominal_format }}
+                </td>
             </tr>
-            <tr>
-                <th><i class="fas fa-chalkboard-teacher"></i> Kelas</th>
-                <td>{{ $transaksi->santri->kelas }}</td>
+            <tr style="background: linear-gradient(135deg, #E8F7F2 0%, #D4F1E3 100%);">
+                <th><i class="fas fa-wallet"></i> Saldo Sesudah</th>
+                <td>
+                    <strong style="font-size: 1.2rem; color: {{ $transaksi->saldo_sesudah >= 0 ? '#6FBA9D' : '#FF8B94' }};">
+                        {{ $transaksi->saldo_sesudah_format }}
+                    </strong>
+                </td>
             </tr>
         </table>
     </div>
 
-    {{-- Grafik Pergerakan Saldo --}}
+    {{-- VISUALISASI PERUBAHAN SALDO --}}
     <div class="detail-section">
-        <h4><i class="fas fa-chart-line"></i> Visualisasi Transaksi</h4>
-        
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
-            {{-- Card Perbandingan --}}
-            <div style="background: linear-gradient(135deg, #E8F7F2 0%, #D4F1E3 100%); padding: 20px; border-radius: 12px; text-align: center;">
-                <i class="fas fa-arrow-down" style="font-size: 2rem; color: var(--success-color); margin-bottom: 10px;"></i>
-                <h5 style="margin: 0 0 5px 0; color: var(--text-light); font-size: 0.9rem;">Nominal Pemasukan</h5>
-                <p style="font-size: 1.5rem; font-weight: 700; color: var(--success-color); margin: 0;">
-                    {{ $transaksi->jenis_transaksi === 'pemasukan' ? 'Rp ' . number_format($transaksi->nominal, 0, ',', '.') : 'Rp 0' }}
+        <h4><i class="fas fa-chart-line"></i> Visualisasi Perubahan Saldo</h4>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+            <div style="background: linear-gradient(135deg, #E8F7F2, #D4F1E3); padding: 16px; border-radius: 12px; text-align: center;">
+                <i class="fas fa-arrow-down" style="font-size: 2rem; color: #6FBA9D; margin-bottom: 8px;"></i>
+                <p style="margin: 0 0 4px 0; color: var(--text-light); font-size: 0.85rem;">Nominal Pemasukan</p>
+                <p style="font-size: 1.4rem; font-weight: 700; color: #6FBA9D; margin: 0;">
+                    {{ $transaksi->jenis_transaksi === 'pemasukan' ? $transaksi->nominal_format : 'Rp 0' }}
                 </p>
             </div>
-            
-            <div style="background: linear-gradient(135deg, #FFE8EA 0%, #FFD5D8 100%); padding: 20px; border-radius: 12px; text-align: center;">
-                <i class="fas fa-arrow-up" style="font-size: 2rem; color: var(--danger-color); margin-bottom: 10px;"></i>
-                <h5 style="margin: 0 0 5px 0; color: var(--text-light); font-size: 0.9rem;">Nominal Pengeluaran</h5>
-                <p style="font-size: 1.5rem; font-weight: 700; color: var(--danger-color); margin: 0;">
-                    {{ $transaksi->jenis_transaksi === 'pengeluaran' ? 'Rp ' . number_format($transaksi->nominal, 0, ',', '.') : 'Rp 0' }}
+            <div style="background: linear-gradient(135deg, #FFE8EA, #FFD5D8); padding: 16px; border-radius: 12px; text-align: center;">
+                <i class="fas fa-arrow-up" style="font-size: 2rem; color: #FF8B94; margin-bottom: 8px;"></i>
+                <p style="margin: 0 0 4px 0; color: var(--text-light); font-size: 0.85rem;">Nominal Pengeluaran</p>
+                <p style="font-size: 1.4rem; font-weight: 700; color: #FF8B94; margin: 0;">
+                    {{ $transaksi->jenis_transaksi === 'pengeluaran' ? $transaksi->nominal_format : 'Rp 0' }}
                 </p>
             </div>
         </div>
 
-        {{-- Progress Bar Perubahan Saldo --}}
-        <div style="background: white; padding: 20px; border-radius: 12px; border: 2px solid var(--primary-light);">
-            <h5 style="margin: 0 0 15px 0; color: var(--text-color); font-size: 1rem;">
-                <i class="fas fa-wallet"></i> Perubahan Saldo
-            </h5>
-            
-            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+        {{-- Progress bar perubahan saldo --}}
+        @php
+            $maxSaldo = max($transaksi->saldo_sebelum, $transaksi->saldo_sesudah, 1);
+            $pctSebelum  = ($transaksi->saldo_sebelum / $maxSaldo) * 100;
+            $pctSesudah  = ($transaksi->saldo_sesudah / $maxSaldo) * 100;
+            $colorSesudah = $transaksi->jenis_transaksi === 'pemasukan' ? '#6FBA9D' : '#FF8B94';
+        @endphp
+
+        <div style="background: white; padding: 20px; border-radius: 12px; border: 2px solid #E8F7F2;">
+            <p style="font-weight: 600; margin: 0 0 12px 0;"><i class="fas fa-wallet"></i> Perubahan Saldo</p>
+
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
                 <span style="font-size: 0.9rem; color: var(--text-light);">Saldo Sebelum</span>
-                <strong style="color: var(--text-color);">{{ 'Rp ' . number_format($transaksi->saldo_sebelum, 0, ',', '.') }}</strong>
+                <strong>Rp {{ number_format($transaksi->saldo_sebelum, 0, ',', '.') }}</strong>
             </div>
-            
-            @php
-                $maxSaldo = max($transaksi->saldo_sebelum, $transaksi->saldo_sesudah);
-                $persentaseSebelum = $maxSaldo > 0 ? ($transaksi->saldo_sebelum / $maxSaldo) * 100 : 0;
-                $persentaseSesudah = $maxSaldo > 0 ? ($transaksi->saldo_sesudah / $maxSaldo) * 100 : 0;
-            @endphp
-            
-            <div style="position: relative; height: 40px; background: #e0e0e0; border-radius: 20px; overflow: hidden; margin-bottom: 10px;">
-                <div style="position: absolute; height: 100%; background: linear-gradient(90deg, var(--primary-color), var(--primary-dark)); width: {{ $persentaseSebelum }}%; border-radius: 20px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.85rem;">
-                    @if($persentaseSebelum > 15)
-                        {{ number_format($persentaseSebelum, 0) }}%
-                    @endif
-                </div>
+            <div style="height: 36px; background: #e0e0e0; border-radius: 18px; overflow: hidden; margin-bottom: 16px;">
+                <div style="height: 100%; width: {{ max($pctSebelum, 3) }}%; background: linear-gradient(90deg, var(--primary-color), #4a9e7f); border-radius: 18px;"></div>
             </div>
-            
-            <div style="text-align: center; margin: 15px 0;">
-                <i class="fas fa-arrow-{{ $transaksi->jenis_transaksi === 'pemasukan' ? 'up' : 'down' }}" 
-                   style="font-size: 1.5rem; color: {{ $transaksi->jenis_transaksi === 'pemasukan' ? 'var(--success-color)' : 'var(--danger-color)' }};"></i>
-                <p style="margin: 5px 0 0 0; font-size: 0.85rem; color: var(--text-light);">
-                    {{ $transaksi->jenis_transaksi === 'pemasukan' ? 'Bertambah' : 'Berkurang' }} 
-                    <strong>{{ 'Rp ' . number_format(abs($transaksi->saldo_sesudah - $transaksi->saldo_sebelum), 0, ',', '.') }}</strong>
+
+            <div style="text-align: center; margin-bottom: 16px;">
+                <i class="fas fa-arrow-{{ $transaksi->jenis_transaksi === 'pemasukan' ? 'up' : 'down' }}"
+                   style="font-size: 1.4rem; color: {{ $colorSesudah }};"></i>
+                <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: var(--text-light);">
+                    Saldo {{ $transaksi->jenis_transaksi === 'pemasukan' ? 'bertambah' : 'berkurang' }}
+                    <strong style="color: {{ $colorSesudah }};">{{ $transaksi->nominal_format }}</strong>
                 </p>
             </div>
-            
-            <div style="position: relative; height: 40px; background: #e0e0e0; border-radius: 20px; overflow: hidden; margin-bottom: 10px;">
-                <div style="position: absolute; height: 100%; background: linear-gradient(90deg, {{ $transaksi->jenis_transaksi === 'pemasukan' ? 'var(--success-color)' : 'var(--danger-color)' }}, {{ $transaksi->jenis_transaksi === 'pemasukan' ? '#4CAF50' : '#E77580' }}); width: {{ $persentaseSesudah }}%; border-radius: 20px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.85rem;">
-                    @if($persentaseSesudah > 15)
-                        {{ number_format($persentaseSesudah, 0) }}%
-                    @endif
-                </div>
+
+            <div style="height: 36px; background: #e0e0e0; border-radius: 18px; overflow: hidden; margin-bottom: 6px;">
+                <div style="height: 100%; width: {{ max($pctSesudah, 3) }}%; background: linear-gradient(90deg, {{ $colorSesudah }}, {{ $transaksi->jenis_transaksi === 'pemasukan' ? '#4CAF50' : '#e07080' }}); border-radius: 18px;"></div>
             </div>
-            
             <div style="display: flex; justify-content: space-between;">
                 <span style="font-size: 0.9rem; color: var(--text-light);">Saldo Sesudah</span>
-                <strong style="color: {{ $transaksi->jenis_transaksi === 'pemasukan' ? 'var(--success-color)' : 'var(--danger-color)' }}; font-size: 1.1rem;">
-                    {{ 'Rp ' . number_format($transaksi->saldo_sesudah, 0, ',', '.') }}
+                <strong style="color: {{ $colorSesudah }}; font-size: 1.05rem;">
+                    Rp {{ number_format($transaksi->saldo_sesudah, 0, ',', '.') }}
                 </strong>
             </div>
         </div>
     </div>
 
-    <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid var(--primary-light); text-align: center;">
-        <a href="{{ route('santri.uang-saku.index') }}" class="btn btn-primary btn-lg">
+    <div style="margin-top: 22px; text-align: center;">
+        <a href="{{ route('santri.uang-saku.index') }}" class="btn btn-primary">
             <i class="fas fa-list"></i> Lihat Semua Riwayat
         </a>
     </div>

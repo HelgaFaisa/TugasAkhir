@@ -24,11 +24,11 @@ class DurasiPreviewWidget extends StatelessWidget {
 
     return Card(
       elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(9),
           gradient: LinearGradient(
             colors: isOverLimit
                 ? [Colors.red.shade400, Colors.red.shade600]
@@ -50,21 +50,21 @@ class DurasiPreviewWidget extends StatelessWidget {
                       ? Icons.warning_amber_rounded
                       : Icons.info_outline,
                   color: Colors.white,
-                  size: 20,
+                  size: 15,
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 7),
                 const Text(
                   'Preview Durasi Izin',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 14,
+                    fontSize: 11,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
 
             // Info cards
             Row(
@@ -77,7 +77,7 @@ class DurasiPreviewWidget extends StatelessWidget {
                     Icons.access_time,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 9),
                 Expanded(
                   child: _buildInfoCard(
                     'Total Setelah',
@@ -86,7 +86,7 @@ class DurasiPreviewWidget extends StatelessWidget {
                     Icons.calendar_today,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 9),
                 Expanded(
                   child: _buildInfoCard(
                     isOverLimit ? 'Kelebihan' : 'Sisa',
@@ -101,9 +101,9 @@ class DurasiPreviewWidget extends StatelessWidget {
             ),
 
             // Progress bar
-            const SizedBox(height: 12),
+            const SizedBox(height: 9),
             ClipRRect(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(7),
               child: LinearProgressIndicator(
                 value: (totalSetelahIzin / kuotaMaksimal).clamp(0.0, 1.0),
                 backgroundColor: Colors.white.withValues(alpha: 0.3),
@@ -114,14 +114,14 @@ class DurasiPreviewWidget extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: 7),
 
             // Percentage text
             Text(
               '${((totalSetelahIzin / kuotaMaksimal) * 100).toStringAsFixed(1)}% dari kuota $kuotaMaksimal hari',
               style: const TextStyle(
                 color: Colors.white70,
-                fontSize: 12,
+                fontSize: 9,
               ),
             ),
           ],
@@ -137,20 +137,20 @@ class DurasiPreviewWidget extends StatelessWidget {
     IconData icon,
   ) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(9),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(7),
       ),
       child: Column(
         children: [
-          Icon(icon, color: Colors.white, size: 20),
-          const SizedBox(height: 4),
+          Icon(icon, color: Colors.white, size: 15),
+          const SizedBox(height: 2),
           Text(
             value,
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 20,
+              fontSize: 15,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -158,7 +158,7 @@ class DurasiPreviewWidget extends StatelessWidget {
             unit,
             style: const TextStyle(
               color: Colors.white70,
-              fontSize: 10,
+              fontSize: 8,
             ),
           ),
           const SizedBox(height: 2),
@@ -166,7 +166,7 @@ class DurasiPreviewWidget extends StatelessWidget {
             label,
             style: const TextStyle(
               color: Colors.white70,
-              fontSize: 11,
+              fontSize: 8,
             ),
             textAlign: TextAlign.center,
           ),

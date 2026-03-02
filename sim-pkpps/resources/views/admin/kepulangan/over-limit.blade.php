@@ -10,20 +10,20 @@
 </div>
 
 {{-- Info Periode --}}
-<div style="background: linear-gradient(135deg, #ff5252 0%, #f48fb1 100%); color: white; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; align-items: center;">
+<div style="background: linear-gradient(135deg, #ff5252 0%, #f48fb1 100%); color: white; padding: 14px; border-radius: 12px; margin-bottom: 14px;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; align-items: center;">
         <div>
-            <h4 style="margin: 0 0 5px 0; opacity: 0.9;">⚠️ Total Santri Over Limit</h4>
+            <h4 style="margin: 0 0 5px 0; opacity: 0.9;">âš ï¸ Total Santri Over Limit</h4>
             <p style="margin: 0; font-size: 2rem; font-weight: 700;">{{ $santriList->count() }}</p>
         </div>
         <div>
-            <h4 style="margin: 0 0 5px 0; opacity: 0.9;">📅 Periode Kuota</h4>
+            <h4 style="margin: 0 0 5px 0; opacity: 0.9;">ðŸ“… Periode Kuota</h4>
             <p style="margin: 0; font-size: 1.1rem; font-weight: 600;">
                 {{ $settings->periode_mulai->format('d M Y') }} - {{ $settings->periode_akhir->format('d M Y') }}
             </p>
         </div>
         <div>
-            <h4 style="margin: 0 0 5px 0; opacity: 0.9;">📊 Kuota Maksimal</h4>
+            <h4 style="margin: 0 0 5px 0; opacity: 0.9;">ðŸ“Š Kuota Maksimal</h4>
             <p style="margin: 0; font-size: 1.1rem; font-weight: 600;">{{ $settings->kuota_maksimal }} Hari / Tahun</p>
         </div>
         <div style="text-align: right;">
@@ -35,8 +35,8 @@
 </div>
 
 {{-- Alert Info --}}
-<div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #ffc107;">
-    <strong>ℹ️ Informasi:</strong>
+<div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 14px; border-left: 4px solid #ffc107;">
+    <strong>â„¹ï¸ Informasi:</strong>
     <p style="margin: 10px 0 0 0;">
         Berikut adalah daftar santri yang telah melebihi kuota maksimal <strong>{{ $settings->kuota_maksimal }} hari</strong> dalam periode ini. 
         Santri tetap bisa mengajukan izin, namun akan mendapat peringatan visual.
@@ -128,9 +128,9 @@
         </div>
 
         {{-- Summary Statistics --}}
-        <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
-            <h4 style="margin: 0 0 15px 0; color: #2C3E50;">📊 Ringkasan Statistik</h4>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+        <div style="margin-top: 22px; padding: 14px; background: #f8f9fa; border-radius: 8px;">
+            <h4 style="margin: 0 0 15px 0; color: #2C3E50;">ðŸ“Š Ringkasan Statistik</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px;">
                 <div style="text-align: center; padding: 15px; background: white; border-radius: 8px; border: 2px solid #dc3545;">
                     <div style="font-size: 0.85rem; color: #7F8C8D; margin-bottom: 5px;">Total Santri Over Limit</div>
                     <div style="font-size: 2rem; font-weight: 700; color: #dc3545;">{{ $santriList->count() }}</div>
@@ -157,7 +157,7 @@
         </div>
 
         {{-- Action Buttons --}}
-        <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+        <div style="margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap;">
             <button type="button" class="btn btn-danger" onclick="showResetSemuaOverLimit()">
                 <i class="fas fa-sync-alt"></i> Reset Semua Santri Over Limit
             </button>
@@ -166,11 +166,11 @@
             </a>
         </div>
     @else
-        <div style="text-align: center; padding: 60px; color: #28a745;">
-            <i class="fas fa-check-circle" style="font-size: 4rem; margin-bottom: 20px; display: block;"></i>
+        <div style="text-align: center; padding: 44px; color: #28a745;">
+            <i class="fas fa-check-circle" style="font-size: 4rem; margin-bottom: 14px; display: block;"></i>
             <h3 style="margin: 0 0 10px 0;">Tidak Ada Santri Over Limit!</h3>
             <p style="color: #7F8C8D;">Semua santri masih dalam batas kuota yang ditentukan.</p>
-            <a href="{{ route('admin.kepulangan.index') }}" class="btn btn-primary" style="margin-top: 20px;">
+            <a href="{{ route('admin.kepulangan.index') }}" class="btn btn-primary" style="margin-top: 14px;">
                 <i class="fas fa-arrow-left"></i> Kembali ke Kepulangan
             </a>
         </div>
@@ -180,17 +180,17 @@
 {{-- Modal Detail Santri --}}
 <div class="modal fade" id="detailSantriModal" tabindex="-1" style="display: none;">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content" style="background: white; border-radius: 12px; padding: 20px;">
-            <div style="margin-bottom: 20px;">
+        <div class="modal-content" style="background: white; border-radius: 12px; padding: 14px;">
+            <div style="margin-bottom: 14px;">
                 <h3 style="margin: 0; color: #2C3E50;">Detail Riwayat Izin Santri</h3>
             </div>
             <div id="detailSantriContent">
-                <div style="text-align: center; padding: 40px;">
+                <div style="text-align: center; padding: 22px;">
                     <i class="fas fa-spinner fa-spin" style="font-size: 2rem;"></i>
                     <p style="margin-top: 10px;">Memuat data...</p>
                 </div>
             </div>
-            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px;">
                 <button type="button" class="btn btn-secondary" onclick="closeModal('detailSantriModal')">Tutup</button>
             </div>
         </div>
@@ -200,10 +200,10 @@
 {{-- Modal Reset Kuota --}}
 <div class="modal fade" id="resetKuotaModal" tabindex="-1" style="display: none;">
     <div class="modal-dialog">
-        <div class="modal-content" style="background: white; border-radius: 12px; padding: 20px;">
+        <div class="modal-content" style="background: white; border-radius: 12px; padding: 14px;">
             <form id="resetKuotaForm">
                 @csrf
-                <div style="margin-bottom: 20px;">
+                <div style="margin-bottom: 14px;">
                     <h3 style="margin: 0; color: #2C3E50;">Reset Kuota Santri</h3>
                 </div>
                 <div style="padding: 15px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 6px; margin-bottom: 15px;">
@@ -216,7 +216,7 @@
                     <label>Catatan Reset (Opsional):</label>
                     <textarea name="catatan" class="form-control" rows="2" placeholder="Alasan reset kuota..."></textarea>
                 </div>
-                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px;">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('resetKuotaModal')">Batal</button>
                     <button type="submit" class="btn btn-warning"><i class="fas fa-sync-alt"></i> Reset Kuota</button>
                 </div>
@@ -247,9 +247,9 @@ function showDetailSantri(idSantri) {
                 const kuota = data.penggunaan_izin;
                 
                 document.getElementById('detailSantriContent').innerHTML = `
-                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <div style="background: #f8f9fa; padding: 14px; border-radius: 8px; margin-bottom: 14px;">
                         <h4 style="margin: 0 0 15px 0;">${santri.nama_lengkap}</h4>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 11px;">
                             <div>
                                 <div style="font-size: 0.85rem; color: #7F8C8D;">ID Santri</div>
                                 <div style="font-weight: 600;">${santri.id_santri}</div>

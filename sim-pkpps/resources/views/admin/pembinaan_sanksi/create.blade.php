@@ -4,24 +4,17 @@
 
 @section('content')
 <div class="page-header">
-    <h2><i class="fas fa-plus-circle"></i> Tambah Pembinaan & Sanksi</h2>
+    <h2><i class="fas fa-plus-circle"></i> Tambah Peraturan & Tata Tertib</h2>
 </div>
 
 <div class="content-box">
-    <div class="alert alert-info" style="margin-bottom: 25px;">
-        <i class="fas fa-info-circle"></i>
-        <strong>Tips:</strong> Gunakan editor di bawah untuk membuat konten dengan format yang rapi. 
-        Anda bisa menggunakan <strong>bold</strong>, <em>italic</em>, membuat daftar bernomor, 
-        mengatur ukuran font, dan lainnya.
-    </div>
-
     <form action="{{ route('admin.pembinaan-sanksi.store') }}" method="POST">
         @csrf
 
         <div class="form-group">
             <label>
                 <i class="fas fa-id-card form-icon"></i>
-                ID Pembinaan (Preview)
+                ID Peraturan (Preview)
             </label>
             <input type="text" class="form-control" value="{{ $nextId }}" disabled>
             <span class="form-text">ID akan dibuat otomatis</span>
@@ -37,14 +30,11 @@
                    id="judul"
                    class="form-control @error('judul') is-invalid @enderror"
                    value="{{ old('judul') }}"
-                   placeholder="Contoh: PEMBINAAN DAN SANKSI, Peraturan Pondok, Tata Tertib"
+                   placeholder="Contoh: Pembinaan & sanksi, Peraturan Pondok, Tata Tertib, dll"
                    required>
             @error('judul')
                 <span class="invalid-feedback">{{ $message }}</span>
             @enderror
-            <span class="form-text">
-                <i class="fas fa-lightbulb"></i> Contoh: "PEMBINAAN DAN SANKSI", "Peraturan Pondok", "Tata Tertib Santri"
-            </span>
         </div>
 
         <div class="form-group">
@@ -101,7 +91,7 @@
             </div>
         </div>
 
-        <div class="btn-group" style="margin-top: 30px;">
+        <div class="btn-group" style="margin-top: 22px;">
             <button type="submit" class="btn btn-primary">
                 <i class="fas fa-save"></i> Simpan
             </button>
@@ -134,7 +124,7 @@
                 ['clean']
             ]
         },
-        placeholder: 'Tulis konten di sini...\n\nGunakan toolbar di atas untuk formatting:\n• Heading untuk judul\n• Bold/Italic untuk penekanan\n• List untuk daftar\n• Color untuk highlight'
+        placeholder: 'Tulis konten di sini...\n\n Gunakan toolbar di atas untuk formatting:\n Heading untuk judul\n Bold/Italic untuk penekanan\n List untuk daftar\nColor untuk highlight'
     });
 
     // Load existing content if any (for old() values)
@@ -172,7 +162,7 @@
     }
     
     .ql-container {
-        font-size: 14px;
+        font-size: 11px;
         font-family: Arial, sans-serif;
         min-height: 350px;
     }

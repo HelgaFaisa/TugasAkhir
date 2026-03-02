@@ -1,4 +1,4 @@
-// lib/features/pelanggaran/pelanggaran_page.dart
+﻿// lib/features/pelanggaran/pelanggaran_page.dart
 
 import 'package:flutter/material.dart';
 import 'kategori_pelanggaran_tab.dart';
@@ -34,7 +34,7 @@ class _PelanggaranPageState extends State<PelanggaranPage>
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
         title: const Text('Pelanggaran Santri'),
-        backgroundColor: const Color(0xFF7C3AED),
+        backgroundColor: const Color(0xFF6FBA9D),
         foregroundColor: Colors.white,
         elevation: 0,
         bottom: TabBar(
@@ -44,15 +44,15 @@ class _PelanggaranPageState extends State<PelanggaranPage>
           unselectedLabelColor: Colors.white70,
           tabs: const [
             Tab(
-              icon: Icon(Icons.list_alt, size: 20),
+              icon: Icon(Icons.list_alt, size: 15),
               text: 'Kategori',
             ),
             Tab(
-              icon: Icon(Icons.gavel, size: 20),
+              icon: Icon(Icons.gavel, size: 15),
               text: 'Pembinaan',
             ),
             Tab(
-              icon: Icon(Icons.history, size: 20),
+              icon: Icon(Icons.history, size: 15),
               text: 'Riwayat',
             ),
           ],

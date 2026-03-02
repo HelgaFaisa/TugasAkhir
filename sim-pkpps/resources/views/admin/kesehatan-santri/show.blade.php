@@ -9,7 +9,7 @@
 
 <!-- Header Actions -->
 <div class="content-box" style="margin-bottom: 25px;">
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 11px;">
         <div>
             <h3 style="margin: 0; color: var(--primary-color);">
                 <i class="fas fa-info-circle"></i> ID Kesehatan: <span style="color: var(--text-color);">{{ $kesehatanSantri->id_kesehatan }}</span>
@@ -45,7 +45,7 @@
                 Status Kesehatan
             </h3>
             <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
-                <span style="background: {{ $kesehatanSantri->status == 'dirawat' ? '#E74C3C' : ($kesehatanSantri->status == 'sembuh' ? '#6FBA9D' : '#FFD56B') }}; color: white; padding: 12px 24px; border-radius: 8px; font-size: 1.2em; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.15);">
+                <span style="background: {{ $kesehatanSantri->status == 'dirawat' ? '#E74C3C' : ($kesehatanSantri->status == 'sembuh' ? '#6FBA9D' : '#FFD56B') }}; color: white; padding: 9px 18px; border-radius: 8px; font-size: 1.2em; font-weight: bold; box-shadow: 0 4px 8px rgba(0,0,0,0.15);">
                     {{ strtoupper($kesehatanSantri->status) }}
                 </span>
                 <div style="border-left: 3px solid {{ $kesehatanSantri->status == 'dirawat' ? '#E74C3C' : ($kesehatanSantri->status == 'sembuh' ? '#6FBA9D' : '#FFD56B') }}; padding-left: 15px;">
@@ -70,12 +70,12 @@
     
     <!-- Card: Informasi Santri -->
     <div class="content-box" style="border-top: 4px solid var(--primary-color);">
-        <h3 style="color: var(--primary-color); margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+        <h3 style="color: var(--primary-color); margin-bottom: 14px; display: flex; align-items: center; gap: 10px;">
             <i class="fas fa-user-circle" style="font-size: 1.5em;"></i>
             <span>Informasi Santri</span>
         </h3>
         
-        <div style="display: flex; flex-direction: column; gap: 15px;">
+        <div style="display: flex; flex-direction: column; gap: 11px;">
             <div class="info-item">
                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
                     <i class="fas fa-id-badge" style="color: var(--primary-color); width: 20px;"></i>
@@ -96,7 +96,7 @@
                 </div>
             </div>
             
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding-top: 15px; border-top: 2px solid var(--primary-light);">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 11px; padding-top: 15px; border-top: 2px solid var(--primary-light);">
                 <div class="info-item">
                     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
                         <i class="fas fa-id-card" style="color: var(--primary-color); font-size: 0.9em;"></i>
@@ -160,7 +160,7 @@
     
     <!-- Card: Timeline Perawatan -->
     <div class="content-box" style="border-top: 4px solid var(--secondary-color);">
-        <h3 style="color: var(--secondary-color); margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+        <h3 style="color: var(--secondary-color); margin-bottom: 14px; display: flex; align-items: center; gap: 10px;">
             <i class="fas fa-calendar-alt" style="font-size: 1.5em;"></i>
             <span>Timeline Perawatan</span>
         </h3>
@@ -170,7 +170,7 @@
             <div style="position: absolute; left: 8px; top: 0; bottom: 0; width: 3px; background: linear-gradient(180deg, var(--primary-color) 0%, var(--secondary-color) 100%);"></div>
             
             <!-- Tanggal Masuk -->
-            <div style="position: relative; margin-bottom: 30px;">
+            <div style="position: relative; margin-bottom: 22px;">
                 <div style="position: absolute; left: -26px; width: 20px; height: 20px; background: var(--primary-color); border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.15);"></div>
                 <div style="background: linear-gradient(135deg, #E8F7F2 0%, #D4F1E3 100%); padding: 15px; border-radius: 8px; border-left: 4px solid var(--primary-color);">
                     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
@@ -223,7 +223,7 @@
 
 <!-- Card: Keluhan dan Catatan -->
 <div class="content-box" style="border-top: 4px solid var(--warning-color); margin-bottom: 25px;">
-    <h3 style="color: var(--warning-color); margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+    <h3 style="color: var(--warning-color); margin-bottom: 14px; display: flex; align-items: center; gap: 10px;">
         <i class="fas fa-notes-medical" style="font-size: 1.5em;"></i>
         <span>Informasi Medis</span>
     </h3>
@@ -240,7 +240,7 @@
                     <p style="margin: 0; font-size: 0.85em; color: #7F8C8D;">Gejala yang dialami</p>
                 </div>
             </div>
-            <div style="background: linear-gradient(135deg, #E8F7F2 0%, #F8FBF9 100%); padding: 20px; border-radius: 8px; border-left: 4px solid var(--primary-color); box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">
+            <div style="background: linear-gradient(135deg, #E8F7F2 0%, #F8FBF9 100%); padding: 14px; border-radius: 8px; border-left: 4px solid var(--primary-color); box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">
                 <p style="margin: 0; line-height: 1.8; color: var(--text-color); font-size: 1.05em;">
                     {{ $kesehatanSantri->keluhan }}
                 </p>
@@ -259,7 +259,7 @@
                     <p style="margin: 0; font-size: 0.85em; color: #7F8C8D;">Informasi tambahan dari petugas UKP</p>
                 </div>
             </div>
-            <div style="background: linear-gradient(135deg, #FFF8E1 0%, #FFF3CD 100%); padding: 20px; border-radius: 8px; border-left: 4px solid var(--warning-color); box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">
+            <div style="background: linear-gradient(135deg, #FFF8E1 0%, #FFF3CD 100%); padding: 14px; border-radius: 8px; border-left: 4px solid var(--warning-color); box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">
                 <p style="margin: 0; line-height: 1.8; color: var(--text-color); font-size: 1.05em;">
                     {{ $kesehatanSantri->catatan }}
                 </p>
@@ -289,7 +289,7 @@
         <form action="{{ route('admin.kesehatan-santri.destroy', $kesehatanSantri) }}" 
               method="POST" 
               style="display: inline;"
-              onsubmit="return confirm('⚠️ Yakin ingin menghapus data kesehatan ini?\n\nData yang dihapus tidak dapat dikembalikan!')">
+              onsubmit="return confirm('âš ï¸ Yakin ingin menghapus data kesehatan ini?\n\nData yang dihapus tidak dapat dikembalikan!')">
             @csrf
             @method('DELETE')
             <button type="submit" class="btn btn-danger">
@@ -301,8 +301,8 @@
 
 <!-- Riwayat Kesehatan Santri (5 data terakhir) -->
 @if($riwayatKesehatan->count() > 0)
-<div class="content-box" style="margin-top: 30px; border-top: 4px solid var(--info-color);">
-    <h3 style="color: var(--info-color); margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;">
+<div class="content-box" style="margin-top: 22px; border-top: 4px solid var(--info-color);">
+    <h3 style="color: var(--info-color); margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between;">
         <span>
             <i class="fas fa-history"></i> Riwayat Kesehatan Lainnya
         </span>
@@ -361,7 +361,7 @@
         </tbody>
     </table>
     
-    <div style="text-align: center; margin-top: 20px;">
+    <div style="text-align: center; margin-top: 14px;">
         <a href="{{ route('admin.kesehatan-santri.riwayat', $kesehatanSantri->id_santri) }}" 
            class="btn btn-primary">
             <i class="fas fa-list"></i> Lihat Semua Riwayat
@@ -372,8 +372,8 @@
 
 <!-- Modal Keluar UKP -->
 <div id="keluarUkpModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; animation: fadeIn 0.3s ease;">
-    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 12px; min-width: 400px; max-width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.3); animation: slideDown 0.3s ease;">
-        <h3 style="margin-bottom: 20px; color: var(--primary-color); display: flex; align-items: center; gap: 10px;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 22px; border-radius: 12px; min-width: 300px; max-width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.3); animation: slideDown 0.3s ease;">
+        <h3 style="margin-bottom: 14px; color: var(--primary-color); display: flex; align-items: center; gap: 10px;">
             <div style="background: var(--primary-color); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
                 <i class="fas fa-sign-out-alt"></i>
             </div>
@@ -403,7 +403,7 @@
                 </select>
             </div>
             
-            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px;">
                 <button type="button" class="btn btn-secondary" onclick="closeKeluarUkpModal()">
                     <i class="fas fa-times"></i> Batal
                 </button>
@@ -444,7 +444,7 @@
 @media (max-width: 768px) {
     #keluarUkpModal > div {
         min-width: 90%;
-        padding: 20px;
+        padding: 14px;
     }
     
     .page-header h2 {

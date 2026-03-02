@@ -2,7 +2,6 @@
 
 namespace App\Http\Middleware;
 
-use App\Providers\RouteServiceProvider;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -10,18 +9,19 @@ use Symfony\Component\HttpFoundation\Response;
 
 class RedirectIfAuthenticated
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
     public function handle(Request $request, Closure $next, string ...$guards): Response
     {
-        $guards = empty($guards) ? [null] : $guards;
+        $path = $request->path();
 
-        foreach ($guards as $guard) {
-            if (Auth::guard($guard)->check()) {
-                return redirect(RouteServiceProvider::HOME);
+        if (str_starts_with($path, 'santri')) {
+            // Halaman guest santri → redirect hanya jika guard santri aktif
+            if (Auth::guard('santri')->check()) {
+                return redirect()->route('santri.dashboard');
+            }
+        } else {
+            // Halaman guest admin → redirect hanya jika guard web aktif
+            if (Auth::check()) {
+                return redirect()->route('admin.dashboard');
             }
         }
 

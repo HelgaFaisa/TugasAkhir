@@ -11,7 +11,7 @@
 </div>
 
 {{-- Filter Periode --}}
-<div class="content-box" style="margin-bottom:20px;">
+<div class="content-box" style="margin-bottom: 14px;">
     <form method="GET" action="{{ route('admin.keuangan.laporan') }}" style="display:flex; gap:12px; align-items:end; flex-wrap:wrap;">
         <div class="form-group" style="margin-bottom:0;">
             <label>Bulan</label>

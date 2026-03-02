@@ -42,15 +42,13 @@
                 </button>
             </div>
             <ul class="sidebar-menu">
-                <!-- Logika penentuan sidebar berdasarkan status login dan role -->
-                <?php if(auth()->guard()->check()): ?>
-                    <?php if(Auth::user()->role === 'admin'): ?>
+                
+                <?php if(auth()->check()): ?>
+                    <?php if(auth()->user()->isAdmin()): ?>
                         <?php echo $__env->make('layouts.admin-sidebar', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
-                    <?php else: ?>
-                        <?php echo $__env->make('layouts.santri-wali-sidebar', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
                     <?php endif; ?>
-                <?php else: ?>
-                    <!-- Jika belum login, tampilkan menu minimal atau kosong -->
+                <?php elseif(auth('santri')->check()): ?>
+                    <?php echo $__env->make('layouts.santri-wali-sidebar', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
                 <?php endif; ?>
             </ul>
         </aside>
@@ -64,12 +62,24 @@
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="user-info">
-                    <?php if(auth()->guard()->check()): ?>
+                    <?php if(auth()->check()): ?>
                         <li class="logout-item">
-                            <form method="POST" action="<?php echo e(Auth::user()->role === 'admin' ? route('admin.logout') : route('santri.logout')); ?>" style="display: inline;">
+                            <form method="POST" action="<?php echo e(route('admin.logout')); ?>" style="display: inline;">
                                 <?php echo csrf_field(); ?>
                                 <button type="submit" 
-                                        style="border: none; background: none; color: #6FBA9D; cursor: pointer; padding: 8px 12px; font-size: 16px; display: flex; align-items: center; gap: 8px; text-decoration: none; font-weight: 500;"
+                                        style="border: none; background: none; color: #6FBA9D; cursor: pointer; padding: 4px 8px; font-size: 0.82rem; display: flex; align-items: center; gap: 6px; text-decoration: none; font-weight: 500;"
+                                        title="Logout">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    <span>Logout</span>
+                                </button>
+                            </form>
+                        </li>
+                    <?php elseif(auth('santri')->check()): ?>
+                        <li class="logout-item">
+                            <form method="POST" action="<?php echo e(route('santri.logout')); ?>" style="display: inline;">
+                                <?php echo csrf_field(); ?>
+                                <button type="submit" 
+                                        style="border: none; background: none; color: #6FBA9D; cursor: pointer; padding: 4px 8px; font-size: 0.82rem; display: flex; align-items: center; gap: 6px; text-decoration: none; font-weight: 500;"
                                         title="Logout">
                                     <i class="fas fa-sign-out-alt"></i>
                                     <span>Logout</span>

@@ -16,7 +16,7 @@ class ApiUangSakuController extends Controller
     {
         try {
             // Ambil id_santri dari user yang login (wali)
-            $idSantri = $request->user()->role_id;
+            $idSantri = $request->user()->id_santri;
             
             // Ambil data santri
             $santri = Santri::where('id_santri', $idSantri)->first();
@@ -77,7 +77,7 @@ class ApiUangSakuController extends Controller
     {
         try {
             // Ambil id_santri dari user yang login (wali)
-            $idSantri = $request->user()->role_id;
+            $idSantri = $request->user()->id_santri;
             
             // Query transaksi uang saku
             $query = UangSaku::where('id_santri', $idSantri)
