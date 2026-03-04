@@ -1,3 +1,5 @@
+﻿
+
 <?php $__env->startSection('content'); ?>
 <div class="page-header">
     <h2><i class="fas fa-chart-line"></i> Data Capaian Santri</h2>
@@ -94,6 +96,7 @@
     <?php endif; ?>
     
     <?php if($santriData->count() > 0): ?>
+        <div class="table-wrapper">
         <table class="data-table">
             <thead>
                 <tr>
@@ -152,6 +155,7 @@
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </tbody>
         </table>
+        </div>
     <?php else: ?>
         <div class="empty-state">
             <i class="fas fa-inbox"></i>

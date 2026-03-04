@@ -1,4 +1,4 @@
-{{-- resources/views/santri/pelanggaran/index.blade.php --}}
+﻿{{-- resources/views/santri/pelanggaran/index.blade.php --}}
 @extends('layouts.app')
 
 @section('title', 'Riwayat Pelanggaran')
@@ -28,7 +28,7 @@
 <div style="background: linear-gradient(135deg, #dc3545 0%, #a71d2a 100%); color: white; padding: 16px 20px; border-radius: var(--border-radius); margin-bottom: 18px; display: flex; align-items: center; gap: 14px; box-shadow: 0 4px 15px rgba(220,53,69,0.3);">
     <i class="fas fa-exclamation-triangle" style="font-size: 2em; opacity: 0.9;"></i>
     <div>
-        <strong style="font-size: 1.05em;">⚠️ Perhatian! Akumulasi poin Anda sudah tinggi ({{ $totalPoin }} poin)</strong><br>
+        <strong style="font-size: 1.05em;">âš ï¸ Perhatian! Akumulasi poin Anda sudah tinggi ({{ $totalPoin }} poin)</strong><br>
         <span style="opacity: 0.9; font-size: 0.9em;">Harap segera hubungi pengurus pondok untuk konsultasi dan penyelesaian kafaroh yang ada.</span>
     </div>
 </div>
@@ -169,13 +169,14 @@
         </h3>
         @if(request()->hasAny(['tanggal_mulai', 'tanggal_selesai', 'bulan_ini']))
         <span class="badge badge-info" style="font-size: 0.85em;">
-            <i class="fas fa-filter"></i> Filter aktif — {{ $riwayat->total() }} data
+            <i class="fas fa-filter"></i> Filter aktif â€” {{ $riwayat->total() }} data
         </span>
         @endif
     </div>
 
     @if($riwayat->count() > 0)
         <div style="overflow-x: auto;">
+            <div class="table-wrapper">
             <table class="data-table">
                 <thead>
                     <tr>
@@ -241,12 +242,13 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
         </div>
 
         {{-- Pagination --}}
         <div style="margin-top: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
             <p style="margin: 0; color: var(--text-light); font-size: 0.88em;">
-                Menampilkan {{ $riwayat->firstItem() }}–{{ $riwayat->lastItem() }} dari {{ $riwayat->total() }} data
+                Menampilkan {{ $riwayat->firstItem() }}-{{ $riwayat->lastItem() }} dari {{ $riwayat->total() }} data
             </p>
             {{ $riwayat->links() }}
         </div>
@@ -272,7 +274,7 @@
     <h3 style="margin-bottom: 18px; color: var(--primary-color);">
         <i class="fas fa-chart-pie"></i> Ringkasan Analisis
     </h3>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+    <div class="grid-auto-fill">
 
         <div style="background: var(--primary-light); padding: 16px; border-radius: var(--border-radius-sm); text-align: center;">
             <i class="fas fa-calculator" style="font-size: 1.8em; color: var(--primary-color); margin-bottom: 8px;"></i>
@@ -300,7 +302,7 @@
                 @if($riwayat->first())
                     {{ \Carbon\Carbon::parse($riwayat->first()->tanggal)->isoFormat('D MMM YYYY') }}
                 @else
-                    —
+                    â€”
                 @endif
             </div>
             <p style="margin: 4px 0 0; color: var(--text-light); font-size: 0.85em;">Pelanggaran Terakhir</p>

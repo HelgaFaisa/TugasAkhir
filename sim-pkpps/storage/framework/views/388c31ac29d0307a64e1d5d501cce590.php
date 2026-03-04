@@ -1,0 +1,252 @@
+<?php $__env->startSection('title', 'Tambah Pembinaan & Sanksi'); ?>
+
+<?php $__env->startSection('content'); ?>
+<div class="page-header">
+    <h2><i class="fas fa-plus-circle"></i> Tambah Peraturan & Tata Tertib</h2>
+</div>
+
+<div class="content-box">
+    <form action="<?php echo e(route('admin.pembinaan-sanksi.store')); ?>" method="POST">
+        <?php echo csrf_field(); ?>
+
+        <div class="form-group">
+            <label>
+                <i class="fas fa-id-card form-icon"></i>
+                ID Peraturan (Preview)
+            </label>
+            <input type="text" class="form-control" value="<?php echo e($nextId); ?>" disabled>
+            <span class="form-text">ID akan dibuat otomatis</span>
+        </div>
+
+        <div class="form-group">
+            <label for="judul">
+                <i class="fas fa-heading form-icon"></i>
+                Judul <span style="color: var(--danger-color);">*</span>
+            </label>
+            <input type="text" 
+                   name="judul" 
+                   id="judul"
+                   class="form-control <?php $__errorArgs = ['judul'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                   value="<?php echo e(old('judul')); ?>"
+                   placeholder="Contoh: Pembinaan & sanksi, Peraturan Pondok, Tata Tertib, dll"
+                   required>
+            <?php $__errorArgs = ['judul'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                <span class="invalid-feedback"><?php echo e($message); ?></span>
+            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+        </div>
+
+        <div class="form-group">
+            <label for="konten">
+                <i class="fas fa-file-alt form-icon"></i>
+                Konten <span style="color: var(--danger-color);">*</span>
+            </label>
+            <div id="editor-container" style="min-height: 400px; background: white; border: 1px solid #ddd; border-radius: 4px;"></div>
+            <textarea name="konten" 
+                      id="konten"
+                      class="form-control <?php $__errorArgs = ['konten'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                      style="display: none;"
+                      required><?php echo e(old('konten')); ?></textarea>
+            <?php $__errorArgs = ['konten'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                <span class="invalid-feedback" style="display: block;"><?php echo e($message); ?></span>
+            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+            <span class="form-text">
+                <i class="fas fa-magic"></i> Gunakan toolbar di atas untuk formatting: Bold, Italic, Daftar Bernomor, Warna, dsb.
+            </span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+                <label for="urutan">
+                    <i class="fas fa-sort-numeric-up form-icon"></i>
+                    Urutan Tampilan
+                </label>
+                <input type="number" 
+                       name="urutan" 
+                       id="urutan"
+                       class="form-control <?php $__errorArgs = ['urutan'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>"
+                       value="<?php echo e(old('urutan', 0)); ?>"
+                       min="0">
+                <?php $__errorArgs = ['urutan'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                    <span class="invalid-feedback"><?php echo e($message); ?></span>
+                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <i class="fas fa-toggle-on form-icon"></i>
+                    Status
+                </label>
+                <div style="margin-top: 12px;">
+                    <label style="display: flex; align-items: center; cursor: pointer;">
+                        <input type="checkbox" 
+                               name="is_active" 
+                               value="1" 
+                               <?php echo e(old('is_active', true) ? 'checked' : ''); ?>
+
+                               style="margin-right: 8px;">
+                        <span>Aktif</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-group" style="margin-top: 22px;">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Simpan
+            </button>
+            <a href="<?php echo e(route('admin.pembinaan-sanksi.index')); ?>" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Batal
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Quill Editor CSS -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+<!-- Quill Editor JS -->
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
+<script>
+    // Initialize Quill Editor
+    var quill = new Quill('#editor-container', {
+        theme: 'snow',
+        modules: {
+            toolbar: [
+                [{ 'header': [1, 2, 3, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ 'color': [] }, { 'background': [] }],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                [{ 'indent': '-1'}, { 'indent': '+1' }],
+                [{ 'align': [] }],
+                ['link', 'image'],
+                ['clean']
+            ]
+        },
+        placeholder: 'Tulis konten di sini...\n\n Gunakan toolbar di atas untuk formatting:\n Heading untuk judul\n Bold/Italic untuk penekanan\n List untuk daftar\nColor untuk highlight'
+    });
+
+    // Load existing content if any (for old() values)
+    var existingContent = document.getElementById('konten').value;
+    if (existingContent) {
+        quill.root.innerHTML = existingContent;
+    }
+
+    // Sync Quill content to hidden textarea on form submit
+    document.querySelector('form').onsubmit = function() {
+        var kontenInput = document.getElementById('konten');
+        kontenInput.value = quill.root.innerHTML;
+        
+        // Validation: check if content is empty
+        if (quill.getText().trim().length === 0) {
+            alert('Konten tidak boleh kosong!');
+            return false;
+        }
+        
+        return true;
+    };
+
+    // Optional: Sync on every change (real-time)
+    quill.on('text-change', function() {
+        document.getElementById('konten').value = quill.root.innerHTML;
+    });
+</script>
+
+<style>
+    /* Custom Quill Editor Styling */
+    .ql-toolbar {
+        background-color: #f8f9fa;
+        border-radius: 4px 4px 0 0;
+        border-bottom: 2px solid #dee2e6;
+    }
+    
+    .ql-container {
+        font-size: 11px;
+        font-family: Arial, sans-serif;
+        min-height: 350px;
+    }
+    
+    .ql-editor {
+        min-height: 350px;
+        max-height: 600px;
+        overflow-y: auto;
+    }
+    
+    .ql-editor h1 {
+        font-size: 2em;
+        color: #2c3e50;
+        margin-top: 0.5em;
+        margin-bottom: 0.5em;
+    }
+    
+    .ql-editor h2 {
+        font-size: 1.5em;
+        color: #34495e;
+        margin-top: 0.5em;
+        margin-bottom: 0.5em;
+    }
+    
+    .ql-editor h3 {
+        font-size: 1.2em;
+        color: #34495e;
+        margin-top: 0.5em;
+        margin-bottom: 0.5em;
+    }
+    
+    .ql-editor p {
+        margin-bottom: 1em;
+    }
+    
+    .ql-editor ol, .ql-editor ul {
+        padding-left: 1.5em;
+        margin-bottom: 1em;
+    }
+    
+    .ql-editor li {
+        margin-bottom: 0.5em;
+    }
+</style>
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\TugasAkhir\sim-pkpps\resources\views/admin/pembinaan_sanksi/create.blade.php ENDPATH**/ ?>

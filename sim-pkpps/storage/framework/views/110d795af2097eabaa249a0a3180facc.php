@@ -29,8 +29,20 @@
 
 
 
-<div class="page-header">
+<div class="page-header" style="display:flex; align-items:center; justify-content:space-between;">
     <h2><i class="fas fa-tachometer-alt"></i> Dashboard Absensi</h2>
+
+    <div style="display:flex; gap:8px;">
+        <a href="<?php echo e(route('admin.mesin.mapping-santri.index')); ?>"
+           class="btn btn-sm btn-secondary">
+            <i class="fas fa-link"></i> Mapping Fingerprint
+        </a>
+        <a href="<?php echo e(route('admin.mesin.import.index')); ?>"
+           class="btn btn-sm btn-success"
+           style="background:#0F7B6C; border-color:#0F7B6C;">
+            <i class="fas fa-file-import"></i> Import
+        </a>
+    </div>
 </div>
 
 <p style="color: var(--text-light); margin-top: 5px; margin-bottom: 14px;">

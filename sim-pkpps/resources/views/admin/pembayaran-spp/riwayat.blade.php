@@ -1,4 +1,4 @@
-{{-- resources/views/admin/pembayaran-spp/riwayat.blade.php --}}
+﻿{{-- resources/views/admin/pembayaran-spp/riwayat.blade.php --}}
 @extends('layouts.app')
 
 @section('title', 'Riwayat Pembayaran SPP')
@@ -56,6 +56,7 @@
     </h4>
 
     <div style="overflow-x: auto;">
+        <div class="table-wrapper">
         <table class="data-table">
             <thead>
                 <tr>
@@ -115,6 +116,7 @@
                 @endforelse
             </tbody>
         </table>
+        </div>
     </div>
 
     <!-- Pagination -->

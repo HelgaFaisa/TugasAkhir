@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'Pembinaan & Sanksi')
 
@@ -36,6 +36,8 @@
             <i class="fas fa-info-circle"></i>
             <strong>Info:</strong> Konten akan ditampilkan sesuai urutan. Drag atau ubah nomor urutan untuk mengatur tampilan.
         </div>
+
+        <div class="table-wrapper">
 
         <table class="data-table">
             <thead>
@@ -107,6 +109,8 @@
                 @endforeach
             </tbody>
         </table>
+
+        </div>
     @else
         <div class="empty-state">
             <i class="fas fa-folder-open"></i>

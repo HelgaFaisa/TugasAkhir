@@ -1,4 +1,4 @@
-{{-- resources/views/admin/kegiatan/riwayat/detail-santri.blade.php --}}
+﻿{{-- resources/views/admin/kegiatan/riwayat/detail-santri.blade.php --}}
 @extends('layouts.app')
 
 @section('content')
@@ -73,6 +73,7 @@
     <h3 style="margin: 0 0 20px 0; color: var(--primary-color);">
         <i class="fas fa-layer-group"></i> Kehadiran Per Kelas
     </h3>
+    <div class="table-wrapper">
     <table class="data-table">
         <thead>
             <tr>
@@ -109,6 +110,7 @@
             @endforeach
         </tbody>
     </table>
+    </div>
 </div>
 @endif
 
@@ -119,6 +121,7 @@
     </h3>
 
     @if($riwayats->count() > 0)
+        <div class="table-wrapper">
         <table class="data-table">
             <thead>
                 <tr>
@@ -143,6 +146,7 @@
                 @endforeach
             </tbody>
         </table>
+        </div>
 
         <div style="margin-top: 14px;">
             {{ $riwayats->links() }}

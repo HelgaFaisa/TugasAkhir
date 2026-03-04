@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
 <div class="page-header">
@@ -12,7 +12,7 @@
     <div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> {{ session('error') }}</div>
 @endif
 
-{{-- ── FILTER + KPI ── --}}
+{{-- â”€â”€ FILTER + KPI â”€â”€ --}}
 <div class="content-box" style="margin-bottom:16px;">
     <form method="GET" action="{{ route('admin.uang-saku.index') }}" id="filterForm"
           style="display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end; margin-bottom:18px;">
@@ -51,21 +51,21 @@
     </form>
 
     {{--
-        ┌─────────────────────────────────────────────────────────────────────┐
-        │  KPI Cards                                                          │
-        │                                                                     │
-        │  Baris 1 (dipengaruhi filter tanggal):                              │
-        │    • Total Transaksi  — jumlah baris transaksi di periode ini       │
-        │    • Total Pemasukan  — uang masuk ke santri di periode ini         │
-        │    • Total Pengeluaran — uang keluar dari santri di periode ini     │
-        │    • Selisih (Net)    — pemasukan minus pengeluaran di periode ini  │
-        │                         positif = lebih banyak uang masuk (surplus) │
-        │                         negatif = lebih banyak uang keluar (defisit)│
-        │                                                                     │
-        │  Baris 2 (REAL-TIME, tidak terpengaruh filter):                     │
-        │    • Total Saldo Seluruh Santri — total uang yang sedang dipegang   │
-        │                         oleh seluruh santri aktif saat ini          │
-        └─────────────────────────────────────────────────────────────────────┘
+        â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+        â”‚  KPI Cards                                                          â”‚
+        â”‚                                                                     â”‚
+        â”‚  Baris 1 (dipengaruhi filter tanggal):                              â”‚
+        â”‚    â€¢ Total Transaksi  â€” jumlah baris transaksi di periode ini       â”‚
+        â”‚    â€¢ Total Pemasukan  â€” uang masuk ke santri di periode ini         â”‚
+        â”‚    â€¢ Total Pengeluaran â€” uang keluar dari santri di periode ini     â”‚
+        â”‚    â€¢ Selisih (Net)    â€” pemasukan minus pengeluaran di periode ini  â”‚
+        â”‚                         positif = lebih banyak uang masuk (surplus) â”‚
+        â”‚                         negatif = lebih banyak uang keluar (defisit)â”‚
+        â”‚                                                                     â”‚
+        â”‚  Baris 2 (REAL-TIME, tidak terpengaruh filter):                     â”‚
+        â”‚    â€¢ Total Saldo Seluruh Santri â€” total uang yang sedang dipegang   â”‚
+        â”‚                         oleh seluruh santri aktif saat ini          â”‚
+        â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
     --}}
 
     {{-- KPI Baris 1: berdasarkan filter periode --}}
@@ -103,7 +103,7 @@
             <p class="card-value" style="font-size:1.05rem;">
                 {{ $kpi['selisih'] >= 0 ? '+' : '-' }} Rp {{ number_format(abs($kpi['selisih']), 0, ',', '.') }}
             </p>
-            <span class="card-sub">{{ $kpi['selisih'] >= 0 ? '✓ Surplus periode ini' : '✗ Defisit periode ini' }}</span>
+            <span class="card-sub">{{ $kpi['selisih'] >= 0 ? 'âœ“ Surplus periode ini' : 'âœ— Defisit periode ini' }}</span>
             <i class="fas fa-balance-scale card-icon"></i>
         </div>
     </div>
@@ -122,7 +122,7 @@
                 </div>
                 <div style="text-align:right;">
                     <span class="badge badge-info" style="font-size:.8rem;padding:5px 10px;">
-                        <i class="fas fa-clock"></i> Real-time — tidak terpengaruh filter tanggal
+                        <i class="fas fa-clock"></i> Real-time â€” tidak terpengaruh filter tanggal
                     </span>
                 </div>
             </div>
@@ -131,7 +131,7 @@
     </div>
 </div>
 
-{{-- ── DAFTAR SANTRI ── --}}
+{{-- â”€â”€ DAFTAR SANTRI â”€â”€ --}}
 <div class="content-box">
 
     {{-- Toolbar: Tambah + Search + Sort --}}
@@ -150,7 +150,7 @@
                     <i class="fas fa-sort"></i> Urut:
                 </label>
                 <select name="sort" class="form-control form-control-sm" onchange="this.form.submit()" style="width:auto;">
-                    <option value="nama"           {{ $sort==='nama'          ? 'selected' : '' }}>Nama A–Z</option>
+                    <option value="nama"           {{ $sort==='nama'          ? 'selected' : '' }}>Nama Aâ€“Z</option>
                     <option value="saldo_asc"      {{ $sort==='saldo_asc'     ? 'selected' : '' }}>Saldo Terendah</option>
                     <option value="saldo_desc"     {{ $sort==='saldo_desc'    ? 'selected' : '' }}>Saldo Tertinggi</option>
                     <option value="transaksi_desc" {{ $sort==='transaksi_desc'? 'selected' : '' }}>Transaksi Terbanyak</option>
@@ -177,8 +177,8 @@
 
     {{-- Legend saldo --}}
     <div style="display:flex;gap:14px;margin-bottom:12px;flex-wrap:wrap;font-size:.78rem;color:var(--text-light);">
-        <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#6FBA9D;margin-right:4px;"></span>Saldo ≥ Rp 100rb</span>
-        <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#f5a623;margin-right:4px;"></span>Saldo Rp 20rb – 99rb</span>
+        <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#6FBA9D;margin-right:4px;"></span>Saldo â‰¥ Rp 100rb</span>
+        <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#f5a623;margin-right:4px;"></span>Saldo Rp 20rb â€“ 99rb</span>
         <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#FF8B94;margin-right:4px;"></span>Saldo &lt; Rp 20rb</span>
     </div>
 
@@ -192,7 +192,7 @@
         @endphp
         <div class="content-box us-row" style="margin-bottom:10px;padding:0;overflow:hidden;">
 
-            {{-- Baris utama — klik untuk expand --}}
+            {{-- Baris utama â€” klik untuk expand --}}
             <div class="us-row-header"
                  onclick="toggleDetail('detail-{{ $santri->id_santri }}', this)"
                  style="display:flex;align-items:center;gap:0;cursor:pointer;padding:13px 16px;flex-wrap:wrap;gap:10px;">
@@ -266,6 +266,7 @@
             <div id="detail-{{ $santri->id_santri }}"
                  style="display:none;border-top:1px solid var(--primary-light);padding:12px 16px;">
                 @if($santri->transaksi_terbaru->isNotEmpty())
+                    <div class="table-wrapper">
                     <table class="data-table">
                         <thead>
                             <tr>
@@ -308,6 +309,7 @@
                             @endforeach
                         </tbody>
                     </table>
+                    </div>
                     @if($santri->transaksi_terbaru->count() >= 5)
                         <div style="text-align:center;margin-top:10px;">
                             <a href="{{ route('admin.uang-saku.riwayat', $santri->id_santri) }}"

@@ -258,6 +258,10 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
           // Summary Stats Cards (2x2 grid)
           _buildSummaryStatsGrid(d),
 
+          // Kalkulasi Progress (progress, kecepatan, estimasi khatam)
+          _buildSectionTitle('Kalkulasi Progress', Icons.analytics_rounded),
+          _buildProgressKalkulasi(d),
+
           // 1. Semester Progress Cards (swipeable)
           _buildSectionTitle('Progress Semester', Icons.auto_graph_rounded),
           _buildSemesterProgressCards(d),
@@ -273,10 +277,6 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
             _buildSectionTitle('Timeline Progress', Icons.timeline_rounded),
             _buildProgressTimeline(d.semesterHistory),
           ],
-
-          // 6. Comparison with Peers
-          _buildSectionTitle('Perbandingan dengan Kelas', Icons.people_rounded),
-          _buildPeerComparison(d),
 
           // 7. Historical Graph
           if (d.semesterHistory.length >= 2) ...[
@@ -387,6 +387,168 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
+        ],
+      ),
+    );
+  }
+
+  // ============================================
+  // KALKULASI PROGRESS (Progress, Kecepatan, Estimasi Khatam)
+  // ============================================
+  Widget _buildProgressKalkulasi(CapaianDashboard d) {
+    final progress = d.currentProgress;
+    final history = d.semesterHistory;
+    final currentPct = progress.totalProgress.clamp(0.0, 100.0);
+
+    // Growth rate: avg difference between consecutive semesters (chronological order)
+    // semesterHistory comes newest-first, so reverse for chronological
+    double growthRate = 0;
+    if (history.length >= 2) {
+      final chrono = history.reversed.toList();
+      final diffs = <double>[];
+      for (int i = 1; i < chrono.length; i++) {
+        diffs.add(chrono[i].rataRataProgress - chrono[i - 1].rataRataProgress);
+      }
+      growthRate = diffs.reduce((a, b) => a + b) / diffs.length;
+    } else if (history.length == 1) {
+      growthRate = history.first.rataRataProgress;
+    } else {
+      growthRate = currentPct;
+    }
+    growthRate = double.parse(growthRate.toStringAsFixed(2));
+
+    // Estimasi khatam
+    String estimasiValue;
+    String estimasiSub;
+    if (currentPct >= 100) {
+      estimasiValue = 'Khatam!';
+      estimasiSub = 'Semua materi selesai 🎉';
+    } else if (growthRate <= 0) {
+      estimasiValue = 'Stagnan';
+      estimasiSub = 'Progress belum meningkat';
+    } else {
+      final semToFinish = ((100 - currentPct) / growthRate).ceil();
+      estimasiValue = '$semToFinish Sem';
+      estimasiSub = 'lagi dari sekarang';
+    }
+
+    // Kecepatan label
+    String kecepatanValue;
+    String kecepatanSub;
+    if (growthRate > 0) {
+      kecepatanValue = '+${growthRate.toStringAsFixed(1)}%';
+      kecepatanSub = 'per semester (rata-rata)';
+    } else if (growthRate < 0) {
+      kecepatanValue = '${growthRate.toStringAsFixed(1)}%';
+      kecepatanSub = 'penurunan per semester';
+    } else {
+      kecepatanValue = 'Stagnan';
+      kecepatanSub = 'belum ada data cukup';
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 12, offset: const Offset(0, 4))],
+        ),
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Progress Saat Ini — full bar
+            Row(
+              children: [
+                const Icon(Icons.donut_large_rounded, size: 13, color: _kPrimary),
+                const SizedBox(width: 5),
+                const Expanded(child: Text('Progress Saat Ini', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600))),
+                Text(
+                  '${currentPct.toStringAsFixed(1)}%',
+                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: _kPrimary),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(5),
+              child: LinearProgressIndicator(
+                value: currentPct / 100,
+                backgroundColor: Colors.grey[200],
+                valueColor: const AlwaysStoppedAnimation(_kPrimary),
+                minHeight: 10,
+              ),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              '${progress.materiSelesai} dari ${progress.totalMateri} materi selesai',
+              style: TextStyle(fontSize: 9, color: Colors.grey[500]),
+            ),
+            const SizedBox(height: 13),
+            const Divider(height: 1, color: Color(0xFFEEEEEE)),
+            const SizedBox(height: 13),
+            // Kecepatan Belajar + Estimasi Khatam side by side
+            Row(
+              children: [
+                Expanded(
+                  child: _kalkulasiItem(
+                    icon: Icons.speed_rounded,
+                    color: _kBlue,
+                    label: 'Kecepatan Belajar',
+                    value: kecepatanValue,
+                    sub: kecepatanSub,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _kalkulasiItem(
+                    icon: Icons.flag_rounded,
+                    color: currentPct >= 100 ? _kPrimary : (growthRate <= 0 ? _kRed : _kOrange),
+                    label: 'Estimasi Khatam',
+                    value: estimasiValue,
+                    sub: estimasiSub,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _kalkulasiItem({
+    required IconData icon,
+    required Color color,
+    required String label,
+    required String value,
+    required String sub,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.07),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: color.withValues(alpha: 0.18)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 14, color: color),
+          const SizedBox(height: 6),
+          Text(value,
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: color),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis),
+          const SizedBox(height: 2),
+          Text(label,
+              style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w600, color: Color(0xFF374151))),
+          const SizedBox(height: 1),
+          Text(sub,
+              style: TextStyle(fontSize: 8, color: Colors.grey[500]),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis),
         ],
       ),
     );
@@ -664,13 +826,14 @@ class _CapaianPageState extends State<CapaianPage> with TickerProviderStateMixin
   }
 
   String _achvEmoji(String type) {
-    switch (type) {
-      case 'khatam': return 'ðŸ†';
-      case 'growth': return 'ðŸ“ˆ';
-      case 'rank': return 'â­';
-      case 'decline': return 'ðŸ“‰';
-      default: return 'ðŸŽ¯';
-    }
+  const map = {
+    'khatam': '🏆',
+    'growth': '📈',
+    'rank': '⭐',
+    'decline': '📉',
+  };
+  return map[type] ?? '🎯';
+
   }
 
   // ============================================

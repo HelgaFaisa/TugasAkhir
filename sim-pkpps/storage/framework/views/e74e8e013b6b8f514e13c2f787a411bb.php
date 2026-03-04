@@ -40,6 +40,7 @@ html, body {
     text-align: center;
     vertical-align: middle;
     padding: 1.5mm 2mm;
+    overflow: hidden;
 }
 .h-sub {
     display:block; font-size:3.5pt; color:#a89060;
@@ -62,6 +63,7 @@ html, body {
     text-align: center;
     vertical-align: middle;
     padding: 0;
+    overflow: hidden;
 }
 
 /* ── DIVIDER 1.6mm ── */
@@ -85,22 +87,27 @@ html, body {
     vertical-align: middle;
     text-align: center;
     padding: 0.5mm 3mm;
+    overflow: hidden;
 }
 .nama-box {
     background: #0d1f3c;
     border: 0.5mm solid #c9a227;
     border-radius: 1mm;
     text-align: center;
-    padding: 1.8mm 2mm;
+    padding: 1.2mm 1.5mm;
     width: 100%;
     display: block;
+    overflow: hidden;
+    max-height: 7.5mm;
 }
 .nama-text {
-    font-size:8pt; font-weight:bold; color:#fff;
-    letter-spacing:0.5pt; font-family:Georgia,serif;
+    font-size:6pt; font-weight:bold; color:#fff;
+    letter-spacing:0.3pt; font-family:Georgia,serif;
     text-align: center;
     display: block;
     width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 /* ── INFO 9mm ── */
@@ -109,6 +116,7 @@ html, body {
     background: #0b1a2e;
     vertical-align: middle;
     padding: 1mm 3mm 0 3mm;
+    overflow: hidden;
 }
 .info-t {
     width:48mm; height:8mm;
@@ -118,14 +126,15 @@ html, body {
 }
 .info-t td {
     height:8mm; padding:0 1.5mm; vertical-align:middle;
+    overflow:hidden;
 }
 .ic-nis   { width:30%; }
 .ic-kelas { width:37%; border-left:0.4mm solid rgba(201,162,39,0.5); border-right:0.4mm solid rgba(201,162,39,0.5); }
 .ic-rfid  { width:33%; }
 .lbl  { display:block; font-size:3pt; color:#c9a227; font-weight:bold; letter-spacing:0.3pt; text-transform:uppercase; margin-bottom:0.5mm; }
-.val      { display:block; font-size:5.5pt; color:#fff; font-weight:bold; }
-.val-sm   { display:block; font-size:4.5pt; color:#fff; font-weight:bold; }
-.val-rfid { display:block; font-size:3.5pt; color:#90c4f0; font-weight:bold; font-family:monospace; word-break:break-all; }
+.val      { display:block; font-size:4.5pt; color:#fff; font-weight:bold; white-space:nowrap; overflow:hidden; }
+.val-sm   { display:block; font-size:4pt; color:#fff; font-weight:bold; overflow:hidden; }
+.val-rfid { display:block; font-size:3pt; color:#90c4f0; font-weight:bold; font-family:monospace; word-break:break-all; overflow:hidden; }
 
 /* ── BOTTOM 9mm ── */
 .td-bottom {
@@ -159,33 +168,39 @@ html, body {
              xmlns:xlink="http://www.w3.org/1999/xlink"
              width="34mm" height="34mm"
              viewBox="0 0 100 100"
+             overflow="hidden"
              style="display:block;margin:0 auto;">
-            <defs>
-                <clipPath id="cp">
-                    <circle cx="50" cy="50" r="44"/>
-                </clipPath>
-            </defs>
 
             
-            <circle cx="50" cy="50" r="44" fill="#1a2f4a"/>
+            <circle cx="50" cy="50" r="37" fill="#1a2f4a"/>
 
             <?php if($fotoBase64 !== ''): ?>
             
-            <image x="6" y="6" width="88" height="88"
-                   clip-path="url(#cp)"
+            <image x="10" y="10" width="80" height="80"
                    preserveAspectRatio="xMidYMid slice"
                    xlink:href="data:<?php echo e($fotoMime); ?>;base64,<?php echo e($fotoBase64); ?>"
                    href="data:<?php echo e($fotoMime); ?>;base64,<?php echo e($fotoBase64); ?>"/>
             <?php else: ?>
             <text x="50" y="50" text-anchor="middle" dominant-baseline="central"
-                  font-size="36" font-weight="bold" fill="#c9a227"
+                  font-size="34" font-weight="bold" fill="#c9a227"
                   font-family="Georgia"><?php echo e($initial); ?></text>
             <?php endif; ?>
 
             
-            <circle cx="50" cy="50" r="48" fill="none" stroke="#c9a227" stroke-width="3.5"/>
+            <circle cx="50" cy="50" r="54" fill="none"
+                    stroke="#0b1a2e" stroke-width="34"/>
+
             
-            <circle cx="50" cy="50" r="44" fill="none" stroke="#8b6914" stroke-width="1"/>
+            <circle cx="50" cy="50" r="38.5" fill="none"
+                    stroke="#c9a227" stroke-width="3"/>
+
+            
+            <circle cx="50" cy="50" r="41" fill="none"
+                    stroke="rgba(201,162,39,0.4)" stroke-width="0.6"/>
+
+            
+            <circle cx="50" cy="50" r="36" fill="none"
+                    stroke="rgba(139,105,20,0.5)" stroke-width="0.5"/>
         </svg>
     </td></tr>
 

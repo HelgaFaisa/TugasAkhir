@@ -29,7 +29,6 @@ class _DashboardPageState extends State<DashboardPage> {
   String _sppStatus = '-';
   bool _sppLunas = false;
   List<Map<String, dynamic>> _beritaList = [];
-  List<int> _kehadiran = List.filled(7, -1); // -1=belum, 1=hadir, 0=alpa
 
   // Kepulangan data
   bool _sedangPulang = false;
@@ -43,7 +42,7 @@ class _DashboardPageState extends State<DashboardPage> {
     _loadData();
   }
 
-  // ─── Data loading (existing logic preserved) ───
+  // ─── Data loading ───
   Future<void> _loadData() async {
     final prefs = await SharedPreferences.getInstance();
     final santriJson = prefs.getString('santri_data');
@@ -124,13 +123,6 @@ class _DashboardPageState extends State<DashboardPage> {
       }
     } catch (_) {}
 
-    // Kehadiran minggu ini – placeholder sampai API tersedia
-    if (mounted) {
-      setState(() {
-        _kehadiran = [1, 1, 1, 0, 1, -1, -1];
-      });
-    }
-
     // Notifikasi kepulangan
     try {
       final kepRes = await _api.getNotifikasiKepulangan();
@@ -139,7 +131,9 @@ class _DashboardPageState extends State<DashboardPage> {
         if (data != null && data is Map) {
           setState(() {
             _sedangPulang = data['sedang_pulang'] == true;
-            _tanggalKembali = data['tanggal_kembali_formatted'] ?? data['tanggal_kembali'] ?? '';
+            _tanggalKembali = data['tanggal_kembali_formatted'] ??
+                data['tanggal_kembali'] ??
+                '';
             _sisaHari = data['sisa_hari'] ?? 0;
             _statusKepulangan = data['status'] ?? '';
           });
@@ -237,8 +231,6 @@ class _DashboardPageState extends State<DashboardPage> {
                     ],
                     _buildSummaryCards(),
                     const SizedBox(height: 20),
-                    _buildKehadiranSection(),
-                    const SizedBox(height: 20),
                     _buildBeritaSection(),
                     const SizedBox(height: 20),
                     _buildMenuSection(),
@@ -285,7 +277,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Assalamualaikum! \u{1F44B}',
+                          'Halo! \u{1F44B}',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.white.withValues(alpha: 0.8),
@@ -380,8 +372,9 @@ class _DashboardPageState extends State<DashboardPage> {
                             height: 6,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color:
-                                  status == 'Aktif' ? _primary : Colors.orange,
+                              color: status == 'Aktif'
+                                  ? _primary
+                                  : Colors.orange,
                             ),
                           ),
                           const SizedBox(width: 5),
@@ -426,9 +419,12 @@ class _DashboardPageState extends State<DashboardPage> {
   // ━━━ KEPULANGAN BANNER ━━━
   Widget _buildKepulanganBanner() {
     final isLate = _statusKepulangan == 'terlambat';
-    final bgColor = isLate ? const Color(0xFFFEE2E2) : const Color(0xFFFFF7ED);
-    final accentColor = isLate ? const Color(0xFFDC2626) : const Color(0xFFF59E0B);
-    final textColor = isLate ? const Color(0xFF991B1B) : const Color(0xFF92400E);
+    final bgColor =
+        isLate ? const Color(0xFFFEE2E2) : const Color(0xFFFFF7ED);
+    final accentColor =
+        isLate ? const Color(0xFFDC2626) : const Color(0xFFF59E0B);
+    final textColor =
+        isLate ? const Color(0xFF991B1B) : const Color(0xFF92400E);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -472,13 +468,16 @@ class _DashboardPageState extends State<DashboardPage> {
                     isLate
                         ? 'Sudah lewat ${_sisaHari.abs()} hari dari jadwal kembali'
                         : 'Kembali $_tanggalKembali ($_sisaHari hari lagi)',
-                    style: TextStyle(fontSize: 12, color: textColor.withValues(alpha: 0.8)),
+                    style: TextStyle(
+                        fontSize: 12,
+                        color: textColor.withValues(alpha: 0.8)),
                   ),
                 ],
               ),
             ),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
                 color: accentColor,
                 borderRadius: BorderRadius.circular(20),
@@ -509,10 +508,13 @@ class _DashboardPageState extends State<DashboardPage> {
           _summaryCard(
             icon: Icons.account_balance_wallet_rounded,
             label: 'Saldo Uang Saku',
-            value: _saldoVisible ? _saldo : '\u2022\u2022\u2022\u2022\u2022\u2022',
+            value: _saldoVisible
+                ? _saldo
+                : '\u2022\u2022\u2022\u2022\u2022\u2022',
             gradient: const [_primary, _primaryDark],
             trailing: GestureDetector(
-              onTap: () => setState(() => _saldoVisible = !_saldoVisible),
+              onTap: () =>
+                  setState(() => _saldoVisible = !_saldoVisible),
               child: Icon(
                 _saldoVisible
                     ? Icons.visibility_rounded
@@ -578,8 +580,8 @@ class _DashboardPageState extends State<DashboardPage> {
               const SizedBox(width: 6),
               Expanded(
                 child: Text(label,
-                    style:
-                        const TextStyle(color: Colors.white70, fontSize: 11),
+                    style: const TextStyle(
+                        color: Colors.white70, fontSize: 11),
                     overflow: TextOverflow.ellipsis),
               ),
               if (trailing != null) trailing,
@@ -601,86 +603,7 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  // ━━━ 3) KEHADIRAN MINGGU INI ━━━
-  Widget _buildKehadiranSection() {
-    const days = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Ahd'];
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _sectionTitle('Kehadiran Minggu Ini', Icons.calendar_today_rounded),
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: _cardDeco(),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: List.generate(7, (i) {
-                final st = _kehadiran[i];
-                final Color bg;
-                final Color fg;
-                final IconData? ico;
-                if (st == 1) {
-                  bg = _primary;
-                  fg = Colors.white;
-                  ico = Icons.check_rounded;
-                } else if (st == 0) {
-                  bg = const Color(0xFFEF4444);
-                  fg = Colors.white;
-                  ico = Icons.close_rounded;
-                } else {
-                  bg = Colors.grey[200]!;
-                  fg = Colors.grey[400]!;
-                  ico = null;
-                }
-                return Column(
-                  children: [
-                    Text(days[i],
-                        style: TextStyle(
-                            fontSize: 10,
-                            color: Colors.grey[600],
-                            fontWeight: FontWeight.w500)),
-                    const SizedBox(height: 6),
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      width: 34,
-                      height: 34,
-                      decoration: BoxDecoration(
-                        color: bg,
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: st == 1
-                            ? [
-                                BoxShadow(
-                                    color:
-                                        _primary.withValues(alpha: 0.3),
-                                    blurRadius: 6,
-                                    offset: const Offset(0, 2))
-                              ]
-                            : null,
-                      ),
-                      child: ico != null
-                          ? Icon(ico, size: 18, color: fg)
-                          : Center(
-                              child: Container(
-                                width: 6,
-                                height: 6,
-                                decoration: BoxDecoration(
-                                    color: fg, shape: BoxShape.circle),
-                              ),
-                            ),
-                    ),
-                  ],
-                );
-              }),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ━━━ 4) BERITA TERBARU ━━━
+  // ━━━ 3) BERITA TERBARU ━━━
   Widget _buildBeritaSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -708,8 +631,8 @@ class _DashboardPageState extends State<DashboardPage> {
           child: _beritaList.isEmpty
               ? Center(
                   child: Text('Belum ada berita',
-                      style:
-                          TextStyle(color: Colors.grey[400], fontSize: 12)))
+                      style: TextStyle(
+                          color: Colors.grey[400], fontSize: 12)))
               : ListView.separated(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -775,7 +698,8 @@ class _DashboardPageState extends State<DashboardPage> {
                     tanggal.toString().length > 10
                         ? tanggal.toString().substring(0, 10)
                         : tanggal.toString(),
-                    style: TextStyle(fontSize: 10, color: Colors.grey[400]),
+                    style:
+                        TextStyle(fontSize: 10, color: Colors.grey[400]),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -787,15 +711,15 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  // ━━━ 5) MENU LAINNYA ━━━
+  // ━━━ 4) MENU LAINNYA ━━━
   Widget _buildMenuSection() {
     final items = [
-      _QMenu(Icons.flight_takeoff_rounded, 'Kepulangan', '/kepulangan'),
+      _QMenu(Icons.payments_rounded, 'SPP', '/spp'),
+      _QMenu(Icons.account_balance_wallet_rounded, 'Uang Saku', '/uang-saku'),
       _QMenu(Icons.calendar_month_rounded, 'Absensi', '/absensi'),
       _QMenu(Icons.warning_amber_rounded, 'Pelanggaran', '/pelanggaran'),
-      _QMenu(Icons.payments_rounded, 'SPP', '/spp'),
       _QMenu(Icons.local_hospital_rounded, 'Kesehatan', '/kesehatan'),
-      _QMenu(Icons.account_balance_wallet_rounded, 'Uang Saku', '/uang-saku'),
+      _QMenu(Icons.flight_takeoff_rounded, 'Kepulangan', '/kepulangan'),
     ];
 
     return Padding(

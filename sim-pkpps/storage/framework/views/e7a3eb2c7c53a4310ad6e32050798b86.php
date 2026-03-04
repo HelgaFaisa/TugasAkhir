@@ -248,7 +248,7 @@ body.auth-page {
     <div class="sl-brand">
       <img src="<?php echo e(asset('images/logo.png')); ?>" alt="Logo PKPPS" class="sl-logo">
       <div class="sl-eyebrow">Portal Santri</div>
-      <h1 class="sl-title">Assalamu'alaikum<br><em>Santri.</em></h1>
+      <h1 class="sl-title">Welcome Back<br><em>SIM Santri</em></h1>
       <p class="sl-sub">PKPPS Riyadlul Jannah</p>
       <div class="sl-divider"></div>
       <p class="sl-desc">Akses nilai, absensi, jadwal, dan seluruh progres pembelajaran santri secara mudah dan aman.</p>
@@ -271,7 +271,7 @@ body.auth-page {
     <!-- Form (kanan) -->
     <div class="sl-form-panel">
       <div class="sl-card">
-        <div class="sl-card-lbl">Login Santri / Wali</div>
+        <div class="sl-card-lbl">Login Santri</div>
         <div class="sl-card-title">Masuk ke Akun</div>
         <div class="sl-card-desc">Gunakan username dan password yang diberikan oleh admin pesantren.</div>
 
@@ -344,9 +344,7 @@ unset($__errorArgs, $__bag); ?>
             Masuk
           </button>
 
-          <div class="sl-foot">
-            Login sebagai Admin? <a href="<?php echo e(route('admin.login')); ?>">Klik di sini</a>
-          </div>
+          
 
           <div class="sl-note">
             <i class="fas fa-info-circle"></i>

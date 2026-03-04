@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
 <div class="page-header">
@@ -140,6 +140,7 @@
     </h3>
     
     @if($transaksi->count() > 0)
+        <div class="table-wrapper">
         <table class="data-table">
             <thead>
                 <tr>
@@ -205,6 +206,7 @@
                 @endforeach
             </tbody>
         </table>
+        </div>
 
         <div style="margin-top: 14px;">
             {{ $transaksi->links() }}

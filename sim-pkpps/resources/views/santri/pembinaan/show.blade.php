@@ -8,7 +8,7 @@
     <h2><i class="fas fa-book-open"></i> Pembinaan & Sanksi</h2>
 </div>
 
-<div style="display: grid; grid-template-columns: 1fr 280px; gap: 18px; align-items: start;">
+<div class="grid-main-sidebar">
 
     {{-- ===== KOLOM KIRI: KONTEN UTAMA ===== --}}
     <div>
@@ -191,10 +191,6 @@
     color: var(--primary-dark, #1a4980);
 }
 
-@media (max-width: 768px) {
-    div[style*="grid-template-columns: 1fr 280px"] {
-        grid-template-columns: 1fr !important;
-    }
-}
+/* grid-main-sidebar responsive is handled in app.css */
 </style>
 @endsection

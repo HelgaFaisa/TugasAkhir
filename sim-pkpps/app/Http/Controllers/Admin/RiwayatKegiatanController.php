@@ -201,19 +201,43 @@ class RiwayatKegiatanController extends Controller
 
         $kelasList = Kelas::active()->ordered()->with('kelompok')->get();
 
-        // Statistik untuk kegiatan ini
-        $stats = AbsensiKegiatan::where('kegiatan_id', $kegiatan->kegiatan_id)
-            ->select('status', DB::raw('count(*) as total'))
+        // Statistik untuk kegiatan ini (sesuai filter)
+        $statsQuery = AbsensiKegiatan::where('kegiatan_id', $kegiatan->kegiatan_id);
+        if ($request->filled('tanggal_dari')) {
+            $statsQuery->whereDate('tanggal', '>=', $request->tanggal_dari);
+        }
+        if ($request->filled('tanggal_sampai')) {
+            $statsQuery->whereDate('tanggal', '<=', $request->tanggal_sampai);
+        }
+        if ($request->filled('bulan')) {
+            $statsQuery->whereMonth('tanggal', date('m', strtotime($request->bulan)))
+                       ->whereYear('tanggal', date('Y', strtotime($request->bulan)));
+        }
+        if ($request->filled('id_kelas')) {
+            $statsQuery->whereHas('santri.kelasSantri', function($q) use ($request) {
+                $q->where('id_kelas', $request->id_kelas);
+            });
+        }
+        $stats = $statsQuery->select('status', DB::raw('count(*) as total'))
             ->groupBy('status')
             ->pluck('total', 'status')
             ->toArray();
+
+        // Hitung total SEMUA santri aktif
+        $totalSantriEligible = Santri::where('status', 'Aktif')->count();
+        $totalRecorded = array_sum($stats);
+        $hadirCount = ($stats['Hadir'] ?? 0) + ($stats['Terlambat'] ?? 0);
+        $persenHadir = $totalSantriEligible > 0 ? round($hadirCount / $totalSantriEligible * 100, 1) : 0;
 
         return view('admin.kegiatan.riwayat.show', compact(
             'kegiatan',
             'riwayats',
             'santris',
             'kelasList',
-            'stats'
+            'stats',
+            'totalSantriEligible',
+            'totalRecorded',
+            'persenHadir'
         ));
     }
 

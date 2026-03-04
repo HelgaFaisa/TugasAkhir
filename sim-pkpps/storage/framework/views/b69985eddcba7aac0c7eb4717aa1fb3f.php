@@ -1,3 +1,5 @@
+﻿
+
 <?php $__env->startSection('content'); ?>
 <div class="page-header">
     <h2><i class="fas fa-book-open"></i> Master Materi Al-Qur'an & Hadist</h2>
@@ -85,6 +87,7 @@
 
 <div class="content-box">
     <?php if($materis->count() > 0): ?>
+        <div class="table-wrapper">
         <table class="data-table">
             <thead>
                 <tr>
@@ -140,6 +143,7 @@
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </tbody>
         </table>
+        </div>
 
         
         <div style="margin-top: 14px;">

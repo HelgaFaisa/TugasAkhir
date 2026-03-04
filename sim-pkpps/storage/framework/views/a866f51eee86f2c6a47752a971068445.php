@@ -1,3 +1,5 @@
+﻿
+
 <?php $__env->startSection('title', 'Data Kesehatan Santri'); ?>
 
 <?php $__env->startSection('content'); ?>
@@ -94,6 +96,7 @@
 
     <!-- Data Table -->
     <?php if($kesehatanSantri->count() > 0): ?>
+        <div class="table-wrapper">
         <table class="data-table">
             <thead>
                 <tr>
@@ -188,6 +191,7 @@
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </tbody>
         </table>
+        </div>
         
         <!-- Pagination -->
         <div style="margin-top: 14px; display: flex; justify-content: center;">

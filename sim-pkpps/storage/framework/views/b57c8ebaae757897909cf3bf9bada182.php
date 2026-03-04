@@ -1,3 +1,5 @@
+﻿
+
 <?php $__env->startSection('content'); ?>
 <div class="page-header">
     <h2><i class="fas fa-cash-register"></i> Kas & Keuangan Pondok</h2>
@@ -56,6 +58,7 @@
     </form>
 
     <?php if($transaksi->count() > 0): ?>
+        <div class="table-wrapper">
         <table class="data-table">
             <thead>
                 <tr>
@@ -97,6 +100,7 @@
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </tbody>
         </table>
+        </div>
         <div style="margin-top: 14px;"><?php echo e($transaksi->links()); ?></div>
     <?php else: ?>
         <div class="empty-state">

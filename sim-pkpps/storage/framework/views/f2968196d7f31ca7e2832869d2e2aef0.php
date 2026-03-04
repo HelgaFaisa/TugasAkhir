@@ -12,7 +12,7 @@
 <li>
     <a href="<?php echo e(route('admin.kegiatan.index')); ?>"
        class="<?php echo e(Request::routeIs('admin.kegiatan.index') ? 'active' : ''); ?>">
-        <i class="fas fa-calendar-check"></i><span>Dashboard Absensi</span>
+        <i class="fas fa-calendar-check"></i><span>Absensi & Kegiatan</span>
     </a>
 </li>
 <?php endif; ?>
@@ -257,14 +257,4 @@
         <i class="fas fa-newspaper"></i><span>Berita</span>
     </a>
 </li>
-<?php endif; ?>
-
-
-<li class="logout-item">
-    <form action="<?php echo e(route('admin.logout')); ?>" method="POST" style="display:inline;">
-        <?php echo csrf_field(); ?>
-        <a href="#" onclick="event.preventDefault(); this.closest('form').submit();">
-            <i class="fas fa-sign-out-alt"></i><span>Logout</span>
-        </a>
-    </form>
-</li><?php /**PATH C:\xampp\htdocs\TugasAkhir\sim-pkpps\resources\views/layouts/admin-sidebar.blade.php ENDPATH**/ ?>
+<?php endif; ?><?php /**PATH C:\xampp\htdocs\TugasAkhir\sim-pkpps\resources\views/layouts/admin-sidebar.blade.php ENDPATH**/ ?>

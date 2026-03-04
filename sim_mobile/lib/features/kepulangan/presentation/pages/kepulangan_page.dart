@@ -58,7 +58,6 @@ class _KepulanganPageState extends State<KepulanganPage> {
           ),
         ],
       ),
-      // â­â­â­ TAMBAHKAN INI (Floating Action Button) â­â­â­
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
           final result = await Navigator.pushNamed(
@@ -119,7 +118,7 @@ class _KepulanganPageState extends State<KepulanganPage> {
             final KuotaInfo kuotaInfo = result['kuota'];
             final KepulanganPaginationModel pagination = result['pagination'];
 
-            // Empty state
+            // Empty state — kuota tetap di atas
             if (kepulanganList.isEmpty) {
               return _buildEmptyState(kuotaInfo);
             }
@@ -271,20 +270,33 @@ class _KepulanganPageState extends State<KepulanganPage> {
     );
   }
 
+  // ✅ PERBAIKAN: KuotaIndicator selalu di atas, pesan kosong di tengah sisa ruang
   Widget _buildEmptyState(KuotaInfo kuotaInfo) {
-    // Sesuaikan UI jika tidak ada data
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.inbox),
-          const SizedBox(height: 7),
-          const Text('Tidak ada data kepulangan.'),
-          const SizedBox(height: 7),
-          // Opsional: tampilkan info kuota
-          KuotaIndicator(kuotaInfo: kuotaInfo),
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Kuota Indicator tetap di atas — sama seperti saat ada data
+        Padding(
+          padding: const EdgeInsets.all(12),
+          child: KuotaIndicator(kuotaInfo: kuotaInfo),
+        ),
+        // Pesan "tidak ada data" di tengah sisa ruang layar
+        const Expanded(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.inbox, size: 48, color: Colors.grey),
+                SizedBox(height: 7),
+                Text(
+                  'Tidak ada data kepulangan.',
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

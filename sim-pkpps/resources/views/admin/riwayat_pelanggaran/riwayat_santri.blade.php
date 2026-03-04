@@ -1,4 +1,4 @@
-{{-- resources/views/admin/riwayat_pelanggaran/riwayat_santri.blade.php --}}
+﻿{{-- resources/views/admin/riwayat_pelanggaran/riwayat_santri.blade.php --}}
 @extends('layouts.app')
 
 @section('title', 'Riwayat Pelanggaran - ' . $santri->nama_lengkap)
@@ -68,6 +68,7 @@
     </div>
 
     @if($riwayat->isNotEmpty())
+        <div class="table-wrapper">
         <table class="data-table">
             <thead>
                 <tr>
@@ -145,6 +146,7 @@
                 @endforeach
             </tbody>
         </table>
+        </div>
 
         <!-- Pagination -->
         <div style="margin-top: 14px;">

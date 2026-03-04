@@ -33,9 +33,10 @@
     @if($kegiatanInfo['is_umum'])
         <strong>Kegiatan Umum</strong> - Diikuti oleh semua santri aktif ({{ $santris->count() }} santri)
     @else
-        <strong>Kegiatan Khusus</strong> - Diikuti oleh kelas:
+        <strong>Kegiatan Khusus</strong> - Untuk kelas:
         <strong style="color: var(--primary-color);">{{ $kegiatanInfo['kelas_list'] }}</strong>
-        ({{ $kegiatanInfo['jumlah_kelas'] }} kelas, {{ $santris->count() }} santri)
+        ({{ $kegiatanInfo['jumlah_kelas'] }} kelas)
+        &nbsp;|&nbsp; Total semua santri aktif: <strong>{{ $santris->count() }} santri</strong>
     @endif
 </div>
 
@@ -46,7 +47,9 @@
 @if($sudahAdaData)
     <div class="alert alert-info" style="margin-bottom: 14px;">
         <i class="fas fa-edit"></i>
-        <strong>Mode Edit</strong> - Data absensi untuk tanggal ini sudah ada ({{ count($absensiData) }} santri).
+        <strong>Mode Edit</strong> - Data absensi untuk tanggal ini sudah ada
+        (<strong>{{ count($absensiData) }}</strong> dari <strong>{{ $santris->count() }}</strong> santri sudah diinput,
+        <strong style="color: {{ ($santris->count() - count($absensiData)) > 0 ? '#dc2626' : '#059669' }};">{{ $santris->count() - count($absensiData) }} belum absen</strong>).
         Anda dapat mengubah status absensi lalu klik Simpan.
     </div>
 @endif
@@ -124,6 +127,7 @@
                     <span class="badge badge-primary">{{ $totalKelas }} santri</span>
                 </div>
             </div>
+            <div class="table-wrapper">
             <table class="data-table" style="margin-top: 0; border-top-left-radius: 0; border-top-right-radius: 0;">
                 <thead>
                     <tr>
@@ -202,6 +206,7 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
         </div>
         @endforeach
 

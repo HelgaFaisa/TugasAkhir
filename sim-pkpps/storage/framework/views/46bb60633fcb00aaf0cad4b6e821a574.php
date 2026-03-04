@@ -1,3 +1,7 @@
+﻿
+
+
+
 <?php $__env->startSection('title', 'Kelola Kelas Santri'); ?>
 
 <?php $__env->startSection('content'); ?>
@@ -99,6 +103,7 @@
 <!-- Kelas List -->
 <div class="content-box">
     <?php if($kelas->count() > 0): ?>
+        <div class="table-wrapper">
         <table class="data-table">
             <thead>
                 <tr>
@@ -165,6 +170,7 @@
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </tbody>
             </table>
+        </div>
 
         <!-- Pagination -->
         <?php if($kelas->hasPages()): ?>

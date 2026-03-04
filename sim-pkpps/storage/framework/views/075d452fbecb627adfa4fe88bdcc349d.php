@@ -110,6 +110,8 @@
                     <span class="badge badge-primary"><?php echo e($kegiatanHari->count()); ?> kegiatan</span>
                 </h4>
 
+                <div class="table-wrapper">
+
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -170,6 +172,8 @@
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </tbody>
                 </table>
+
+                </div>
             </div>
         <?php endif; ?>
     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>

@@ -1,3 +1,5 @@
+﻿
+
 <?php $__env->startSection('content'); ?>
 <div class="page-header">
     <h2><i class="fas fa-wallet"></i> Manajemen Uang Saku Santri</h2>
@@ -88,7 +90,7 @@
                 <?php echo e($kpi['selisih'] >= 0 ? '+' : '-'); ?> Rp <?php echo e(number_format(abs($kpi['selisih']), 0, ',', '.')); ?>
 
             </p>
-            <span class="card-sub"><?php echo e($kpi['selisih'] >= 0 ? '✓ Surplus periode ini' : '✗ Defisit periode ini'); ?></span>
+            <span class="card-sub"><?php echo e($kpi['selisih'] >= 0 ? 'âœ“ Surplus periode ini' : 'âœ— Defisit periode ini'); ?></span>
             <i class="fas fa-balance-scale card-icon"></i>
         </div>
     </div>
@@ -108,7 +110,7 @@
                 </div>
                 <div style="text-align:right;">
                     <span class="badge badge-info" style="font-size:.8rem;padding:5px 10px;">
-                        <i class="fas fa-clock"></i> Real-time — tidak terpengaruh filter tanggal
+                        <i class="fas fa-clock"></i> Real-time â€” tidak terpengaruh filter tanggal
                     </span>
                 </div>
             </div>
@@ -136,7 +138,7 @@
                     <i class="fas fa-sort"></i> Urut:
                 </label>
                 <select name="sort" class="form-control form-control-sm" onchange="this.form.submit()" style="width:auto;">
-                    <option value="nama"           <?php echo e($sort==='nama'          ? 'selected' : ''); ?>>Nama A–Z</option>
+                    <option value="nama"           <?php echo e($sort==='nama'          ? 'selected' : ''); ?>>Nama Aâ€“Z</option>
                     <option value="saldo_asc"      <?php echo e($sort==='saldo_asc'     ? 'selected' : ''); ?>>Saldo Terendah</option>
                     <option value="saldo_desc"     <?php echo e($sort==='saldo_desc'    ? 'selected' : ''); ?>>Saldo Tertinggi</option>
                     <option value="transaksi_desc" <?php echo e($sort==='transaksi_desc'? 'selected' : ''); ?>>Transaksi Terbanyak</option>
@@ -163,8 +165,8 @@
 
     
     <div style="display:flex;gap:14px;margin-bottom:12px;flex-wrap:wrap;font-size:.78rem;color:var(--text-light);">
-        <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#6FBA9D;margin-right:4px;"></span>Saldo ≥ Rp 100rb</span>
-        <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#f5a623;margin-right:4px;"></span>Saldo Rp 20rb – 99rb</span>
+        <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#6FBA9D;margin-right:4px;"></span>Saldo â‰¥ Rp 100rb</span>
+        <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#f5a623;margin-right:4px;"></span>Saldo Rp 20rb â€“ 99rb</span>
         <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#FF8B94;margin-right:4px;"></span>Saldo &lt; Rp 20rb</span>
     </div>
 
@@ -256,6 +258,7 @@
             <div id="detail-<?php echo e($santri->id_santri); ?>"
                  style="display:none;border-top:1px solid var(--primary-light);padding:12px 16px;">
                 <?php if($santri->transaksi_terbaru->isNotEmpty()): ?>
+                    <div class="table-wrapper">
                     <table class="data-table">
                         <thead>
                             <tr>
@@ -299,6 +302,7 @@
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </tbody>
                     </table>
+                    </div>
                     <?php if($santri->transaksi_terbaru->count() >= 5): ?>
                         <div style="text-align:center;margin-top:10px;">
                             <a href="<?php echo e(route('admin.uang-saku.riwayat', $santri->id_santri)); ?>"

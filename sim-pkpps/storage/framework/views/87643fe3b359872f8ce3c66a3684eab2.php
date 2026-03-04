@@ -1,3 +1,7 @@
+﻿
+
+
+
 <?php $__env->startSection('title', 'Data Kepulangan Santri'); ?>
 
 <?php $__env->startSection('content'); ?>
@@ -177,6 +181,7 @@
 
     
     <div style="overflow-x: auto;">
+        <div class="table-wrapper">
         <table class="data-table">
             <thead>
                 <tr>
@@ -331,6 +336,7 @@
                 <?php endif; ?>
             </tbody>
         </table>
+        </div>
     </div>
 
     
@@ -625,14 +631,14 @@ function calculateDurasiAktual() {
     
     if (durasiAktual < durasiRencana) {
         const selisih = durasiRencana - durasiAktual;
-        selisihText = `âœ… Santri pulang ${selisih} hari lebih cepat dari rencana. Kuota akan berkurang ${durasiAktual} hari.`;
+        selisihText = `Ã¢Å“â€¦ Santri pulang ${selisih} hari lebih cepat dari rencana. Kuota akan berkurang ${durasiAktual} hari.`;
         selisihColor = '#28a745';
     } else if (durasiAktual > durasiRencana) {
         const selisih = durasiAktual - durasiRencana;
-        selisihText = `âš ï¸ Santri pulang ${selisih} hari lebih lambat dari rencana. Kuota akan bertambah ${selisih} hari.`;
+        selisihText = `Ã¢Å¡Â Ã¯Â¸Â Santri pulang ${selisih} hari lebih lambat dari rencana. Kuota akan bertambah ${selisih} hari.`;
         selisihColor = '#ffc107';
     } else {
-        selisihText = `âœ“ Sesuai rencana (${durasiAktual} hari).`;
+        selisihText = `Ã¢Å“â€œ Sesuai rencana (${durasiAktual} hari).`;
         selisihColor = '#007bff';
     }
     

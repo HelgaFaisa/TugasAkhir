@@ -52,7 +52,7 @@
     </div>
 </div>
 
-<div style="display: grid; grid-template-columns: 1fr 340px; gap: 18px; align-items: start;">
+<div class="grid-main-sidebar-lg">
 
     {{-- ===== KOLOM KIRI: DETAIL ===== --}}
     <div>
@@ -213,7 +213,7 @@
             <h4 style="margin: 0 0 14px; opacity: 0.9; font-size: 0.95em;">
                 <i class="fas fa-fire"></i> Informasi Poin
             </h4>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+            <div class="grid-2col" style="gap: 12px; margin-bottom: 14px;">
                 <div style="background: rgba(255,255,255,0.15); padding: 12px; border-radius: 8px; text-align: center;">
                     <div style="font-size: 1.8em; font-weight: 800;">{{ $poin }}</div>
                     <div style="opacity: 0.8; font-size: 0.8em;">Poin Saat Ini</div>
@@ -275,10 +275,6 @@
 </div>
 
 <style>
-@media (max-width: 768px) {
-    div[style*="grid-template-columns: 1fr 340px"] {
-        grid-template-columns: 1fr !important;
-    }
-}
+/* grid-main-sidebar-lg responsive is handled in app.css */
 </style>
 @endsection

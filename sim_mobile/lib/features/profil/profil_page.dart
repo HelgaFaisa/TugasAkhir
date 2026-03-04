@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/api/api_service.dart';
 
@@ -72,7 +73,7 @@ class _ProfilPageState extends State<ProfilPage> {
                   children: [
                     // Header dengan foto
                     _buildHeader(),
-                    
+
                     // Content
                     Padding(
                       padding: const EdgeInsets.all(12),
@@ -93,10 +94,12 @@ class _ProfilPageState extends State<ProfilPage> {
                           ),
                           const SizedBox(height: 12),
 
-                          // Kelas yang Diikuti (NEW)
-                          if (_santriData?['kelas_list'] != null && (_santriData!['kelas_list'] as List).isNotEmpty)
+                          // Kelas yang Diikuti
+                          if (_santriData?['kelas_list'] != null &&
+                              (_santriData!['kelas_list'] as List).isNotEmpty)
                             _buildKelasListSection(),
-                          if (_santriData?['kelas_list'] != null && (_santriData!['kelas_list'] as List).isNotEmpty)
+                          if (_santriData?['kelas_list'] != null &&
+                              (_santriData!['kelas_list'] as List).isNotEmpty)
                             const SizedBox(height: 12),
 
                           // Alamat & Asal
@@ -104,8 +107,10 @@ class _ProfilPageState extends State<ProfilPage> {
                             title: 'Alamat & Asal',
                             icon: Icons.location_on_outlined,
                             children: [
-                              _buildInfoRow('Alamat Santri', _santriData?['alamat_santri'], isMultiline: true),
-                              _buildInfoRow('Daerah Asal', _santriData?['daerah_asal'], isLast: true),
+                              _buildInfoRow('Alamat Santri', _santriData?['alamat_santri'],
+                                  isMultiline: true),
+                              _buildInfoRow('Daerah Asal', _santriData?['daerah_asal'],
+                                  isLast: true),
                             ],
                           ),
                           const SizedBox(height: 12),
@@ -116,7 +121,8 @@ class _ProfilPageState extends State<ProfilPage> {
                             icon: Icons.family_restroom,
                             children: [
                               _buildInfoRow('Nama Orang Tua', _santriData?['nama_orang_tua']),
-                              _buildInfoRow('Nomor HP Orang Tua', _santriData?['nomor_hp_ortu'], isLast: true),
+                              _buildInfoRow('Nomor HP Orang Tua', _santriData?['nomor_hp_ortu'],
+                                  isLast: true),
                             ],
                           ),
                           const SizedBox(height: 19),
@@ -134,6 +140,7 @@ class _ProfilPageState extends State<ProfilPage> {
     final namaLengkap = _santriData?['nama_lengkap'] ?? 'Nama Santri';
     final idSantri = _santriData?['id_santri'] ?? '-';
     final status = _santriData?['status'] ?? 'Aktif';
+    final fotoUrl = _santriData?['foto_url'];
 
     return Container(
       width: double.infinity,
@@ -155,7 +162,7 @@ class _ProfilPageState extends State<ProfilPage> {
         padding: const EdgeInsets.fromLTRB(19, 0, 19, 24),
         child: Column(
           children: [
-            // Avatar
+            // Avatar dengan foto
             Container(
               padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(
@@ -165,11 +172,7 @@ class _ProfilPageState extends State<ProfilPage> {
               child: CircleAvatar(
                 radius: 50,
                 backgroundColor: Colors.white,
-                child: Icon(
-                  Icons.person,
-                  size: 39,
-                  color: const Color(0xFF6FBA9D).withValues(alpha: 0.7),
-                ),
+                child: _buildFotoWidget(fotoUrl),
               ),
             ),
             const SizedBox(height: 12),
@@ -196,7 +199,7 @@ class _ProfilPageState extends State<ProfilPage> {
             ),
             const SizedBox(height: 9),
 
-            // Primary Kelas Badge (NEW)
+            // Primary Kelas Badge
             _buildPrimaryKelasBadge(),
             const SizedBox(height: 7),
 
@@ -218,6 +221,52 @@ class _ProfilPageState extends State<ProfilPage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// Widget foto profil dengan fallback ke icon
+  Widget _buildFotoWidget(String? fotoUrl) {
+    if (fotoUrl == null || fotoUrl.isEmpty) {
+      return Icon(
+        Icons.person,
+        size: 39,
+        color: const Color(0xFF6FBA9D).withValues(alpha: 0.7),
+      );
+    }
+
+    // Fix localhost: Chrome pakai localhost, Android emulator pakai 10.0.2.2
+    final fixedUrl = kIsWeb
+        ? fotoUrl
+        : fotoUrl.replaceFirst('http://localhost', 'http://192.168.100.71');
+        
+    debugPrint('🖼️ Foto URL: $fixedUrl');
+
+    return ClipOval(
+      child: Image.network(
+        fixedUrl,
+        width: 100,
+        height: 100,
+        fit: BoxFit.cover,
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return const SizedBox(
+            width: 30,
+            height: 30,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: Color(0xFF6FBA9D),
+            ),
+          );
+        },
+        errorBuilder: (context, error, stackTrace) {
+          debugPrint('🔴 Foto error: $error');
+          return Icon(
+            Icons.person,
+            size: 39,
+            color: const Color(0xFF6FBA9D).withValues(alpha: 0.7),
+          );
+        },
       ),
     );
   }
@@ -261,14 +310,16 @@ class _ProfilPageState extends State<ProfilPage> {
     );
   }
 
-  Widget _buildInfoRow(String label, String? value, {bool isMultiline = false, bool isLast = false}) {
+  Widget _buildInfoRow(String label, String? value,
+      {bool isMultiline = false, bool isLast = false}) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final labelWidth = constraints.maxWidth * 0.35;
         return Padding(
           padding: EdgeInsets.only(bottom: isLast ? 0 : 9),
           child: Row(
-            crossAxisAlignment: isMultiline ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+            crossAxisAlignment:
+                isMultiline ? CrossAxisAlignment.start : CrossAxisAlignment.center,
             children: [
               SizedBox(
                 width: labelWidth,
@@ -309,7 +360,7 @@ class _ProfilPageState extends State<ProfilPage> {
   Widget _buildPrimaryKelasBadge() {
     final kelasName = _santriData?['kelas'] ?? '-';
     final kelasList = _santriData?['kelas_list'] as List?;
-    
+
     // Count total kelas
     int totalKelas = 0;
     if (kelasList != null) {
@@ -417,7 +468,7 @@ class _ProfilPageState extends State<ProfilPage> {
               final kelompok = entry.value;
               final kelompokName = kelompok['kelompok_name'] ?? 'Unknown';
               final kelasItems = kelompok['kelas'] as List? ?? [];
-              
+
               return Column(
                 children: [
                   if (index > 0) const SizedBox(height: 7),
@@ -437,7 +488,7 @@ class _ProfilPageState extends State<ProfilPage> {
     final icon = _getKelompokIcon(kelompokName);
 
     return Container(
-decoration: BoxDecoration(
+      decoration: BoxDecoration(
         border: Border.all(color: color.withValues(alpha: 0.3)),
         borderRadius: BorderRadius.circular(9),
       ),
@@ -478,12 +529,12 @@ decoration: BoxDecoration(
               margin: const EdgeInsets.only(top: 7),
               padding: const EdgeInsets.all(9),
               decoration: BoxDecoration(
-                color: isPrimary 
-                    ? color.withValues(alpha: 0.1) 
+                color: isPrimary
+                    ? color.withValues(alpha: 0.1)
                     : Colors.grey.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(7),
-                border: isPrimary 
-                    ? Border.all(color: color.withValues(alpha: 0.3), width: 1.5) 
+                border: isPrimary
+                    ? Border.all(color: color.withValues(alpha: 0.3), width: 1.5)
                     : null,
               ),
               child: Row(

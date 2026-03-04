@@ -34,9 +34,10 @@
     <?php if($kegiatanInfo['is_umum']): ?>
         <strong>Kegiatan Umum</strong> - Diikuti oleh semua santri aktif (<?php echo e($santris->count()); ?> santri)
     <?php else: ?>
-        <strong>Kegiatan Khusus</strong> - Diikuti oleh kelas:
+        <strong>Kegiatan Khusus</strong> - Untuk kelas:
         <strong style="color: var(--primary-color);"><?php echo e($kegiatanInfo['kelas_list']); ?></strong>
-        (<?php echo e($kegiatanInfo['jumlah_kelas']); ?> kelas, <?php echo e($santris->count()); ?> santri)
+        (<?php echo e($kegiatanInfo['jumlah_kelas']); ?> kelas)
+        &nbsp;|&nbsp; Total semua santri aktif: <strong><?php echo e($santris->count()); ?> santri</strong>
     <?php endif; ?>
 </div>
 
@@ -47,7 +48,9 @@
 <?php if($sudahAdaData): ?>
     <div class="alert alert-info" style="margin-bottom: 14px;">
         <i class="fas fa-edit"></i>
-        <strong>Mode Edit</strong> - Data absensi untuk tanggal ini sudah ada (<?php echo e(count($absensiData)); ?> santri).
+        <strong>Mode Edit</strong> - Data absensi untuk tanggal ini sudah ada
+        (<strong><?php echo e(count($absensiData)); ?></strong> dari <strong><?php echo e($santris->count()); ?></strong> santri sudah diinput,
+        <strong style="color: <?php echo e(($santris->count() - count($absensiData)) > 0 ? '#dc2626' : '#059669'); ?>;"><?php echo e($santris->count() - count($absensiData)); ?> belum absen</strong>).
         Anda dapat mengubah status absensi lalu klik Simpan.
     </div>
 <?php endif; ?>
@@ -126,6 +129,7 @@
                     <span class="badge badge-primary"><?php echo e($totalKelas); ?> santri</span>
                 </div>
             </div>
+            <div class="table-wrapper">
             <table class="data-table" style="margin-top: 0; border-top-left-radius: 0; border-top-right-radius: 0;">
                 <thead>
                     <tr>
@@ -205,6 +209,7 @@
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </tbody>
             </table>
+            </div>
         </div>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 

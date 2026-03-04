@@ -1,4 +1,4 @@
-{{-- resources/views/santri/pelanggaran/kategori.blade.php --}}
+﻿{{-- resources/views/santri/pelanggaran/kategori.blade.php --}}
 @extends('layouts.app')
 
 @section('title', 'Daftar Kategori Pelanggaran')
@@ -36,13 +36,13 @@
     <div style="display: flex; gap: 12px; flex-wrap: wrap;">
         <div style="display: flex; align-items: center; gap: 8px; background: #fff3cd; padding: 8px 14px; border-radius: 50px; font-size: 0.88em;">
             <span style="background: var(--warning-color); color: #333; padding: 2px 10px; border-radius: 50px; font-weight: 700; font-size: 0.9em;">
-                <i class="fas fa-star"></i> 1–5
+                <i class="fas fa-star"></i> 1â€“5
             </span>
             <span style="color: #856404;">Ringan</span>
         </div>
         <div style="display: flex; align-items: center; gap: 8px; background: #fdecea; padding: 8px 14px; border-radius: 50px; font-size: 0.88em;">
             <span style="background: var(--danger-color); color: white; padding: 2px 10px; border-radius: 50px; font-weight: 700; font-size: 0.9em;">
-                <i class="fas fa-star"></i> 6–15
+                <i class="fas fa-star"></i> 6â€“15
             </span>
             <span style="color: #a71d2a;">Sedang</span>
         </div>
@@ -54,7 +54,7 @@
         </div>
         <div style="display: flex; align-items: center; gap: 8px; background: #eafaf1; padding: 8px 14px; border-radius: 50px; font-size: 0.88em;">
             <i class="fas fa-hands" style="color: var(--success-color);"></i>
-            <span style="color: #155724;">Kafaroh → Poin dilebur menjadi 0</span>
+            <span style="color: #155724;">Kafaroh â†’ Poin dilebur menjadi 0</span>
         </div>
     </div>
 </div>
@@ -72,6 +72,7 @@
 
     @if($kategoriList->count() > 0)
         <div style="overflow-x: auto;">
+            <div class="table-wrapper">
             <table class="data-table">
                 <thead>
                     <tr>
@@ -137,6 +138,7 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
         </div>
 
         {{-- Statistik ringkas --}}

@@ -1,4 +1,4 @@
-{{-- resources/views/admin/kepulangan/over-limit.blade.php --}}
+﻿{{-- resources/views/admin/kepulangan/over-limit.blade.php --}}
 
 @extends('layouts.app')
 
@@ -13,17 +13,17 @@
 <div style="background: linear-gradient(135deg, #ff5252 0%, #f48fb1 100%); color: white; padding: 14px; border-radius: 12px; margin-bottom: 14px;">
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; align-items: center;">
         <div>
-            <h4 style="margin: 0 0 5px 0; opacity: 0.9;">âš ï¸ Total Santri Over Limit</h4>
+            <h4 style="margin: 0 0 5px 0; opacity: 0.9;">Ã¢Å¡Â Ã¯Â¸Â Total Santri Over Limit</h4>
             <p style="margin: 0; font-size: 2rem; font-weight: 700;">{{ $santriList->count() }}</p>
         </div>
         <div>
-            <h4 style="margin: 0 0 5px 0; opacity: 0.9;">ðŸ“… Periode Kuota</h4>
+            <h4 style="margin: 0 0 5px 0; opacity: 0.9;">Ã°Å¸â€œâ€¦ Periode Kuota</h4>
             <p style="margin: 0; font-size: 1.1rem; font-weight: 600;">
                 {{ $settings->periode_mulai->format('d M Y') }} - {{ $settings->periode_akhir->format('d M Y') }}
             </p>
         </div>
         <div>
-            <h4 style="margin: 0 0 5px 0; opacity: 0.9;">ðŸ“Š Kuota Maksimal</h4>
+            <h4 style="margin: 0 0 5px 0; opacity: 0.9;">Ã°Å¸â€œÅ  Kuota Maksimal</h4>
             <p style="margin: 0; font-size: 1.1rem; font-weight: 600;">{{ $settings->kuota_maksimal }} Hari / Tahun</p>
         </div>
         <div style="text-align: right;">
@@ -36,7 +36,7 @@
 
 {{-- Alert Info --}}
 <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 14px; border-left: 4px solid #ffc107;">
-    <strong>â„¹ï¸ Informasi:</strong>
+    <strong>Ã¢â€žÂ¹Ã¯Â¸Â Informasi:</strong>
     <p style="margin: 10px 0 0 0;">
         Berikut adalah daftar santri yang telah melebihi kuota maksimal <strong>{{ $settings->kuota_maksimal }} hari</strong> dalam periode ini. 
         Santri tetap bisa mengajukan izin, namun akan mendapat peringatan visual.
@@ -46,6 +46,7 @@
 <div class="content-box">
     @if($santriList->count() > 0)
         <div style="overflow-x: auto;">
+            <div class="table-wrapper">
             <table class="data-table">
                 <thead>
                     <tr>
@@ -125,11 +126,12 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
         </div>
 
         {{-- Summary Statistics --}}
         <div style="margin-top: 22px; padding: 14px; background: #f8f9fa; border-radius: 8px;">
-            <h4 style="margin: 0 0 15px 0; color: #2C3E50;">ðŸ“Š Ringkasan Statistik</h4>
+            <h4 style="margin: 0 0 15px 0; color: #2C3E50;">Ã°Å¸â€œÅ  Ringkasan Statistik</h4>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px;">
                 <div style="text-align: center; padding: 15px; background: white; border-radius: 8px; border: 2px solid #dc3545;">
                     <div style="font-size: 0.85rem; color: #7F8C8D; margin-bottom: 5px;">Total Santri Over Limit</div>

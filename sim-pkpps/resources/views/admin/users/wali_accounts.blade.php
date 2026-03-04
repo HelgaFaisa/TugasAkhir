@@ -1,4 +1,4 @@
-{{-- resources/views/admin/users/wali_accounts.blade.php --}}
+﻿{{-- resources/views/admin/users/wali_accounts.blade.php --}}
 @extends('layouts.app', ['isAdmin' => true])
 
 @section('title', 'Manajemen Akun Wali Santri')
@@ -28,6 +28,7 @@
 
     {{-- Tabel akun wali yang sudah ada --}}
     <h3>Daftar Akun Wali ({{ $users->count() }})</h3>
+    <div class="table-wrapper">
     <table class="data-table">
         <thead>
             <tr>
@@ -65,6 +66,7 @@
             @endforelse
         </tbody>
     </table>
+    </div>
 
     {{-- Tabel santri belum punya akun wali --}}
     <h3 style="margin-top:22px;">
@@ -91,6 +93,8 @@
             ->toArray();
         $namaOrtuPreviewDipakai = [];
     @endphp
+
+    <div class="table-wrapper">
 
     <table class="data-table">
         <thead>
@@ -168,5 +172,7 @@
             @endforelse
         </tbody>
     </table>
+
+    </div>
 </div>
 @endsection

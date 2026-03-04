@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'Detail Riwayat Pelanggaran')
 
@@ -182,6 +182,7 @@
         <h3 style="color: var(--primary-color); margin-bottom: 15px;">
             <i class="fas fa-list"></i> Riwayat Pelanggaran Lainnya (Santri yang Sama)
         </h3>
+        <div class="table-wrapper">
         <table class="data-table">
             <thead>
                 <tr>
@@ -212,6 +213,7 @@
                 @endforeach
             </tbody>
         </table>
+        </div>
     @endif
 
     <div class="btn-group" style="margin-top: 22px;">

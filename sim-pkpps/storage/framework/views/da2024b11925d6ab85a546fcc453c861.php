@@ -1,10 +1,10 @@
-
+﻿
 <div class="content-box" style="margin-bottom:16px;">
     <h4 style="margin:0 0 12px;font-size:.88rem;font-weight:700;color:var(--text-color);display:flex;align-items:center;gap:8px;">
         <span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;background:linear-gradient(135deg,var(--primary-color),var(--primary-dark));border-radius:6px;flex-shrink:0;">
             <i class="fas fa-calendar-day" style="font-size:.7rem;color:#fff;"></i>
         </span>
-        Jadwal Kegiatan — <?php echo e($hari); ?>
+        Jadwal Kegiatan <?php echo e($hari); ?>
 
     </h4>
 
@@ -15,6 +15,7 @@
         </div>
     <?php else: ?>
     <div class="table-responsive" style="overflow-x:auto;">
+        <div class="table-wrapper">
         <table class="data-table" style="margin-top:0;">
             <thead>
                 <tr>
@@ -42,7 +43,7 @@
                     <td style="font-size:.78rem;font-weight:600;white-space:nowrap;color:var(--text-color);">
                         <?php echo e(is_string($k->waktu_mulai) ? $k->waktu_mulai : $k->waktu_mulai->format('H:i')); ?>
 
-                        <span style="color:var(--text-light);margin:0 2px;">–</span>
+                        <span style="color:var(--text-light);margin:0 2px;"> - </span>
                         <?php echo e(is_string($k->waktu_selesai) ? $k->waktu_selesai : $k->waktu_selesai->format('H:i')); ?>
 
                     </td>
@@ -71,13 +72,14 @@
                                 <span style="color:#bbb;">(<?php echo e($k->total_absensi); ?> data)</span>
                             </small>
                         <?php else: ?>
-                            <small class="text-muted">—</small>
+                            <small class="text-muted"></small>
                         <?php endif; ?>
                     </td>
                 </tr>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </tbody>
         </table>
+        </div>
     </div>
     <?php endif; ?>
 </div><?php /**PATH C:\xampp\htdocs\TugasAkhir\sim-pkpps\resources\views/admin/dashboard/_jadwal-kegiatan.blade.php ENDPATH**/ ?>

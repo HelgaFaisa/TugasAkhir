@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
 <div class="page-header">
@@ -106,6 +106,8 @@
                         Kategori: {{ $kategori }}
                     </h4>
                     
+                    <div class="table-wrapper">
+                    
                     <table class="data-table">
                         <thead>
                             <tr>
@@ -157,6 +159,8 @@
                             @endforeach
                         </tbody>
                     </table>
+                    
+                    </div>
                 </div>
             @endif
         @endforeach

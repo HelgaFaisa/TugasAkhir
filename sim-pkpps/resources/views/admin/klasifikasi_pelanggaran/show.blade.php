@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'Detail Klasifikasi')
 
@@ -53,6 +53,7 @@
         <h3 style="color: var(--primary-color); margin-bottom: 15px;">
             <i class="fas fa-list"></i> Daftar Pelanggaran
         </h3>
+        <div class="table-wrapper">
         <table class="data-table">
             <thead>
                 <tr>
@@ -83,6 +84,7 @@
                 @endforeach
             </tbody>
         </table>
+        </div>
     @else
         <div class="empty-state">
             <i class="fas fa-inbox"></i>

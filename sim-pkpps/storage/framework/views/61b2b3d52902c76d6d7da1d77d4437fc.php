@@ -150,6 +150,10 @@
                                         <span style="background: #6FBAA5; color: white; padding: 3px 8px; border-radius: 8px; font-size: 0.75rem;">
                                             <i class="fas fa-id-card"></i> RFID
                                         </span>
+                                    <?php elseif($absensi->metode_absen == 'Import_Mesin'): ?>
+                                        <span style="background: #7c3aed; color: white; padding: 3px 8px; border-radius: 8px; font-size: 0.75rem;">
+                                            <i class="fas fa-desktop"></i> Mesin
+                                        </span>
                                     <?php else: ?>
                                         <span style="background: #6c757d; color: white; padding: 3px 8px; border-radius: 8px; font-size: 0.75rem;">
                                             <i class="fas fa-hand-pointer"></i> Manual
@@ -170,6 +174,57 @@
             </div>
         <?php endif; ?>
     </div>
+
+    
+    <?php if(isset($santriBelumAbsen) && $santriBelumAbsen->count() > 0): ?>
+    <div style="margin-top: 18px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h5 style="color: #d97706; margin: 0;">
+                <i class="fas fa-exclamation-triangle"></i> Santri Belum Absen (<?php echo e($santriBelumAbsen->count()); ?> orang)
+            </h5>
+        </div>
+
+        <?php $__currentLoopData = $santriBelumAbsenPerKelas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $namaKelas => $kelasSantris): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+        <div style="margin-bottom: 12px;">
+            <div style="background: linear-gradient(135deg, #fef3c7, #fef9c3); padding: 8px 14px; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center;">
+                <h6 style="margin: 0; color: #92400e; font-size: 0.9rem;">
+                    <i class="fas fa-school"></i> <?php echo e($namaKelas); ?>
+
+                </h6>
+                <span style="background: #f59e0b; color: white; padding: 2px 10px; border-radius: 10px; font-size: 0.75rem; font-weight: 600;">
+                    <?php echo e($kelasSantris->count()); ?> santri
+                </span>
+            </div>
+            <div style="max-height: 200px; overflow-y: auto; border: 1px solid #fde68a; border-top: 0; border-radius: 0 0 8px 8px;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead style="position: sticky; top: 0; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                        <tr style="border-bottom: 2px solid #fde68a;">
+                            <th style="padding: 8px; text-align: left; font-size: 0.8rem; color: #6c757d;">No</th>
+                            <th style="padding: 8px; text-align: left; font-size: 0.8rem; color: #6c757d;">ID</th>
+                            <th style="padding: 8px; text-align: left; font-size: 0.8rem; color: #6c757d;">Nama Santri</th>
+                            <th style="padding: 8px; text-align: center; font-size: 0.8rem; color: #6c757d;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php $__currentLoopData = $kelasSantris; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $idx => $santri): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <tr style="border-bottom: 1px solid #fef3c7;">
+                            <td style="padding: 6px 8px; font-size: 0.85rem;"><?php echo e($idx + 1); ?></td>
+                            <td style="padding: 6px 8px; font-size: 0.85rem; font-weight: 600;"><?php echo e($santri->id_santri); ?></td>
+                            <td style="padding: 6px 8px; font-size: 0.85rem;"><?php echo e($santri->nama_lengkap); ?></td>
+                            <td style="padding: 6px 8px; text-align: center;">
+                                <span style="background: #fef3c7; color: #92400e; padding: 3px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: 600;">
+                                    <i class="fas fa-hourglass-half"></i> Belum
+                                </span>
+                            </td>
+                        </tr>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+    </div>
+    <?php endif; ?>
 
     
     <div style="margin-top: 25px; padding-top: 20px; border-top: 2px solid #e9ecef; display: flex; gap: 10px; justify-content: flex-end;">

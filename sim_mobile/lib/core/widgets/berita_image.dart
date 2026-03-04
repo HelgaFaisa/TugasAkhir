@@ -1,7 +1,5 @@
-// lib/core/widgets/berita_image.dart
-// Widget RINGAN untuk load gambar berita - TANPA package tambahan
-
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart'; // ← tambahkan ini
 
 class BeritaImage extends StatelessWidget {
   final String? imageUrl;
@@ -15,25 +13,31 @@ class BeritaImage extends StatelessWidget {
     this.borderRadius,
   });
 
+  String _fixUrl(String url) {
+    if (kIsWeb) {
+      // Chrome: tetap pakai localhost, jangan diganti
+      return url;
+    }
+    // Android emulator
+    return url.replaceFirst('http://localhost', 'http://192.168.100.71');
+}
+
   @override
   Widget build(BuildContext context) {
-    // Jika null atau kosong, return empty
     if (imageUrl == null || imageUrl!.isEmpty) {
       return const SizedBox.shrink();
     }
 
+    final fixedUrl = _fixUrl(imageUrl!);
+
     return ClipRRect(
       borderRadius: borderRadius ?? BorderRadius.zero,
       child: Image.network(
-        imageUrl!,
+        fixedUrl,
         width: double.infinity,
         height: height,
         fit: BoxFit.cover,
-        
-        // Optimasi: cacheWidth untuk resize otomatis
         cacheWidth: 800,
-        
-        // Loading placeholder ringan
         loadingBuilder: (context, child, loadingProgress) {
           if (loadingProgress == null) return child;
           return Container(
@@ -48,10 +52,8 @@ class BeritaImage extends StatelessWidget {
             ),
           );
         },
-        
-        // Error handler
         errorBuilder: (context, error, stackTrace) {
-          debugPrint('ðŸ”´ Image error: $imageUrl');
+          debugPrint('🔴 Image error: $error');
           return Container(
             height: height,
             color: Colors.grey[200],

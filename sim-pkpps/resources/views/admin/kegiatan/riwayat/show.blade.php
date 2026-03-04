@@ -135,6 +135,47 @@
     </div>
 </div>
 
+{{-- Ringkasan Total Santri --}}
+@if(isset($totalSantriEligible))
+<div style="background: #fff; border-radius: 12px; padding: 16px 20px; margin-bottom: 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border-left: 4px solid #2563eb;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
+        <div>
+            <h4 style="margin: 0; font-size: 1rem; color: #1a2332;">
+                <i class="fas fa-users" style="color: #2563eb;"></i> Total Semua Santri: <strong>{{ $totalSantriEligible }}</strong>
+            </h4>
+            <p style="margin: 4px 0 0; font-size: 0.84rem; color: #6b7280;">
+                Sudah absen: <strong style="color: #059669;">{{ $totalRecorded }}</strong>
+                &nbsp;·&nbsp;
+                Belum absen: <strong style="color: {{ ($totalSantriEligible - $totalRecorded) > 0 ? '#dc2626' : '#059669' }};">{{ max(0, $totalSantriEligible - $totalRecorded) }}</strong>
+            </p>
+        </div>
+        <div style="text-align: right;">
+            <div style="font-size: 1.5rem; font-weight: 800; color: {{ $persenHadir >= 85 ? '#059669' : ($persenHadir >= 70 ? '#d97706' : '#dc2626') }};">
+                {{ $persenHadir }}%
+            </div>
+            <div style="font-size: 0.78rem; color: #6b7280;">Kehadiran</div>
+        </div>
+    </div>
+    {{-- Progress bar --}}
+    @php
+        $pctSudah = $totalSantriEligible > 0 ? round($totalRecorded / $totalSantriEligible * 100, 1) : 0;
+        $pctBelumRiwayat = 100 - $pctSudah;
+    @endphp
+    <div style="height: 24px; background: #f3f4f6; border-radius: 12px; overflow: hidden; display: flex;">
+        @if($pctSudah > 0)
+        <div style="width: {{ $pctSudah }}%; background: linear-gradient(90deg, #22c55e, #16a34a); display: flex; align-items: center; justify-content: center; color: white; font-size: 0.73rem; font-weight: 700;" title="Sudah Absen: {{ $totalRecorded }}">
+            {{ $totalRecorded }}
+        </div>
+        @endif
+        @if($pctBelumRiwayat > 0 && ($totalSantriEligible - $totalRecorded) > 0)
+        <div style="width: {{ $pctBelumRiwayat }}%; background: #d1d5db; display: flex; align-items: center; justify-content: center; color: #6b7280; font-size: 0.73rem; font-weight: 700;" title="Belum Absen: {{ $totalSantriEligible - $totalRecorded }}">
+            {{ $totalSantriEligible - $totalRecorded }}
+        </div>
+        @endif
+    </div>
+</div>
+@endif
+
 {{-- 6 KPI Cards --}}
 <div class="stats-row">
     <div class="stat-card hadir">
@@ -274,6 +315,27 @@
             $dayAlpa      = $records->where('status', 'Alpa')->count();
             $dayPulang    = $records->where('status', 'Pulang')->count();
             $dayTotal     = $records->count();
+
+            // Group per kelas kegiatan (khusus) atau kelas_name santri (umum)
+            $isUmum = $kegiatan->kelasKegiatan->isEmpty();
+            if ($isUmum) {
+                $recordsPerKelas = $records->groupBy(fn($r) =>
+                    optional(optional($r->santri->kelasSantri->first())->kelas)->nama_kelas ?? 'Tanpa Kelas'
+                )->sortKeys();
+            } else {
+                $recordsPerKelas = collect();
+                $placedIds = [];
+                foreach ($kegiatan->kelasKegiatan as $kls) {
+                    $inKelas = $records->filter(function($r) use ($kls, &$placedIds) {
+                        if (in_array($r->id, $placedIds)) return false;
+                        return $r->santri->kelasSantri->contains('id_kelas', $kls->id);
+                    });
+                    foreach ($inKelas as $r) $placedIds[] = $r->id;
+                    if ($inKelas->count() > 0) $recordsPerKelas[$kls->nama_kelas] = $inKelas;
+                }
+                $lainnya = $records->filter(fn($r) => !in_array($r->id, $placedIds));
+                if ($lainnya->count() > 0) $recordsPerKelas['Kelas Lain'] = $lainnya;
+            }
         @endphp
 
         <div class="day-group">
@@ -306,20 +368,28 @@
                 </div>
             </div>
             <div class="day-body">
+                @foreach($recordsPerKelas as $namaKelas => $kelasRecords)
+                <div style="background: linear-gradient(135deg, #f0fdf4, #e8f5e9); padding: 8px 18px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0;">
+                    <span style="font-size: 0.85rem; font-weight: 600; color: #065f46;">
+                        <i class="fas fa-school"></i> {{ $namaKelas }}
+                    </span>
+                    <span style="background: #6FBAA5; color: white; padding: 2px 10px; border-radius: 10px; font-size: 0.75rem; font-weight: 600;">
+                        {{ $kelasRecords->count() }} santri
+                    </span>
+                </div>
                 <table>
                     <thead>
                         <tr>
                             <th style="width: 45px;">No</th>
                             <th style="width: 90px;">ID Santri</th>
                             <th>Nama Santri</th>
-                            <th style="width: 140px;">Kelas</th>
                             <th style="width: 90px; text-align: center;">Status</th>
                             <th style="width: 80px; text-align: center;">Waktu</th>
                             <th style="width: 80px;">Metode</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($records as $index => $riwayat)
+                        @foreach($kelasRecords->values() as $index => $riwayat)
                         <tr>
                             <td>{{ $index + 1 }}</td>
                             <td><strong>{{ $riwayat->id_santri }}</strong></td>
@@ -329,13 +399,6 @@
                                     {{ $riwayat->santri->nama_lengkap }}
                                 </a>
                             </td>
-                            <td>
-                                @if($riwayat->santri->kelasSantri->first() && $riwayat->santri->kelasSantri->first()->kelas)
-                                    {{ $riwayat->santri->kelasSantri->first()->kelas->nama_kelas }}
-                                @else
-                                    <span style="color: #9CA3AF;">-</span>
-                                @endif
-                            </td>
                             <td style="text-align: center;">{!! $riwayat->status_badge !!}</td>
                             <td style="text-align: center;">
                                 {{ $riwayat->waktu_absen ? \Carbon\Carbon::parse($riwayat->waktu_absen)->format('H:i') : '-' }}
@@ -344,6 +407,10 @@
                                 @if($riwayat->metode_absen == 'RFID')
                                     <span style="background: #DBEAFE; color: #1E40AF; padding: 3px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: 600;">
                                         <i class="fas fa-id-card"></i> RFID
+                                    </span>
+                                @elseif($riwayat->metode_absen == 'Import_Mesin')
+                                    <span style="background: #EDE9FE; color: #6B21A8; padding: 3px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: 600;">
+                                        <i class="fas fa-desktop"></i> Mesin
                                     </span>
                                 @else
                                     <span style="background: #E5E7EB; color: #374151; padding: 3px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: 600;">
@@ -355,6 +422,7 @@
                         @endforeach
                     </tbody>
                 </table>
+                @endforeach
             </div>
         </div>
     @endforeach

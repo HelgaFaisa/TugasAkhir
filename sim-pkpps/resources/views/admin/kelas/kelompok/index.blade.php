@@ -1,4 +1,4 @@
-{{-- 
+﻿{{-- 
 ============================================================================
 LOKASI FILE: resources/views/admin/kelas/kelompok/index.blade.php
 ============================================================================
@@ -89,6 +89,7 @@ CATATAN: Buat folder "kelompok" di dalam folder "kelas" terlebih dahulu
 <!-- Kelompok List -->
 <div class="content-box">
     @if ($kelompokKelas->count() > 0)
+        <div class="table-wrapper">
         <table class="data-table">
             <thead>
                 <tr>
@@ -155,6 +156,7 @@ CATATAN: Buat folder "kelompok" di dalam folder "kelas" terlebih dahulu
                     @endforeach
                 </tbody>
             </table>
+        </div>
 
         <!-- Pagination -->
         @if ($kelompokKelas->hasPages())

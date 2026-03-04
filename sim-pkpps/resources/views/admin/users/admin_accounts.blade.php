@@ -1,4 +1,4 @@
-@extends('layouts.app', ['isAdmin' => true])
+﻿@extends('layouts.app', ['isAdmin' => true])
 
 @section('title', 'Manajemen Akun Admin')
 
@@ -25,6 +25,8 @@
         Kelola akun untuk role <strong>Akademik</strong> dan <strong>Pamong</strong>.
         Akun <strong>Super Admin</strong> tidak dapat dihapus dari halaman ini.
     </p>
+
+    <div class="table-wrapper">
 
     <table class="data-table">
         <thead>
@@ -78,5 +80,7 @@
             @endforelse
         </tbody>
     </table>
+
+    </div>
 </div>
 @endsection

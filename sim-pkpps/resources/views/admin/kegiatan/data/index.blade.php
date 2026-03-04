@@ -106,6 +106,8 @@
                     <span class="badge badge-primary">{{ $kegiatanHari->count() }} kegiatan</span>
                 </h4>
 
+                <div class="table-wrapper">
+
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -165,6 +167,8 @@
                         @endforeach
                     </tbody>
                 </table>
+
+                </div>
             </div>
         @endif
     @endforeach

@@ -1,4 +1,4 @@
-{{-- 
+﻿{{-- 
 ============================================================================
 LOKASI FILE: resources/views/admin/kelas/index.blade.php
 ============================================================================
@@ -104,6 +104,7 @@ LOKASI FILE: resources/views/admin/kelas/index.blade.php
 <!-- Kelas List -->
 <div class="content-box">
     @if ($kelas->count() > 0)
+        <div class="table-wrapper">
         <table class="data-table">
             <thead>
                 <tr>
@@ -169,6 +170,7 @@ LOKASI FILE: resources/views/admin/kelas/index.blade.php
                     @endforeach
                 </tbody>
             </table>
+        </div>
 
         <!-- Pagination -->
         @if ($kelas->hasPages())

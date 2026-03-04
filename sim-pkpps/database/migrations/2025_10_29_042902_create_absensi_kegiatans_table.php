@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('id_santri', 10);
             $table->date('tanggal');
             $table->enum('status', ['Hadir', 'Izin', 'Sakit', 'Alpa']);
-            $table->enum('metode_absen', ['Manual', 'RFID'])->default('Manual');
+            $table->string('metode_absen', 50)->default('Manual');
             $table->time('waktu_absen')->nullable();
             $table->timestamps();
             

@@ -12,12 +12,12 @@ class SppPage extends StatefulWidget {
 
 class _SppPageState extends State<SppPage> {
   final _api = ApiService();
-  
+
   Map<String, dynamic>? _statusBulanIni;
   Map<String, dynamic>? _tunggakan;
   Map<String, dynamic>? _statistik;
   List<dynamic> _riwayatList = [];
-  
+
   bool _isLoading = true;
   String _selectedStatus = 'semua';
   int _currentPage = 1;
@@ -41,27 +41,21 @@ class _SppPageState extends State<SppPage> {
   Future<void> _loadStatusBulanIni() async {
     final result = await _api.getStatusSppBulanIni();
     if (mounted && result['success'] == true) {
-      setState(() {
-        _statusBulanIni = result['data'];
-      });
+      setState(() => _statusBulanIni = result['data']);
     }
   }
 
   Future<void> _loadTunggakan() async {
     final result = await _api.getTunggakanSpp();
     if (mounted && result['success'] == true) {
-      setState(() {
-        _tunggakan = result['data'];
-      });
+      setState(() => _tunggakan = result['data']);
     }
   }
 
   Future<void> _loadStatistik() async {
     final result = await _api.getStatistikSpp();
     if (mounted && result['success'] == true) {
-      setState(() {
-        _statistik = result['data'];
-      });
+      setState(() => _statistik = result['data']);
     }
   }
 
@@ -88,7 +82,6 @@ class _SppPageState extends State<SppPage> {
           } else {
             _riwayatList.addAll(result['data']);
           }
-
           if (result['pagination'] != null) {
             _lastPage = result['pagination']['last_page'] ?? 1;
           }
@@ -98,17 +91,48 @@ class _SppPageState extends State<SppPage> {
     }
   }
 
-  String _formatRupiah(int nominal) {
-    return 'Rp ${nominal.toString().replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (Match m) => '${m[1]}.',
-    )}';
+  String _formatRupiah(num nominal) {
+    return 'Rp ${nominal.toInt().toString().replaceAllMapped(
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (Match m) => '${m[1]}.',
+        )}';
   }
 
-  Color _getStatusColor(String status, {bool isTelat = false}) {
+  /// Deteksi apakah item adalah cicilan:
+  /// status "Belum Lunas" + ada field is_cicilan==true ATAU nominal_terbayar > 0
+  bool _isCicilan(Map<String, dynamic> item) {
+    if (item['status'] != 'Belum Lunas') return false;
+    if (item['is_cicilan'] == true) return true;
+    final terbayar = (item['nominal_terbayar'] ?? 0) as num;
+    return terbayar > 0;
+  }
+
+  Color _getStatusColor(Map<String, dynamic> item) {
+    final status = item['status'] ?? '';
+    final isTelat = item['is_telat'] ?? false;
     if (status == 'Lunas') return Colors.green;
+    if (_isCicilan(item)) return Colors.purple;
     if (isTelat) return Colors.red;
     return Colors.orange;
+  }
+
+  String _getStatusLabel(Map<String, dynamic> item) {
+    final status = item['status'] ?? '';
+    final isTelat = item['is_telat'] ?? false;
+    if (status == 'Lunas') return 'Lunas';
+    if (_isCicilan(item)) {
+      final pct = _getPorsentase(item);
+      return 'Cicilan $pct%';
+    }
+    if (isTelat) return 'Telat';
+    return 'Belum';
+  }
+
+  int _getPorsentase(Map<String, dynamic> item) {
+    final nominal = (item['nominal'] ?? 0) as num;
+    final terbayar = (item['nominal_terbayar'] ?? 0) as num;
+    if (nominal <= 0) return 0;
+    return (terbayar / nominal * 100).clamp(0, 100).round();
   }
 
   @override
@@ -122,9 +146,9 @@ class _SppPageState extends State<SppPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () {
-              _loadData();
-              _loadRiwayat(isRefresh: true);
+            onPressed: () async {
+              await _loadData();
+              await _loadRiwayat(isRefresh: true);
             },
           ),
         ],
@@ -137,23 +161,18 @@ class _SppPageState extends State<SppPage> {
         child: ListView(
           padding: const EdgeInsets.all(12),
           children: [
-            // Status Bulan Ini
             if (_statusBulanIni != null) _buildStatusBulanIniCard(),
             const SizedBox(height: 12),
 
-            // Alert Tunggakan
             if (_tunggakan != null && _tunggakan!['ada_tunggakan'] == true)
               _buildAlertTunggakan(),
 
-            // Statistik
             if (_statistik != null) _buildStatistikCard(),
             const SizedBox(height: 15),
 
-            // Filter
             _buildFilterChips(),
             const SizedBox(height: 12),
 
-            // Riwayat
             const Text(
               'Riwayat Pembayaran',
               style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
@@ -173,6 +192,10 @@ class _SppPageState extends State<SppPage> {
       ),
     );
   }
+
+  // ─────────────────────────────────────────────
+  // STATUS BULAN INI
+  // ─────────────────────────────────────────────
 
   Widget _buildStatusBulanIniCard() {
     final adaTagihan = _statusBulanIni!['ada_tagihan'] ?? false;
@@ -218,24 +241,45 @@ class _SppPageState extends State<SppPage> {
 
     final isLunas = status == 'Lunas';
     final isTelat = _statusBulanIni!['is_telat'] ?? false;
-    final nominal = _statusBulanIni!['nominal'] ?? 0;
+    final isCicilan = _statusBulanIni!['is_cicilan'] == true ||
+        ((_statusBulanIni!['nominal_terbayar'] ?? 0) as num) > 0 && !isLunas;
+    final nominal = (_statusBulanIni!['nominal'] ?? 0) as num;
+    final nominalTerbayar =
+        (_statusBulanIni!['nominal_terbayar'] ?? 0) as num;
+
+    List<Color> gradientColors;
+    String statusLabel;
+    IconData statusIcon;
+
+    if (isLunas) {
+      gradientColors = [Colors.green[400]!, Colors.green[600]!];
+      statusLabel = 'Sudah Lunas';
+      statusIcon = Icons.check_circle;
+    } else if (isCicilan) {
+      gradientColors = [Colors.purple[400]!, Colors.purple[600]!];
+      statusLabel = 'Cicilan';
+      statusIcon = Icons.payments_outlined;
+    } else if (isTelat) {
+      gradientColors = [Colors.red[400]!, Colors.red[600]!];
+      statusLabel = 'Belum Lunas (Telat)';
+      statusIcon = Icons.warning_amber_rounded;
+    } else {
+      gradientColors = [Colors.orange[400]!, Colors.orange[600]!];
+      statusLabel = 'Belum Lunas';
+      statusIcon = Icons.warning_amber_rounded;
+    }
 
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: isLunas
-              ? [Colors.green[400]!, Colors.green[600]!]
-              : isTelat
-                  ? [Colors.red[400]!, Colors.red[600]!]
-                  : [Colors.orange[400]!, Colors.orange[600]!],
+          colors: gradientColors,
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: (isLunas ? Colors.green : isTelat ? Colors.red : Colors.orange)
-                .withValues(alpha: 0.3),
+            color: gradientColors[0].withValues(alpha: 0.35),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -253,11 +297,7 @@ class _SppPageState extends State<SppPage> {
                   color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(9),
                 ),
-                child: Icon(
-                  isLunas ? Icons.check_circle : Icons.warning_amber_rounded,
-                  color: Colors.white,
-                  size: 21,
-                ),
+                child: Icon(statusIcon, color: Colors.white, size: 21),
               ),
               const SizedBox(width: 9),
               Expanded(
@@ -274,15 +314,8 @@ class _SppPageState extends State<SppPage> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      isLunas
-                          ? 'Sudah Lunas'
-                          : isTelat
-                              ? 'Belum Lunas (Telat)'
-                              : 'Belum Lunas',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 11,
-                      ),
+                      statusLabel,
+                      style: const TextStyle(color: Colors.white, fontSize: 11),
                     ),
                   ],
                 ),
@@ -290,6 +323,8 @@ class _SppPageState extends State<SppPage> {
             ],
           ),
           const SizedBox(height: 12),
+
+          // Nominal row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -299,9 +334,8 @@ class _SppPageState extends State<SppPage> {
                   Text(
                     'Nominal',
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.9),
-                      fontSize: 9,
-                    ),
+                        color: Colors.white.withValues(alpha: 0.9),
+                        fontSize: 9),
                   ),
                   const SizedBox(height: 2),
                   Text(
@@ -321,9 +355,8 @@ class _SppPageState extends State<SppPage> {
                     Text(
                       'Batas Bayar',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.9),
-                        fontSize: 9,
-                      ),
+                          color: Colors.white.withValues(alpha: 0.9),
+                          fontSize: 9),
                     ),
                     const SizedBox(height: 2),
                     Text(
@@ -338,13 +371,47 @@ class _SppPageState extends State<SppPage> {
                 ),
             ],
           ),
+
+          // Cicilan progress bar (hanya jika cicilan)
+          if (isCicilan) ...[
+            const SizedBox(height: 12),
+            _buildProgressBar(
+              terbayar: nominalTerbayar.toDouble(),
+              total: nominal.toDouble(),
+              foreground: Colors.white,
+              background: Colors.white.withValues(alpha: 0.3),
+            ),
+            const SizedBox(height: 4),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Terbayar: ${_formatRupiah(nominalTerbayar)}',
+                  style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.9),
+                      fontSize: 10),
+                ),
+                Text(
+                  'Sisa: ${_formatRupiah(nominal - nominalTerbayar)}',
+                  style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.9),
+                      fontSize: 10),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );
   }
 
+  // ─────────────────────────────────────────────
+  // ALERT TUNGGAKAN
+  // ─────────────────────────────────────────────
+
   Widget _buildAlertTunggakan() {
-    final totalTunggakan = _tunggakan!['total_tunggakan'] ?? 0;
+    final totalTunggakan =
+        (_tunggakan!['total_tunggakan'] ?? 0) as num;
     final jumlahBulan = _tunggakan!['jumlah_bulan'] ?? 0;
 
     return Container(
@@ -384,10 +451,15 @@ class _SppPageState extends State<SppPage> {
     );
   }
 
+  // ─────────────────────────────────────────────
+  // STATISTIK
+  // ─────────────────────────────────────────────
+
   Widget _buildStatistikCard() {
     return Card(
       elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
@@ -395,7 +467,8 @@ class _SppPageState extends State<SppPage> {
           children: [
             const Text(
               'Statistik Pembayaran',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+              style:
+                  TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
             Row(
@@ -405,13 +478,28 @@ class _SppPageState extends State<SppPage> {
                     'Lunas',
                     _statistik!['total_lunas'].toString(),
                     Colors.green,
+                    Icons.check_circle_outline,
                   ),
                 ),
+                // Divider vertikal
+                Container(
+                    width: 1, height: 40, color: Colors.grey[200]),
+                Expanded(
+                  child: _buildStatItem(
+                    'Cicilan',
+                    (_statistik!['total_cicilan'] ?? 0).toString(),
+                    Colors.purple,
+                    Icons.payments_outlined,
+                  ),
+                ),
+                Container(
+                    width: 1, height: 40, color: Colors.grey[200]),
                 Expanded(
                   child: _buildStatItem(
                     'Belum',
                     _statistik!['total_belum_lunas'].toString(),
                     Colors.orange,
+                    Icons.schedule_outlined,
                   ),
                 ),
               ],
@@ -422,9 +510,12 @@ class _SppPageState extends State<SppPage> {
     );
   }
 
-  Widget _buildStatItem(String label, String value, Color color) {
+  Widget _buildStatItem(
+      String label, String value, Color color, IconData icon) {
     return Column(
       children: [
+        Icon(icon, color: color, size: 18),
+        const SizedBox(height: 4),
         Text(
           value,
           style: TextStyle(
@@ -434,13 +525,15 @@ class _SppPageState extends State<SppPage> {
           ),
         ),
         const SizedBox(height: 2),
-        Text(
-          label,
-          style: TextStyle(fontSize: 9, color: Colors.grey[600]),
-        ),
+        Text(label,
+            style: TextStyle(fontSize: 9, color: Colors.grey[600])),
       ],
     );
   }
+
+  // ─────────────────────────────────────────────
+  // FILTER CHIPS
+  // ─────────────────────────────────────────────
 
   Widget _buildFilterChips() {
     return SingleChildScrollView(
@@ -449,6 +542,7 @@ class _SppPageState extends State<SppPage> {
         children: [
           _buildFilterChip('Semua', 'semua'),
           _buildFilterChip('Lunas', 'Lunas'),
+          _buildFilterChip('Cicilan', 'Cicilan'),
           _buildFilterChip('Belum Lunas', 'Belum Lunas'),
         ],
       ),
@@ -470,47 +564,54 @@ class _SppPageState extends State<SppPage> {
           });
           _loadRiwayat();
         },
-        selectedColor: const Color(0xFF6FBA9D).withValues(alpha: 0.2),
+        selectedColor:
+            const Color(0xFF6FBA9D).withValues(alpha: 0.2),
         checkmarkColor: const Color(0xFF6FBA9D),
       ),
     );
   }
 
+  // ─────────────────────────────────────────────
+  // RIWAYAT CARD
+  // ─────────────────────────────────────────────
+
   Widget _buildRiwayatCard(Map<String, dynamic> item) {
+    final isCicilan = _isCicilan(item);
+    final statusColor = _getStatusColor(item);
+    final statusLabel = _getStatusLabel(item);
+    final nominal = (item['nominal'] ?? 0) as num;
+    final nominalTerbayar = (item['nominal_terbayar'] ?? 0) as num;
+    final nominalSisa = (item['nominal_sisa'] ?? (nominal - nominalTerbayar)) as num;
+    final porsentase = _getPorsentase(item);
     final status = item['status'] ?? '';
-    final isTelat = item['is_telat'] ?? false;
-    final statusColor = _getStatusColor(status, isTelat: isTelat);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 9),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(9)),
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Header: periode + badge status
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   item['periode'] ?? '',
                   style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
+                      fontSize: 12, fontWeight: FontWeight.bold),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: statusColor.withValues(alpha: 0.1),
+                    color: statusColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(9),
                   ),
                   child: Text(
-                    status == 'Lunas'
-                        ? 'Lunas'
-                        : isTelat
-                            ? 'Telat'
-                            : 'Belum',
+                    statusLabel,
                     style: TextStyle(
                       fontSize: 9,
                       fontWeight: FontWeight.bold,
@@ -521,40 +622,162 @@ class _SppPageState extends State<SppPage> {
               ],
             ),
             const SizedBox(height: 9),
+
+            // Nominal utama
             Text(
-              _formatRupiah(item['nominal'] ?? 0),
+              _formatRupiah(nominal),
               style: const TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF6FBA9D),
               ),
             ),
-            const SizedBox(height: 9),
-            if (item['tanggal_bayar_formatted'] != null)
+
+            // ── Cicilan detail ──────────────────────
+            if (isCicilan) ...[
+              const SizedBox(height: 9),
+              _buildProgressBar(
+                terbayar: nominalTerbayar.toDouble(),
+                total: nominal.toDouble(),
+                foreground: Colors.purple,
+                background: Colors.purple.withValues(alpha: 0.12),
+              ),
+              const SizedBox(height: 6),
               Row(
                 children: [
-                  Icon(Icons.check_circle, size: 11, color: Colors.green[600]),
-                  const SizedBox(width: 2),
-                  Text(
-                    'Dibayar: ${item['tanggal_bayar_formatted']}',
-                    style: TextStyle(fontSize: 9, color: Colors.grey[600]),
+                  Expanded(
+                    child: _buildMiniInfo(
+                      icon: Icons.check_circle_outline,
+                      color: Colors.green,
+                      label: 'Terbayar',
+                      value: _formatRupiah(nominalTerbayar),
+                    ),
+                  ),
+                  Expanded(
+                    child: _buildMiniInfo(
+                      icon: Icons.hourglass_bottom_outlined,
+                      color: Colors.red,
+                      label: 'Sisa',
+                      value: _formatRupiah(nominalSisa),
+                    ),
+                  ),
+                  Expanded(
+                    child: _buildMiniInfo(
+                      icon: Icons.percent_outlined,
+                      color: Colors.purple,
+                      label: 'Progress',
+                      value: '$porsentase%',
+                    ),
                   ),
                 ],
+              ),
+            ],
+
+            // ── Footer: tanggal ─────────────────────
+            const SizedBox(height: 9),
+            if (status == 'Lunas' &&
+                item['tanggal_bayar_formatted'] != null)
+              _buildDateRow(
+                icon: Icons.check_circle,
+                color: Colors.green[600]!,
+                text: 'Dibayar: ${item['tanggal_bayar_formatted']}',
+              )
+            else if (isCicilan)
+              _buildDateRow(
+                icon: Icons.schedule,
+                color: Colors.purple[600]!,
+                text: 'Batas: ${item['batas_bayar_formatted'] ?? '-'}',
               )
             else
-              Row(
-                children: [
-                  Icon(Icons.schedule, size: 11, color: Colors.grey[600]),
-                  const SizedBox(width: 2),
-                  Text(
-                    'Batas: ${item['batas_bayar_formatted']}',
-                    style: TextStyle(fontSize: 9, color: Colors.grey[600]),
-                  ),
-                ],
+              _buildDateRow(
+                icon: Icons.schedule,
+                color: Colors.grey[600]!,
+                text: 'Batas: ${item['batas_bayar_formatted'] ?? '-'}',
               ),
           ],
         ),
       ),
+    );
+  }
+
+  // ─────────────────────────────────────────────
+  // HELPERS / SHARED WIDGETS
+  // ─────────────────────────────────────────────
+
+  Widget _buildProgressBar({
+    required double terbayar,
+    required double total,
+    required Color foreground,
+    required Color background,
+  }) {
+    final fraction = total > 0 ? (terbayar / total).clamp(0.0, 1.0) : 0.0;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Container(
+          height: 8,
+          width: constraints.maxWidth,
+          decoration: BoxDecoration(
+            color: background,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Container(
+              width: constraints.maxWidth * fraction,
+              height: 8,
+              decoration: BoxDecoration(
+                color: foreground,
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildMiniInfo({
+    required IconData icon,
+    required Color color,
+    required String label,
+    required String value,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(icon, size: 10, color: color),
+            const SizedBox(width: 3),
+            Text(label,
+                style:
+                    TextStyle(fontSize: 9, color: Colors.grey[600])),
+          ],
+        ),
+        const SizedBox(height: 2),
+        Text(
+          value,
+          style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+              color: color),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDateRow({
+    required IconData icon,
+    required Color color,
+    required String text,
+  }) {
+    return Row(
+      children: [
+        Icon(icon, size: 11, color: color),
+        const SizedBox(width: 4),
+        Text(text,
+            style: TextStyle(fontSize: 9, color: Colors.grey[600])),
+      ],
     );
   }
 
@@ -579,11 +802,13 @@ class _SppPageState extends State<SppPage> {
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
-            Icon(Icons.receipt_long_outlined, size: 60, color: Colors.grey[400]),
+            Icon(Icons.receipt_long_outlined,
+                size: 60, color: Colors.grey[400]),
             const SizedBox(height: 12),
             Text(
               'Belum ada riwayat pembayaran',
-              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+              style:
+                  TextStyle(fontSize: 12, color: Colors.grey[600]),
             ),
           ],
         ),

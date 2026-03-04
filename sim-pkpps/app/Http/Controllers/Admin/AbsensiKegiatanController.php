@@ -33,34 +33,38 @@ class AbsensiKegiatanController extends Controller
             
         $tanggal = request('tanggal', now()->format('Y-m-d'));
         
-        // Build santri grouped by kegiatan kelas
+        // Build santri grouped by kelas
         $santriGrouped = collect();
-        
+        $allSantris = Santri::where('status', 'Aktif')
+            ->with(['kelasSantri.kelas', 'kelasPrimary.kelas'])
+            ->orderBy('nama_lengkap')
+            ->get();
+
         if ($kegiatan->isForAllClasses()) {
-            // Kegiatan umum: ambil SEMUA santri aktif, group by primary kelas
-            $allSantris = Santri::where('status', 'Aktif')
-                ->with(['kelasSantri.kelas', 'kelasPrimary.kelas'])
-                ->orderBy('nama_lengkap')
-                ->get();
-            
+            // Kegiatan umum: group by primary kelas
             $santriGrouped = $allSantris->groupBy(function($s) {
                 $primary = $s->kelasPrimary;
                 return $primary && $primary->kelas ? $primary->kelas->nama_kelas : 'Tanpa Kelas';
             })->sortKeys();
         } else {
-            // Kegiatan khusus: group by kegiatan kelas
+            // Kegiatan khusus: group by kelas yang di-assign ke kegiatan
+            $placedIds = [];
             foreach ($kegiatan->kelasKegiatan as $kelas) {
-                $santriInKelas = Santri::where('status', 'Aktif')
-                    ->whereHas('kelasSantri', function($q) use ($kelas) {
-                        $q->where('id_kelas', $kelas->id);
-                    })
-                    ->with(['kelasSantri.kelas', 'kelasPrimary.kelas'])
-                    ->orderBy('nama_lengkap')
-                    ->get();
-                
-                if ($santriInKelas->count() > 0) {
-                    $santriGrouped[$kelas->nama_kelas] = $santriInKelas;
+                $santriForKelas = $allSantris->filter(function($s) use ($kelas, &$placedIds) {
+                    if (in_array($s->id_santri, $placedIds)) return false;
+                    return $s->kelasSantri->contains('id_kelas', $kelas->id);
+                });
+                foreach ($santriForKelas as $s) {
+                    $placedIds[] = $s->id_santri;
                 }
+                if ($santriForKelas->count() > 0) {
+                    $santriGrouped[$kelas->nama_kelas] = $santriForKelas;
+                }
+            }
+            // Santri yang tidak termasuk kelas kegiatan manapun
+            $santriLainnya = $allSantris->whereNotIn('id_santri', $placedIds);
+            if ($santriLainnya->count() > 0) {
+                $santriGrouped['Kelas Lain'] = $santriLainnya;
             }
         }
         
@@ -222,29 +226,13 @@ class AbsensiKegiatanController extends Controller
             ->orderBy('waktu_absen', 'desc')
             ->get();
 
-        // Build kelas list for filter dropdown
-        if ($kegiatan->isForAllClasses()) {
-            $kelasFilterList = Kelas::active()->ordered()->get();
-        } else {
-            $kelasFilterList = $kegiatan->kelasKegiatan;
-        }
+        // Build kelas list for filter dropdown — selalu tampilkan semua kelas aktif
+        $kelasFilterList = Kelas::active()->ordered()->get();
 
-        // Grup per kelas berdasarkan kegiatan kelas
-        if ($kegiatan->isForAllClasses()) {
-            $absensiPerKelas = $absensis->groupBy(function ($item) {
-                return $item->santri->kelas_name ?? 'Belum Ada Kelas';
-            })->sortKeys();
-        } else {
-            $absensiPerKelas = collect();
-            foreach ($kegiatan->kelasKegiatan as $kelas) {
-                $kelasAbsensis = $absensis->filter(function ($item) use ($kelas) {
-                    return $item->santri->kelasSantri->contains('id_kelas', $kelas->id);
-                });
-                if ($kelasAbsensis->count() > 0) {
-                    $absensiPerKelas[$kelas->nama_kelas] = $kelasAbsensis;
-                }
-            }
-        }
+        // Grup per kelas — selalu group by kelas_name santri
+        $absensiPerKelas = $absensis->groupBy(function ($item) {
+            return $item->santri->kelas_name ?? 'Belum Ada Kelas';
+        })->sortKeys();
 
         // Statistik
         $statsQuery = AbsensiKegiatan::where('kegiatan_id', $kegiatan_id);
@@ -265,7 +253,73 @@ class AbsensiKegiatanController extends Controller
             ->pluck('total', 'status')
             ->toArray();
 
-        return view('admin.kegiatan.absensi.rekap', compact('kegiatan', 'absensis', 'absensiPerKelas', 'stats', 'kelasFilterList'));
+        // ── Hitung total SEMUA santri aktif ──
+        $allSantriQuery = Santri::where('status', 'Aktif');
+        if ($request->filled('kelas_id')) {
+            $allSantriQuery->whereHas('kelasSantri', function($q) use ($request) {
+                $q->where('id_kelas', $request->kelas_id);
+            });
+        }
+        $totalSantriEligible = $allSantriQuery->count();
+
+        // Hitung santri unik yang sudah tercatat absensi (sesuai filter)
+        $recordedQuery = AbsensiKegiatan::where('kegiatan_id', $kegiatan_id);
+        if ($request->filled('tanggal')) {
+            $recordedQuery->whereDate('tanggal', $request->tanggal);
+        }
+        if ($request->filled('bulan')) {
+            $recordedQuery->whereMonth('tanggal', date('m', strtotime($request->bulan)))
+                          ->whereYear('tanggal', date('Y', strtotime($request->bulan)));
+        }
+        if ($request->filled('kelas_id')) {
+            $recordedQuery->whereHas('santri.kelasSantri', function($q) use ($request) {
+                $q->where('id_kelas', $request->kelas_id);
+            });
+        }
+        $santriSudahAbsen = $recordedQuery->distinct('id_santri')->count('id_santri');
+        $belumAbsen = max(0, $totalSantriEligible - $santriSudahAbsen);
+
+        // Persentase kehadiran berdasarkan total semua santri aktif
+        $totalRecorded = array_sum($stats);
+        $hadirCount = ($stats['Hadir'] ?? 0) + ($stats['Terlambat'] ?? 0);
+        $persenHadir = $totalSantriEligible > 0 ? round($hadirCount / $totalSantriEligible * 100, 1) : 0;
+
+        // Daftar santri yang belum absen (selalu ditampilkan)
+        $santriBelumAbsen = collect();
+
+        // Bangun query ID santri yang sudah absen (sesuai filter aktif)
+        $sudahAbsenQuery = AbsensiKegiatan::where('kegiatan_id', $kegiatan_id);
+        if ($request->filled('tanggal')) {
+            $sudahAbsenQuery->whereDate('tanggal', $request->tanggal);
+        }
+        if ($request->filled('bulan')) {
+            $sudahAbsenQuery->whereMonth('tanggal', date('m', strtotime($request->bulan)))
+                            ->whereYear('tanggal', date('Y', strtotime($request->bulan)));
+        }
+        if ($request->filled('kelas_id')) {
+            $sudahAbsenQuery->whereHas('santri.kelasSantri', function($q) use ($request) {
+                $q->where('id_kelas', $request->kelas_id);
+            });
+        }
+        $idSantriSudahAbsen = $sudahAbsenQuery->pluck('id_santri')->unique()->toArray();
+
+        $belumQuery = Santri::where('status', 'Aktif');
+        if ($request->filled('kelas_id')) {
+            $belumQuery->whereHas('kelasSantri', function($q) use ($request) {
+                $q->where('id_kelas', $request->kelas_id);
+            });
+        }
+        $santriBelumAbsen = $belumQuery
+            ->whereNotIn('id_santri', $idSantriSudahAbsen)
+            ->with(['kelasPrimary.kelas'])
+            ->orderBy('nama_lengkap')
+            ->get();
+
+        return view('admin.kegiatan.absensi.rekap', compact(
+            'kegiatan', 'absensis', 'absensiPerKelas', 'stats', 'kelasFilterList',
+            'totalSantriEligible', 'santriSudahAbsen', 'belumAbsen', 'persenHadir',
+            'totalRecorded', 'hadirCount', 'santriBelumAbsen'
+        ));
     }
 
     /**

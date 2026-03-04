@@ -100,7 +100,7 @@
     <div class="detail-section">
         <h4><i class="fas fa-chart-line"></i> Visualisasi Perubahan Saldo</h4>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+        <div class="grid-2col" style="margin-bottom: 20px;">
             <div style="background: linear-gradient(135deg, #E8F7F2, #D4F1E3); padding: 16px; border-radius: 12px; text-align: center;">
                 <i class="fas fa-arrow-down" style="font-size: 2rem; color: #6FBA9D; margin-bottom: 8px;"></i>
                 <p style="margin: 0 0 4px 0; color: var(--text-light); font-size: 0.85rem;">Nominal Pemasukan</p>

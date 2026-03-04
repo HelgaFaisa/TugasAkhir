@@ -1,3 +1,6 @@
+﻿
+
+
 <?php $__env->startSection('title', 'Riwayat Uang Saku'); ?>
 
 <?php $__env->startSection('content'); ?>
@@ -69,6 +72,7 @@
 
 <div class="table-container" style="margin-top: 14px;">
     <?php if($riwayatUangSaku->count() > 0): ?>
+        <div class="table-wrapper">
         <table class="data-table">
             <thead>
                 <tr>
@@ -113,6 +117,7 @@
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </tbody>
         </table>
+        </div>
         
         
         <div style="margin-top: 14px;">

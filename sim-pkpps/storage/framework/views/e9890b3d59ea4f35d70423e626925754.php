@@ -1,3 +1,6 @@
+﻿
+
+
 <?php $__env->startSection('title', 'Pembayaran SPP'); ?>
 
 <?php $__env->startSection('content'); ?>
@@ -115,12 +118,13 @@
         </div>
         <div style="font-size:11px;color:#666;">
             Periode: <strong><?php echo e($bulanIndo[$bulan]??''); ?> <?php echo e($tahun); ?></strong>
-            <?php if($tab==='sudah-bayar'): ?> &nbsp;·&nbsp; <i class="fas fa-sort-amount-down"></i> Terbaru bayar di atas <?php endif; ?>
+            <?php if($tab==='sudah-bayar'): ?> &nbsp;Â·&nbsp; <i class="fas fa-sort-amount-down"></i> Terbaru bayar di atas <?php endif; ?>
         </div>
     </div>
 
     
     <div style="overflow-x:auto;">
+        <div class="table-wrapper">
         <table class="data-table">
             <thead>
                 <tr>
@@ -248,6 +252,7 @@
                 <?php endif; ?>
             </tbody>
         </table>
+        </div>
     </div>
 
     

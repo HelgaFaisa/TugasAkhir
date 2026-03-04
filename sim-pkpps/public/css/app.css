@@ -142,6 +142,7 @@ body {
 .app-wrapper {
     display: flex;
     min-height: 100vh;
+    align-items: flex-start;
 }
 
 /* ===================================
@@ -154,9 +155,17 @@ body {
     transition: var(--transition-base);
     flex-shrink: 0;
     box-shadow: 4px 0 15px rgba(111, 186, 157, 0.15);
-    position: relative;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
     z-index: 100;
 }
+
+/* Hide sidebar scrollbar but keep it functional */
+.sidebar::-webkit-scrollbar { width: 0; }
+.sidebar { scrollbar-width: none; }
 
 .sidebar-header {
     padding: 16px 12px;
@@ -314,6 +323,136 @@ body {
     z-index: 1001;
 }
 
+/* ===== SIDEBAR BRAND ===== */
+.sidebar-header {
+    position: relative;
+}
+
+.sidebar-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 14px 10px 12px;
+    text-align: center;
+}
+
+/* Icon wrapper dengan ring animasi */
+.sidebar-brand-icon-wrapper {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+}
+
+.sidebar-brand-icon-wrapper::before {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255, 255, 255, 0.3);
+    animation: brand-pulse 3s ease-in-out infinite;
+}
+
+.sidebar-brand-icon-wrapper::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.03));
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+@keyframes brand-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.4; }
+    50% { transform: scale(1.12); opacity: 1; }
+}
+
+.sidebar-brand-icon {
+    position: relative;
+    z-index: 1;
+    font-size: 1.5rem;
+    color: #FFFFFF;
+    filter: drop-shadow(0 1px 4px rgba(0,0,0,0.15));
+    animation: brand-float 4s ease-in-out infinite;
+}
+
+@keyframes brand-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+/* Teks nama utama */
+.sidebar-brand-name {
+    display: block;
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: 0.82rem;
+    letter-spacing: 0.05em;
+    line-height: 1.3;
+    color: #FFFFFF;
+}
+
+/* Sub-label PKPPS */
+.sidebar-brand-sub {
+    display: block;
+    font-family: 'Cinzel', serif;
+    font-weight: 600;
+    font-size: 0.55rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 2px;
+}
+
+/* Ornamen garis + titik */
+.sidebar-brand-ornament {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 6px;
+}
+
+.ornament-line {
+    width: 22px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45));
+}
+
+.ornament-line:last-child {
+    background: linear-gradient(90deg, rgba(255,255,255,0.45), transparent);
+}
+
+.ornament-dot {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    box-shadow: 0 0 4px rgba(255,255,255,0.6);
+}
+
+/* ===== COLLAPSED (desktop) — teks hilang, icon saja ===== */
+.sidebar.collapsed .sidebar-brand-text,
+.sidebar.collapsed .sidebar-brand-ornament {
+    display: none;
+}
+
+.sidebar.collapsed .sidebar-brand {
+    padding: 12px 6px;
+}
+
+.sidebar.collapsed .sidebar-brand-icon-wrapper {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 0;
+}
+
+.sidebar.collapsed .sidebar-brand-icon {
+    font-size: 1.1rem;
+}
+
 /* ===================================
    6. MAIN CONTENT
    =================================== */
@@ -358,6 +497,8 @@ body {
 .main-content {
     padding: clamp(10px, 1.2vw, 16px);
     flex-grow: 1;
+    transition: opacity 0.3s ease-in;
+    opacity: 1;
 }
 
 /* ===================================
@@ -491,6 +632,43 @@ body {
     border-radius: var(--border-radius);
     box-shadow: var(--shadow-sm);
     border: 1px solid var(--primary-light);
+}
+
+/* ===================================
+   RESPONSIVE GRID UTILITY CLASSES
+   Replaces inline grid-template-columns styles
+   =================================== */
+.grid-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.grid-main-sidebar {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 18px;
+    align-items: start;
+}
+
+.grid-main-sidebar-lg {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 18px;
+    align-items: start;
+}
+
+.grid-auto-fill {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.grid-content-auto {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 14px;
+    align-items: start;
 }
 
 /* ===================================
@@ -871,6 +1049,17 @@ tr.spp-telat:hover {
     padding: 12px;
     box-shadow: var(--shadow-sm);
     border: 1px solid var(--primary-light);
+}
+
+/* Table Wrapper - Horizontal scroll on mobile */
+.table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 16px;
+}
+
+.table-wrapper .data-table {
+    min-width: 600px;
 }
 
 /* ===================================
@@ -1461,18 +1650,72 @@ input[type="checkbox"]:hover {
         padding: 10px;
     }
 
+    /* Sidebar Brand — mobile: hide text, show icon only */
+    .sidebar-brand-text,
+    .sidebar-brand-ornament {
+        display: none;
+    }
+
+    .sidebar-brand {
+        padding: 10px 6px;
+    }
+
+    .sidebar-brand-icon-wrapper {
+        width: 32px;
+        height: 32px;
+        margin-bottom: 0;
+    }
+
+    .sidebar-brand-icon {
+        font-size: 1.1rem;
+    }
+
+    /* Tapi kalau sidebar mobile-active (terbuka penuh), tampilkan teks */
+    .sidebar.mobile-active .sidebar-brand-text,
+    .sidebar.mobile-active .sidebar-brand-ornament {
+        display: flex;
+    }
+
+    .sidebar.mobile-active .sidebar-brand-text {
+        display: block;
+    }
+
+    .sidebar.mobile-active .sidebar-brand {
+        padding: 14px 10px 12px;
+    }
+
+    .sidebar.mobile-active .sidebar-brand-icon-wrapper {
+        width: 44px;
+        height: 44px;
+        margin-bottom: 8px;
+    }
+
+    .sidebar.mobile-active .sidebar-brand-icon {
+        font-size: 1.5rem;
+    }
+
     .page-header h2 {
         font-size: clamp(0.9rem, 1.5vw, 1.1rem);
     }
 
-    /* Cards */
+    /* Cards - 2 columns on tablet */
     .row-cards {
-        grid-template-columns: 1fr;
-        gap: 16px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
     }
 
     .card-value {
         font-size: 1.3rem;
+    }
+
+    /* Responsive grid utilities */
+    .grid-main-sidebar,
+    .grid-main-sidebar-lg {
+        grid-template-columns: 1fr;
+    }
+
+    .grid-content-auto {
+        grid-template-columns: 1fr;
     }
 
     /* Tables */
@@ -1680,12 +1923,6 @@ input[type="checkbox"]:hover {
     .data-table td {
         padding: 5px 4px;
     }
-    
-    /* Hide less important columns */
-    .data-table th:nth-child(2),
-    .data-table td:nth-child(2) {
-        display: none;
-    }
 
     /* Detail Header */
     .detail-header {
@@ -1724,6 +1961,30 @@ input[type="checkbox"]:hover {
     
     .kelas-grid {
         grid-template-columns: 1fr;
+    }
+
+    /* Row Cards - 2 columns on small mobile */
+    .row-cards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    .row-cards-5 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .kpi-grid-kegiatan {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    /* Responsive grid utilities - stack on small mobile */
+    .grid-2col {
+        grid-template-columns: 1fr;
+    }
+
+    .grid-auto-fill {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
@@ -1796,9 +2057,9 @@ input[type="checkbox"]:hover {
         max-height: 200px !important;
     }
 
-    /* Cards Statistik */
+    /* Cards Statistik - 2 columns */
     .row-cards {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
         gap: 8px;
     }
     
@@ -1825,14 +2086,14 @@ input[type="checkbox"]:hover {
 }
 
 @media (max-width: 480px) {
-    /* Quick Links Grid - Full Width */
+    /* Quick Links Grid - 2 columns */
     .content-box > div[style*="grid"] {
-        grid-template-columns: 1fr !important;
+        grid-template-columns: repeat(2, 1fr) !important;
     }
     
     /* Card Values */
     .card-value {
-        font-size: 1.3rem !important;
+        font-size: 1.3rem;
     }
     
     /* Page Header */
@@ -1871,11 +2132,11 @@ input[type="checkbox"]:hover {
 
 @media (max-width: 480px) {
     .row-cards {
-        grid-template-columns: 1fr !important;
+        grid-template-columns: repeat(2, 1fr);
     }
     
     .card-value {
-        font-size: 1.3rem !important;
+        font-size: 1.3rem;
     }
 }
 
@@ -2073,7 +2334,7 @@ input[type="checkbox"]:hover {
 
 @media (max-width: 480px) {
     .row-cards-5 {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
     }
     .spp-summary {
         grid-template-columns: 1fr;
@@ -2536,7 +2797,7 @@ input[type="checkbox"]:hover {
 }
 
 @media (max-width: 480px) {
-    .kpi-grid-kegiatan { grid-template-columns: 1fr; }
+    .kpi-grid-kegiatan { grid-template-columns: repeat(2, 1fr); gap: 10px; }
 }
 
 /* ===================================

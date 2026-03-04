@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'Detail Kesehatan Santri')
 
@@ -289,7 +289,7 @@
         <form action="{{ route('admin.kesehatan-santri.destroy', $kesehatanSantri) }}" 
               method="POST" 
               style="display: inline;"
-              onsubmit="return confirm('âš ï¸ Yakin ingin menghapus data kesehatan ini?\n\nData yang dihapus tidak dapat dikembalikan!')">
+              onsubmit="return confirm('Ã¢Å¡Â Ã¯Â¸Â Yakin ingin menghapus data kesehatan ini?\n\nData yang dihapus tidak dapat dikembalikan!')">
             @csrf
             @method('DELETE')
             <button type="submit" class="btn btn-danger">
@@ -310,6 +310,8 @@
             {{ $riwayatKesehatan->count() }} data terakhir
         </span>
     </h3>
+    
+    <div class="table-wrapper">
     
     <table class="data-table">
         <thead>
@@ -360,6 +362,8 @@
             @endforeach
         </tbody>
     </table>
+    
+    </div>
     
     <div style="text-align: center; margin-top: 14px;">
         <a href="{{ route('admin.kesehatan-santri.riwayat', $kesehatanSantri->id_santri) }}" 

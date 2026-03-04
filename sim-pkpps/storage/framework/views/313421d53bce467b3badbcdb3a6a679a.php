@@ -392,6 +392,7 @@
         <details>
             <summary><?php echo e($kelompok['nama_kelompok']); ?> (<?php echo e(count($kelompok['kelas'])); ?> kelas)</summary>
             <div class="kelas-detail-body">
+                <div class="table-wrapper">
                 <table class="data-table" style="font-size: 0.85rem;">
                     <thead>
                         <tr>
@@ -416,6 +417,7 @@
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </tbody>
                 </table>
+                </div>
             </div>
         </details>
     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>

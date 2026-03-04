@@ -96,17 +96,6 @@
 </div>
 
 
-<?php if($dataGrafik->count() > 0): ?>
-<div class="content-box" style="margin-bottom: 14px;">
-    <h3 style="margin: 0 0 16px 0; color: var(--primary-color);">
-        <i class="fas fa-chart-bar"></i> Kunjungan 6 Bulan Terakhir
-        <span style="font-size: 0.78rem; font-weight: 400; color: var(--text-light); margin-left: 6px;">per status</span>
-    </h3>
-    <canvas id="chartKesehatan" style="max-height: 240px;"></canvas>
-</div>
-<?php endif; ?>
-
-
 <div class="content-box" style="margin-bottom: 14px;">
     <form method="GET" action="<?php echo e(route('santri.kesehatan.index')); ?>" id="filterForm">
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 11px; align-items: end;">

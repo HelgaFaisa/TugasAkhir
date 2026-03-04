@@ -1,4 +1,4 @@
-{{-- resources/views/admin/kepulangan/show.blade.php --}}
+﻿{{-- resources/views/admin/kepulangan/show.blade.php --}}
 
 @extends('layouts.app')
 
@@ -67,19 +67,19 @@
                 <td>
                     @if($kepulangan->is_aktif)
                         <span style="display: inline-block; background: #28a745; color: white; padding: 4px 10px; border-radius: 4px; font-size: 0.9rem;">
-                            ðŸ  Sedang Izin
+                            Ã°Å¸ÂÂ  Sedang Izin
                         </span>
                     @elseif($kepulangan->is_terlambat)
                         <span style="display: inline-block; background: #dc3545; color: white; padding: 4px 10px; border-radius: 4px; font-size: 0.9rem;">
-                            â° Terlambat Kembali
+                            Ã¢ÂÂ° Terlambat Kembali
                         </span>
                     @elseif($kepulangan->status == 'Selesai')
                         <span style="display: inline-block; background: #6c757d; color: white; padding: 4px 10px; border-radius: 4px; font-size: 0.9rem;">
-                            âœ… Sudah Selesai
+                            Ã¢Å“â€¦ Sudah Selesai
                         </span>
                     @else
                         <span style="display: inline-block; background: #81C6E8; color: white; padding: 4px 10px; border-radius: 4px; font-size: 0.9rem;">
-                            ðŸ“… Belum Dimulai
+                            Ã°Å¸â€œâ€¦ Belum Dimulai
                         </span>
                     @endif
                 </td>
@@ -287,6 +287,7 @@
         <i class="fas fa-list"></i> Riwayat Kepulangan Lainnya (5 Terakhir)
     </h4>
     <div style="overflow-x: auto;">
+        <div class="table-wrapper">
         <table class="data-table">
             <thead>
                 <tr>
@@ -329,6 +330,7 @@
                 @endforeach
             </tbody>
         </table>
+        </div>
     </div>
 </div>
 @endif

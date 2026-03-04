@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'Data Kesehatan Santri')
 
@@ -91,6 +91,7 @@
 
     <!-- Data Table -->
     @if($kesehatanSantri->count() > 0)
+        <div class="table-wrapper">
         <table class="data-table">
             <thead>
                 <tr>
@@ -182,6 +183,7 @@
                 @endforeach
             </tbody>
         </table>
+        </div>
         
         <!-- Pagination -->
         <div style="margin-top: 14px; display: flex; justify-content: center;">

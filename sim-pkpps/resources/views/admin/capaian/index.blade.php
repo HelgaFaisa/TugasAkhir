@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
 <div class="page-header">
@@ -92,6 +92,7 @@
     @endif
     
     @if($santriData->count() > 0)
+        <div class="table-wrapper">
         <table class="data-table">
             <thead>
                 <tr>
@@ -150,6 +151,7 @@
                 @endforeach
             </tbody>
         </table>
+        </div>
     @else
         <div class="empty-state">
             <i class="fas fa-inbox"></i>

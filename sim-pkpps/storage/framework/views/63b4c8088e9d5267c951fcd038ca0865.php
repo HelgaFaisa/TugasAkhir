@@ -1,3 +1,5 @@
+﻿
+
 <?php $__env->startSection('content'); ?>
 <div class="page-header">
     <h2><i class="fas fa-id-card"></i> Kelola Kartu RFID Santri</h2>
@@ -39,6 +41,7 @@
     </div>
 
     <?php if($santris->count() > 0): ?>
+        <div class="table-wrapper">
         <table class="data-table">
             <thead>
                 <tr>
@@ -94,6 +97,7 @@
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </tbody>
         </table>
+        </div>
 
         <div style="margin-top: 14px;">
             <?php echo e($santris->links()); ?>

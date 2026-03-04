@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
 <style>
@@ -115,7 +115,7 @@
         @if($streak > 0)
             <div class="insight-box i-success">
                 <i class="fas fa-fire"></i>
-                Streak kehadiran beruntun: <strong>{{ $streak }} kegiatan</strong> ðŸ”¥
+                Streak kehadiran beruntun: <strong>{{ $streak }} kegiatan</strong> Ã°Å¸â€Â¥
             </div>
         @endif
         @if(($stats->total ?? 0) > 0)
@@ -131,6 +131,7 @@
 <div class="chart-box">
     <h4><i class="fas fa-tasks"></i> Kehadiran Per Kegiatan</h4>
     @if($perKegiatan->count() > 0)
+        <div class="table-wrapper">
         <table class="data-table" style="font-size:0.85rem;">
             <thead>
                 <tr>
@@ -159,6 +160,7 @@
                 @endforeach
             </tbody>
         </table>
+        </div>
     @else
         <p style="color:var(--text-light); font-size:0.85rem;">Belum ada data kehadiran per kegiatan.</p>
     @endif
@@ -168,6 +170,7 @@
 <div class="chart-box">
     <h4><i class="fas fa-history"></i> Riwayat Absensi Terbaru</h4>
     @if($riwayatTerbaru->count() > 0)
+        <div class="table-wrapper">
         <table class="data-table" style="font-size:0.85rem;">
             <thead><tr><th>Tanggal</th><th>Kegiatan</th><th>Kategori</th><th class="text-center">Status</th></tr></thead>
             <tbody>
@@ -181,6 +184,7 @@
                 @endforeach
             </tbody>
         </table>
+        </div>
     @else
         <p style="color:var(--text-light);">Belum ada riwayat.</p>
     @endif

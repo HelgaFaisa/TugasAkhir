@@ -237,31 +237,67 @@ class KegiatanController extends Controller
             ->whereDate('tanggal', $tanggal)
             ->orderBy('waktu_absen', 'desc')->get();
 
-        if ($kegiatan->isForAllClasses()) {
+        $isUmum = $kegiatan->isForAllClasses();
+
+        // Grup absensi per kelas kegiatan (khusus) atau kelas_name (umum)
+        if ($isUmum) {
             $absensiPerKelas = $absensis->groupBy(fn($item) => $item->santri->kelas_name ?? 'Belum Ada Kelas')->sortKeys();
         } else {
             $absensiPerKelas = collect();
             foreach ($kegiatan->kelasKegiatan as $kelas) {
-                $kelasAbsensis = $absensis->filter(fn($item) => $item->santri->kelasSantri->contains('id_kelas', $kelas->id));
-                if ($kelasAbsensis->count() > 0) $absensiPerKelas[$kelas->nama_kelas] = $kelasAbsensis;
+                $filtered = $absensis->filter(fn($item) => $item->santri->kelasSantri->contains('id_kelas', $kelas->id));
+                if ($filtered->count() > 0) $absensiPerKelas[$kelas->nama_kelas] = $filtered;
             }
+            // Sisanya yang tidak cocok kelas manapun
+            $placedIds = $absensiPerKelas->flatten()->pluck('id')->toArray();
+            $lainnya = $absensis->filter(fn($item) => !$absensiPerKelas->flatten()->contains('id', $item->id));
+            if ($lainnya->count() > 0) $absensiPerKelas['Kelas Lain'] = $lainnya;
         }
 
         $stats       = [
-            'hadir' => $absensis->where('status', 'Hadir')->count(),
-            'izin'  => $absensis->where('status', 'Izin')->count(),
-            'sakit' => $absensis->where('status', 'Sakit')->count(),
-            'alpa'  => $absensis->where('status', 'Alpa')->count(),
+            'hadir'     => $absensis->where('status', 'Hadir')->count(),
+            'terlambat' => $absensis->where('status', 'Terlambat')->count(),
+            'izin'      => $absensis->where('status', 'Izin')->count(),
+            'sakit'     => $absensis->where('status', 'Sakit')->count(),
+            'alpa'      => $absensis->where('status', 'Alpa')->count(),
         ];
-        $totalSantri = $kegiatan->isForAllClasses()
-            ? Santri::where('status', 'Aktif')->count()
-            : $kegiatan->getEligibleSantris()->count();
+        $totalSantri = Santri::where('status', 'Aktif')->count();
 
-        $stats['belum_absen']  = $totalSantri - $absensis->count();
+        $stats['belum_absen']  = max(0, $totalSantri - $absensis->count());
+        $stats['sudah_absen']  = $absensis->count();
         $stats['total']        = $totalSantri;
         $stats['persen_hadir'] = $totalSantri > 0 ? round(($stats['hadir'] / $totalSantri) * 100, 1) : 0;
 
-        return view('admin.kegiatan.data.partials.detail-modal', compact('kegiatan', 'absensis', 'absensiPerKelas', 'stats', 'tanggal'));
+        // Daftar santri belum absen, di-group per kelas kegiatan (khusus) atau kelasPrimary (umum)
+        $idSantriSudahAbsen = $absensis->pluck('id_santri')->toArray();
+        $allBelumAbsen = Santri::where('status', 'Aktif')
+            ->whereNotIn('id_santri', $idSantriSudahAbsen)
+            ->with(['kelasSantri.kelas', 'kelasPrimary.kelas'])
+            ->orderBy('nama_lengkap')
+            ->get();
+
+        if ($isUmum) {
+            $santriBelumAbsenPerKelas = $allBelumAbsen->groupBy(function($s) {
+                return optional(optional($s->kelasPrimary)->kelas)->nama_kelas ?? 'Tanpa Kelas';
+            })->sortKeys();
+        } else {
+            $santriBelumAbsenPerKelas = collect();
+            $placedBelumIds = [];
+            foreach ($kegiatan->kelasKegiatan as $kelas) {
+                $inKelas = $allBelumAbsen->filter(function($s) use ($kelas, &$placedBelumIds) {
+                    if (in_array($s->id_santri, $placedBelumIds)) return false;
+                    return $s->kelasSantri->contains('id_kelas', $kelas->id);
+                });
+                foreach ($inKelas as $s) $placedBelumIds[] = $s->id_santri;
+                if ($inKelas->count() > 0) $santriBelumAbsenPerKelas[$kelas->nama_kelas] = $inKelas;
+            }
+            $lainnyaBelum = $allBelumAbsen->whereNotIn('id_santri', $placedBelumIds);
+            if ($lainnyaBelum->count() > 0) $santriBelumAbsenPerKelas['Kelas Lain'] = $lainnyaBelum;
+        }
+
+        $santriBelumAbsen = $allBelumAbsen; // kept for count reference
+
+        return view('admin.kegiatan.data.partials.detail-modal', compact('kegiatan', 'absensis', 'absensiPerKelas', 'stats', 'tanggal', 'santriBelumAbsen', 'santriBelumAbsenPerKelas'));
     }
 
     /**

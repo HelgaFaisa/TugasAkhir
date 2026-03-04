@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
 <style>
@@ -121,6 +121,7 @@
 @if(!empty($breakdownPerKelas) && count($breakdownPerKelas) > 0)
 <div class="chart-box">
     <h4><i class="fas fa-school"></i> Breakdown Per Kelas</h4>
+    <div class="table-wrapper">
     <table class="data-table" style="font-size:0.85rem;">
         <thead><tr><th>Kelas</th><th class="text-center">Total</th><th class="text-center">Hadir</th><th class="text-center" style="min-width:180px;">% Kehadiran</th></tr></thead>
         <tbody>
@@ -139,6 +140,7 @@
             @endforeach
         </tbody>
     </table>
+    </div>
 </div>
 @endif
 

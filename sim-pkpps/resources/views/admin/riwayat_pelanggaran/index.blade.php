@@ -1,4 +1,4 @@
-{{-- resources/views/admin/riwayat_pelanggaran/index.blade.php --}}
+﻿{{-- resources/views/admin/riwayat_pelanggaran/index.blade.php --}}
 @extends('layouts.app')
 
 @section('title', 'Riwayat Pelanggaran')
@@ -155,6 +155,7 @@
     </div>
 
     @if($data->isNotEmpty())
+        <div class="table-wrapper">
         <table class="data-table">
             <thead>
                 <tr>
@@ -233,6 +234,7 @@
                 @endforeach
             </tbody>
         </table>
+        </div>
 
         <!-- Pagination -->
         <div style="margin-top: 14px;">

@@ -4,7 +4,7 @@
     <li>
         <a href="<?php echo e(route('santri.dashboard')); ?>" class="<?php echo e(Request::routeIs('santri.dashboard') ? 'active' : ''); ?>">
             <i class="fas fa-tachometer-alt"></i>
-            <span>Dashboard Progres</span>
+            <span>Dashboard</span>
         </a>
     </li>
 
@@ -71,16 +71,4 @@
             <span>Berita</span>
         </a>
     </li>
-    <li>
-
-    
-    <li class="logout-item">
-        <form action="<?php echo e(route('santri.logout')); ?>" method="POST" id="logout-form-santri" style="display: none;">
-            <?php echo csrf_field(); ?>
-        </form>
-        <a href="#" onclick="event.preventDefault(); if(confirm('Yakin ingin logout?')) document.getElementById('logout-form-santri').submit();">
-            <i class="fas fa-sign-out-alt"></i>
-            <span>Logout</span>
-        </a>
-    </li>
-</ul><?php /**PATH C:\xampp\htdocs\TugasAkhir\sim-pkpps\resources\views/layouts/santri-wali-sidebar.blade.php ENDPATH**/ ?>
+    <li><?php /**PATH C:\xampp\htdocs\TugasAkhir\sim-pkpps\resources\views/layouts/santri-wali-sidebar.blade.php ENDPATH**/ ?>

@@ -1,3 +1,6 @@
+﻿
+
+
 <?php $__env->startSection('title', 'Manajemen Akun Santri'); ?>
 
 <?php $__env->startSection('content'); ?>
@@ -23,6 +26,7 @@
 
     
     <h3>Daftar Akun Santri (<?php echo e($users->count()); ?>)</h3>
+    <div class="table-wrapper">
     <table class="data-table">
         <thead>
             <tr>
@@ -58,6 +62,7 @@
             <?php endif; ?>
         </tbody>
     </table>
+    </div>
 
     
     <h3 style="margin-top:22px;">
@@ -75,6 +80,8 @@
         </form>
     </div>
     <?php endif; ?>
+
+    <div class="table-wrapper">
 
     <table class="data-table">
         <thead>
@@ -124,6 +131,8 @@
             <?php endif; ?>
         </tbody>
     </table>
+
+    </div>
 </div>
 <?php $__env->stopSection(); ?>
 <?php echo $__env->make('layouts.app', ['isAdmin' => true], \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\TugasAkhir\sim-pkpps\resources\views/admin/users/santri_accounts.blade.php ENDPATH**/ ?>

@@ -1,3 +1,5 @@
+﻿
+
 <?php $__env->startSection('title', 'Data Santri'); ?>
 
 <?php $__env->startSection('content'); ?>
@@ -58,6 +60,8 @@
             <?php endif; ?>
         </form>
     </div>
+
+    <div class="table-wrapper">
 
     <table class="data-table">
         <thead>
@@ -142,6 +146,8 @@
             <?php endif; ?>
         </tbody>
     </table>
+
+    </div>
 
     <?php if($santris->count() > 0): ?>
         <div style="margin-top: 14px; padding-top: 20px; border-top: 1px solid #E8F7F2;">

@@ -1,4 +1,4 @@
-@extends('layouts.app', ['isAdmin' => true])
+﻿@extends('layouts.app', ['isAdmin' => true])
 
 @section('title', 'Data Santri')
 
@@ -58,6 +58,8 @@
             @endif
         </form>
     </div>
+
+    <div class="table-wrapper">
 
     <table class="data-table">
         <thead>
@@ -138,6 +140,8 @@
             @endforelse
         </tbody>
     </table>
+
+    </div>
 
     @if($santris->count() > 0)
         <div style="margin-top: 14px; padding-top: 20px; border-top: 1px solid #E8F7F2;">

@@ -12,7 +12,7 @@
 <li>
     <a href="{{ route('admin.kegiatan.index') }}"
        class="{{ Request::routeIs('admin.kegiatan.index') ? 'active' : '' }}">
-        <i class="fas fa-calendar-check"></i><span>Dashboard Absensi</span>
+        <i class="fas fa-calendar-check"></i><span>Absensi & Kegiatan</span>
     </a>
 </li>
 @endif
@@ -259,13 +259,3 @@
     </a>
 </li>
 @endif
-
-{{-- ── LOGOUT ── --}}
-<li class="logout-item">
-    <form action="{{ route('admin.logout') }}" method="POST" style="display:inline;">
-        @csrf
-        <a href="#" onclick="event.preventDefault(); this.closest('form').submit();">
-            <i class="fas fa-sign-out-alt"></i><span>Logout</span>
-        </a>
-    </form>
-</li>

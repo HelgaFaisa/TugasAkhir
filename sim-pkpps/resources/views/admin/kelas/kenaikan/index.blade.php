@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'Kenaikan Kelas Massal')
 
@@ -85,6 +85,8 @@
             </p>
         </div>
 
+        <div class="table-wrapper">
+
         <table class="data-table">
             <thead>
                 <tr>
@@ -132,7 +134,7 @@
                                     @endforeach
                                 </select>
                             @else
-                                <span class="text-muted" style="font-size:0.85rem;">—</span>
+                                <span class="text-muted" style="font-size:0.85rem;"></span>
                             @endif
                         </td>
                         <td style="text-align: center;">
@@ -163,6 +165,8 @@
                 @endforeach
             </tbody>
         </table>
+
+        </div>
     </div>
 @else
     <div class="content-box">
@@ -196,7 +200,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
-    // ── Enable/disable tombol Naikkan berdasarkan pilihan dropdown ──
+    // â”€â”€ Enable/disable tombol Naikkan berdasarkan pilihan dropdown â”€â”€
     document.querySelectorAll('.target-kelas-select').forEach(function (select) {
         var kelasId = select.dataset.kelasId;
         var button  = document.querySelector('.btn-naikkan[data-kelas-id="' + kelasId + '"]');
@@ -213,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // ── Handle klik tombol Naikkan ──
+    // â”€â”€ Handle klik tombol Naikkan â”€â”€
     document.querySelectorAll('.btn-naikkan').forEach(function (button) {
         button.addEventListener('click', function (e) {
             e.preventDefault();

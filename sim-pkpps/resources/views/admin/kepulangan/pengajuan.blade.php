@@ -1,4 +1,4 @@
-{{-- resources/views/admin/kepulangan/pengajuan.blade.php --}}
+﻿{{-- resources/views/admin/kepulangan/pengajuan.blade.php --}}
 
 @extends('layouts.app')
 
@@ -98,6 +98,7 @@
 
     {{-- Data Table --}}
     <div style="overflow-x: auto;">
+        <div class="table-wrapper">
         <table class="data-table">
             <thead>
                 <tr>
@@ -197,6 +198,7 @@
                 @endforelse
             </tbody>
         </table>
+        </div>
     </div>
 
     {{-- Pagination --}}

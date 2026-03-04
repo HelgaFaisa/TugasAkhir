@@ -1,10 +1,10 @@
-{{-- resources/views/admin/dashboard/_jadwal-kegiatan.blade.php --}}
+﻿{{-- resources/views/admin/dashboard/_jadwal-kegiatan.blade.php --}}
 <div class="content-box" style="margin-bottom:16px;">
     <h4 style="margin:0 0 12px;font-size:.88rem;font-weight:700;color:var(--text-color);display:flex;align-items:center;gap:8px;">
         <span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;background:linear-gradient(135deg,var(--primary-color),var(--primary-dark));border-radius:6px;flex-shrink:0;">
             <i class="fas fa-calendar-day" style="font-size:.7rem;color:#fff;"></i>
         </span>
-        Jadwal Kegiatan — {{ $hari }}
+        Jadwal Kegiatan {{ $hari }}
     </h4>
 
     @if($kegiatan->isEmpty())
@@ -14,6 +14,7 @@
         </div>
     @else
     <div class="table-responsive" style="overflow-x:auto;">
+        <div class="table-wrapper">
         <table class="data-table" style="margin-top:0;">
             <thead>
                 <tr>
@@ -40,7 +41,7 @@
                     </td>
                     <td style="font-size:.78rem;font-weight:600;white-space:nowrap;color:var(--text-color);">
                         {{ is_string($k->waktu_mulai) ? $k->waktu_mulai : $k->waktu_mulai->format('H:i') }}
-                        <span style="color:var(--text-light);margin:0 2px;">–</span>
+                        <span style="color:var(--text-light);margin:0 2px;"> - </span>
                         {{ is_string($k->waktu_selesai) ? $k->waktu_selesai : $k->waktu_selesai->format('H:i') }}
                     </td>
                     <td>
@@ -68,13 +69,14 @@
                                 <span style="color:#bbb;">({{ $k->total_absensi }} data)</span>
                             </small>
                         @else
-                            <small class="text-muted">—</small>
+                            <small class="text-muted"></small>
                         @endif
                     </td>
                 </tr>
                 @endforeach
             </tbody>
         </table>
+        </div>
     </div>
     @endif
 </div>

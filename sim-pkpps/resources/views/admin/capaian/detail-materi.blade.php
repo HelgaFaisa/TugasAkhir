@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
 <div class="page-header">
@@ -34,7 +34,7 @@
             <option value="">Semua Semester</option>
             @foreach($semesters as $semester)
                 <option value="{{ $semester->id_semester }}" {{ $selectedSemester == $semester->id_semester ? 'selected' : '' }}>
-                    {{ $semester->nama_semester }} @if($semester->is_active) â˜… @endif
+                    {{ $semester->nama_semester }} @if($semester->is_active) Ã¢Ëœâ€¦ @endif
                 </option>
             @endforeach
         </select>
@@ -88,6 +88,7 @@
     </h4>
     
     @if($capaians->count() > 0)
+        <div class="table-wrapper">
         <table class="data-table">
             <thead>
                 <tr>
@@ -151,6 +152,7 @@
                 @endforeach
             </tbody>
         </table>
+        </div>
     @else
         <div class="empty-state">
             <i class="fas fa-clipboard-list"></i>

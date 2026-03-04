@@ -4,7 +4,7 @@
     <li>
         <a href="{{ route('santri.dashboard') }}" class="{{ Request::routeIs('santri.dashboard') ? 'active' : '' }}">
             <i class="fas fa-tachometer-alt"></i>
-            <span>Dashboard Progres</span>
+            <span>Dashboard</span>
         </a>
     </li>
 
@@ -72,15 +72,3 @@
         </a>
     </li>
     <li>
-
-    {{-- Logout --}}
-    <li class="logout-item">
-        <form action="{{ route('santri.logout') }}" method="POST" id="logout-form-santri" style="display: none;">
-            @csrf
-        </form>
-        <a href="#" onclick="event.preventDefault(); if(confirm('Yakin ingin logout?')) document.getElementById('logout-form-santri').submit();">
-            <i class="fas fa-sign-out-alt"></i>
-            <span>Logout</span>
-        </a>
-    </li>
-</ul>

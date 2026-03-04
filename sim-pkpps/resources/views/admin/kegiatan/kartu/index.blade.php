@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
 <div class="page-header">
@@ -39,6 +39,7 @@
     </div>
 
     @if($santris->count() > 0)
+        <div class="table-wrapper">
         <table class="data-table">
             <thead>
                 <tr>
@@ -94,6 +95,7 @@
                 @endforeach
             </tbody>
         </table>
+        </div>
 
         <div style="margin-top: 14px;">
             {{ $santris->links() }}

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'Detail Kelas')
 
@@ -97,6 +97,8 @@
         <span class="badge badge-info">{{ $santriList->count() }} santri</span>
     </h3>
     
+    <div class="table-wrapper">
+    
     <table class="data-table">
         <thead>
             <tr>
@@ -131,6 +133,8 @@
             @endforeach
         </tbody>
     </table>
+    
+    </div>
 </div>
 @else
 <div class="content-box" style="margin-top: 14px;">

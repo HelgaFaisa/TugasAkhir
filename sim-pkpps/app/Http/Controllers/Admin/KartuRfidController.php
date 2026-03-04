@@ -79,6 +79,10 @@ class KartuRfidController extends Controller
 
         // ── Siapkan data untuk view ──────────────────────────────────────
         $namaSantri = strtoupper($santri->nama_lengkap ?? 'NAMA SANTRI');
+        // Potong nama max 28 karakter agar muat di kartu
+        if (mb_strlen($namaSantri) > 28) {
+            $namaSantri = mb_substr($namaSantri, 0, 27) . '…';
+        }
         $initial    = strtoupper(substr($santri->nama_lengkap ?? 'S', 0, 1));
         $nis        = !empty($santri->nis) ? $santri->nis : '-';
         $uid        = !empty($santri->rfid_uid) ? $santri->rfid_uid : '-';
@@ -108,7 +112,7 @@ class KartuRfidController extends Controller
             }
         }
 
-        // Foto santri — embed base64 (tidak butuh GD)
+        // Foto santri — resize ke ukuran kartu lalu embed base64
         $fotoBase64 = '';
         $fotoMime   = 'image/jpeg';
         if (!empty($santri->foto)) {
@@ -118,9 +122,40 @@ class KartuRfidController extends Controller
                 public_path($santri->foto),
             ] as $fp) {
                 if (file_exists($fp)) {
-                    $ext        = strtolower(pathinfo($fp, PATHINFO_EXTENSION));
-                    $fotoMime   = in_array($ext, ['png', 'gif', 'webp']) ? 'image/' . $ext : 'image/jpeg';
-                    $fotoBase64 = base64_encode(file_get_contents($fp));
+                    $ext      = strtolower(pathinfo($fp, PATHINFO_EXTENSION));
+                    $fotoMime = in_array($ext, ['png', 'gif', 'webp']) ? 'image/' . $ext : 'image/jpeg';
+
+                    // Resize agar base64 tidak terlalu besar (max 400×400)
+                    if (extension_loaded('gd')) {
+                        $imgData = file_get_contents($fp);
+                        $src     = @imagecreatefromstring($imgData);
+                        if ($src) {
+                            $origW = imagesx($src);
+                            $origH = imagesy($src);
+                            $max   = 400;
+                            if ($origW > $max || $origH > $max) {
+                                $ratio = min($max / $origW, $max / $origH);
+                                $newW  = (int) round($origW * $ratio);
+                                $newH  = (int) round($origH * $ratio);
+                                $dst   = imagecreatetruecolor($newW, $newH);
+                                imagecopyresampled($dst, $src, 0, 0, 0, 0, $newW, $newH, $origW, $origH);
+                                imagedestroy($src);
+                                ob_start();
+                                imagejpeg($dst, null, 80);
+                                $resized = ob_get_clean();
+                                imagedestroy($dst);
+                                $fotoBase64 = base64_encode($resized);
+                                $fotoMime   = 'image/jpeg';
+                            } else {
+                                imagedestroy($src);
+                                $fotoBase64 = base64_encode($imgData);
+                            }
+                        } else {
+                            $fotoBase64 = base64_encode($imgData);
+                        }
+                    } else {
+                        $fotoBase64 = base64_encode(file_get_contents($fp));
+                    }
                     break;
                 }
             }
@@ -154,10 +189,17 @@ class KartuRfidController extends Controller
             'enableImports'     => true,
         ]);
 
+        // Naikkan limit regex agar mPDF tidak error pada HTML besar
+        $prevLimit = ini_get('pcre.backtrack_limit');
+        ini_set('pcre.backtrack_limit', '5000000');
+
         // Matikan page break otomatis
         $mpdf->SetAutoPageBreak(false);
         $mpdf->SetDisplayMode('fullpage');
         $mpdf->WriteHTML($html);
+
+        // Kembalikan limit semula
+        ini_set('pcre.backtrack_limit', $prevLimit);
 
         return response($mpdf->Output('Kartu_RFID_' . $santri->id_santri . '.pdf', 'S'))
             ->header('Content-Type', 'application/pdf')

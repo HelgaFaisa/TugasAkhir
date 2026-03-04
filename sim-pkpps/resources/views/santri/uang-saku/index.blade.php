@@ -1,4 +1,4 @@
-{{-- resources/views/santri/uang-saku/index.blade.php --}}
+﻿{{-- resources/views/santri/uang-saku/index.blade.php --}}
 @extends('layouts.app')
 
 @section('title', 'Riwayat Uang Saku')
@@ -70,6 +70,7 @@
 {{-- Tabel Riwayat --}}
 <div class="table-container" style="margin-top: 14px;">
     @if($riwayatUangSaku->count() > 0)
+        <div class="table-wrapper">
         <table class="data-table">
             <thead>
                 <tr>
@@ -114,6 +115,7 @@
                 @endforeach
             </tbody>
         </table>
+        </div>
         
         {{-- Pagination --}}
         <div style="margin-top: 14px;">

@@ -1,4 +1,4 @@
-{{-- resources/views/admin/kepulangan/settings.blade.php --}}
+﻿{{-- resources/views/admin/kepulangan/settings.blade.php --}}
 
 @extends('layouts.app')
 
@@ -112,7 +112,7 @@
             </div>
             
             <div style="background: #E8F7F2; padding: 15px; border-radius: 8px; margin-bottom: 14px; border-left: 4px solid #6FBA9D;">
-                <strong>â„¹ï¸ Informasi:</strong>
+                <strong>Ã¢â€žÂ¹Ã¯Â¸Â Informasi:</strong>
                 <ul style="margin: 10px 0 0 20px; padding: 0;">
                     <li>Periode ini menentukan rentang waktu perhitungan kuota</li>
                     <li>Perubahan periode akan mempengaruhi perhitungan kuota santri</li>
@@ -133,7 +133,7 @@
         </h3>
         
         <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 14px; border-left: 4px solid #ffc107;">
-            <strong>âš ï¸ PERHATIAN:</strong>
+            <strong>Ã¢Å¡Â Ã¯Â¸Â PERHATIAN:</strong>
             <p style="margin: 10px 0 0 0;">
                 Reset kuota akan mengubah status semua izin yang "Disetujui" dalam periode saat ini menjadi "Selesai". 
                 Ini akan mereset perhitungan kuota untuk memulai periode baru.
@@ -175,7 +175,7 @@
 
         {{-- Info Tambahan --}}
         <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; border-left: 4px solid #2196f3;">
-            <strong>ðŸ’¡ Tips:</strong>
+            <strong>Ã°Å¸â€™Â¡ Tips:</strong>
             <ul style="margin: 10px 0 0 20px; padding: 0; font-size: 0.9rem;">
                 <li>Reset individual dapat dilakukan dari halaman detail santri</li>
                 <li>Reset massal sebaiknya dilakukan di akhir periode</li>
@@ -194,6 +194,7 @@
     
     @if($resetLogs->count() > 0)
         <div style="overflow-x: auto;">
+            <div class="table-wrapper">
             <table class="data-table">
                 <thead>
                     <tr>
@@ -214,7 +215,7 @@
                             <td>
                                 <span style="display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; font-weight: 600; 
                                     {{ $log->jenis_reset == 'massal' ? 'background: #dc3545; color: white;' : 'background: #ffc107; color: #000;' }}">
-                                    {{ $log->jenis_reset == 'massal' ? 'ðŸ‘¥ Massal' : 'ðŸ‘¤ Individual' }}
+                                    {{ $log->jenis_reset == 'massal' ? 'Ã°Å¸â€˜Â¥ Massal' : 'Ã°Å¸â€˜Â¤ Individual' }}
                                 </span>
                             </td>
                             <td>
@@ -248,6 +249,7 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
         </div>
     @else
         <div style="text-align: center; padding: 22px; color: #7F8C8D;">
@@ -267,7 +269,7 @@
                 </h3>
             </div>
             <div style="padding: 14px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 6px; margin-bottom: 15px;">
-                <h4 style="margin: 0 0 10px 0; color: #856404;">âš ï¸ PERINGATAN PENTING!</h4>
+                <h4 style="margin: 0 0 10px 0; color: #856404;">Ã¢Å¡Â Ã¯Â¸Â PERINGATAN PENTING!</h4>
                 <p style="margin: 0; color: #856404;">
                     Anda akan mereset kuota untuk <strong>{{ $totalSantri }} santri aktif</strong>. 
                     Semua izin yang berstatus "Disetujui" akan diubah menjadi "Selesai".
@@ -279,7 +281,7 @@
                 </p>
                 <ul style="margin: 10px 0 0 20px; padding: 0; font-size: 0.9rem;">
                     <li>Semua perhitungan kuota akan direset ke 0</li>
-                    <li>Status izin "Disetujui" â†’ "Selesai"</li>
+                    <li>Status izin "Disetujui" Ã¢â€ â€™ "Selesai"</li>
                     <li>Data arsip tetap tersimpan</li>
                     <li>Aktivitas tercatat dalam log</li>
                 </ul>

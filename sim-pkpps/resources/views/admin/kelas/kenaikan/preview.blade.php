@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'Preview Kenaikan Kelas')
 
@@ -98,6 +98,7 @@
         </div>
 
         @if ($santriList->count() > 0)
+            <div class="table-wrapper">
             <table class="data-table">
                 <thead>
                     <tr>
@@ -152,6 +153,7 @@
                         @endforeach
                     </tbody>
                 </table>
+            </div>
 
             <hr>
 

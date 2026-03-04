@@ -1,4 +1,4 @@
-{{-- resources/views/admin/pembayaran-spp/index.blade.php --}}
+﻿{{-- resources/views/admin/pembayaran-spp/index.blade.php --}}
 @extends('layouts.app')
 
 @section('title', 'Pembayaran SPP')
@@ -20,7 +20,7 @@
 
 <div class="content-box">
 
-    {{-- ── Filter ── --}}
+    {{-- â”€â”€ Filter â”€â”€ --}}
     <div style="background:#f8f9fa;padding:14px;border-radius:8px;margin-bottom:14px;">
         <form method="GET" action="{{ route('admin.pembayaran-spp.index') }}" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
             <input type="hidden" name="tab" value="{{ $tab }}">
@@ -66,7 +66,7 @@
         </form>
     </div>
 
-    {{-- ── KPI Cards ── --}}
+    {{-- â”€â”€ KPI Cards â”€â”€ --}}
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:14px;">
         <div class="kpi-card" style="background:linear-gradient(135deg,#667eea,#764ba2);">
             <div><div class="kpi-label">Total Santri Aktif</div><div class="kpi-val">{{ $totalSantriAll }}</div><div class="kpi-sub">Periode ini</div></div>
@@ -90,7 +90,7 @@
         </div>
     </div>
 
-    {{-- ── Tab Navigation ── --}}
+    {{-- â”€â”€ Tab Navigation â”€â”€ --}}
     <div style="display:flex;gap:6px;margin-bottom:14px;border-bottom:2px solid #e0e0e0;flex-wrap:wrap;">
         <a href="{{ route('admin.pembayaran-spp.index', array_merge(request()->except('tab'),['tab'=>'belum-bayar'])) }}"
            class="spp-tab {{ $tab==='belum-bayar'?'spp-tab-danger':'spp-tab-outline-danger' }}">
@@ -109,7 +109,7 @@
         </a>
     </div>
 
-    {{-- ── Action Buttons ── --}}
+    {{-- â”€â”€ Action Buttons â”€â”€ --}}
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
             <a href="{{ route('admin.pembayaran-spp.generate') }}" class="btn btn-warning btn-sm"><i class="fas fa-cogs"></i> Generate SPP</a>
@@ -118,12 +118,13 @@
         </div>
         <div style="font-size:11px;color:#666;">
             Periode: <strong>{{ $bulanIndo[$bulan]??'' }} {{ $tahun }}</strong>
-            @if($tab==='sudah-bayar') &nbsp;·&nbsp; <i class="fas fa-sort-amount-down"></i> Terbaru bayar di atas @endif
+            @if($tab==='sudah-bayar') &nbsp;Â·&nbsp; <i class="fas fa-sort-amount-down"></i> Terbaru bayar di atas @endif
         </div>
     </div>
 
-    {{-- ── Table ── --}}
+    {{-- â”€â”€ Table â”€â”€ --}}
     <div style="overflow-x:auto;">
+        <div class="table-wrapper">
         <table class="data-table">
             <thead>
                 <tr>
@@ -194,7 +195,7 @@
                         </td>
                     @endif
 
-                    {{-- ── Aksi (1 baris, tombol ikon) ── --}}
+                    {{-- â”€â”€ Aksi (1 baris, tombol ikon) â”€â”€ --}}
                     <td class="text-center" style="white-space:nowrap;">
                         @if($item['pembayaran'])
                             {{-- Riwayat selalu ada --}}
@@ -249,9 +250,10 @@
                 @endforelse
             </tbody>
         </table>
+        </div>
     </div>
 
-    {{-- ── Pagination ── --}}
+    {{-- â”€â”€ Pagination â”€â”€ --}}
     @if($totalPages>1)
     <div style="margin-top:14px;display:flex;justify-content:center;align-items:center;gap:10px;">
         @if($currentPage>1)
@@ -265,7 +267,7 @@
     @endif
 </div>
 
-{{-- ── Modal Catat Cicilan ── --}}
+{{-- â”€â”€ Modal Catat Cicilan â”€â”€ --}}
 <div id="modalCicilan" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center;">
     <div style="background:#fff;border-radius:12px;padding:24px;width:100%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,.3);margin:16px;">
         <h4 style="margin:0 0 4px;"><i class="fas fa-coins" style="color:#9c27b0;"></i> Catat Cicilan</h4>

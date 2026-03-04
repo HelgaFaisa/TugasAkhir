@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
 @php
@@ -63,6 +63,7 @@
     <div class="content-box">
         <h4 style="margin-bottom:12px;"><i class="fas fa-arrow-up" style="color:var(--danger-color);"></i> Pengeluaran Terbesar</h4>
         @if($detailPengeluaran->count() > 0)
+            <div class="table-wrapper">
             <table class="data-table">
                 <thead><tr><th>Tanggal</th><th>Keterangan</th><th>Nominal</th></tr></thead>
                 <tbody>
@@ -75,6 +76,7 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
         @else
             <p class="text-muted">Tidak ada pengeluaran bulan ini.</p>
         @endif
@@ -84,6 +86,7 @@
     <div class="content-box">
         <h4 style="margin-bottom:12px;"><i class="fas fa-arrow-down" style="color:var(--success-color);"></i> Pemasukan Non-SPP</h4>
         @if($detailPemasukan->count() > 0)
+            <div class="table-wrapper">
             <table class="data-table">
                 <thead><tr><th>Tanggal</th><th>Keterangan</th><th>Nominal</th></tr></thead>
                 <tbody>
@@ -96,6 +99,7 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
         @else
             <p class="text-muted">Tidak ada pemasukan non-SPP bulan ini.</p>
         @endif

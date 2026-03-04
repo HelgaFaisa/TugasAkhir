@@ -213,6 +213,91 @@ body.auth-page {
   border-color:#6FBA9D; background:#fff; box-shadow:0 0 0 3px rgba(111,186,157,.1);
 }
 
+/* ── Demo Account Button ── */
+.lg-demo-btn {
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  margin-top:10px; padding:9px;
+  background:transparent; border:1.5px dashed #A8D8C6; border-radius:10px;
+  font-size:.76rem; font-weight:600; color:#8AADA0; cursor:pointer;
+  font-family:inherit; width:100%;
+  transition:all .2s;
+}
+.lg-demo-btn:hover { border-color:#6FBA9D; color:#3D8A6E; background:#EBF7F2; }
+
+/* ── Modal Overlay ── */
+.lg-modal-overlay {
+  position:fixed; inset:0; z-index:9999;
+  background:rgba(15,33,24,.45); backdrop-filter:blur(4px);
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none; transition:opacity .25s ease;
+}
+.lg-modal-overlay.open { opacity:1; pointer-events:all; }
+
+/* ── Modal Box ── */
+.lg-modal {
+  background:#fff; border-radius:20px; padding:32px 28px;
+  width:100%; max-width:380px; position:relative;
+  box-shadow:0 20px 60px rgba(15,33,24,.18);
+  transform:translateY(16px) scale(.97); transition:transform .25s ease;
+}
+.lg-modal-overlay.open .lg-modal { transform:translateY(0) scale(1); }
+.lg-modal::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:3px;
+  background:linear-gradient(90deg,#6FBA9D,#A8D8C6,#6FBA9D);
+  border-radius:20px 20px 0 0;
+}
+.lg-modal-close {
+  position:absolute; top:14px; right:16px;
+  background:none; border:none; font-size:1.1rem;
+  color:#B8D4C8; cursor:pointer; line-height:1;
+  transition:color .2s;
+}
+.lg-modal-close:hover { color:#3D8A6E; }
+.lg-modal-ico {
+  width:44px; height:44px; border-radius:12px; background:#EBF7F2;
+  display:flex; align-items:center; justify-content:center;
+  color:#3D8A6E; font-size:1rem; margin-bottom:14px;
+}
+.lg-modal-title {
+  font-family:'DM Serif Display',serif;
+  font-size:1.35rem; color:#0F2118; margin-bottom:4px;
+}
+.lg-modal-sub { font-size:.75rem; color:#8AADA0; margin-bottom:20px; line-height:1.5; }
+.lg-demo-table { width:100%; border-collapse:collapse; }
+.lg-demo-table thead tr th {
+  font-size:.64rem; font-weight:700; letter-spacing:1.2px;
+  text-transform:uppercase; color:#8AADA0;
+  padding:0 10px 8px; text-align:left;
+  border-bottom:1px solid #EBF7F2;
+}
+.lg-demo-table tbody tr { transition:background .15s; }
+.lg-demo-table tbody tr:hover { background:#F4FCF8; }
+.lg-demo-table tbody tr td {
+  padding:10px 10px; font-size:.78rem; color:#2A4235;
+  border-bottom:1px solid #F0FAF5; vertical-align:middle;
+}
+.lg-demo-table tbody tr:last-child td { border-bottom:none; }
+.lg-role-badge {
+  display:inline-block; padding:2px 8px;
+  border-radius:20px; font-size:.66rem; font-weight:700;
+  letter-spacing:.5px;
+}
+.badge-super  { background:#FFF3E0; color:#E65100; }
+.badge-akademik { background:#E3F2FD; color:#1565C0; }
+.badge-pamong { background:#F3E5F5; color:#6A1B9A; }
+.badge-santri { background:#E8F5E9; color:#2E7D32; }
+.lg-copy-btn {
+  background:none; border:none; color:#A8D8C6; cursor:pointer;
+  font-size:.72rem; padding:2px 4px; border-radius:4px;
+  transition:color .2s;
+}
+.lg-copy-btn:hover { color:#3D8A6E; }
+.lg-modal-note {
+  margin-top:16px; padding:10px 12px;
+  background:#FFFBF0; border-left:3px solid #FFD54F;
+  border-radius:8px; font-size:.72rem; color:#795548; line-height:1.6;
+}
+
 /* Responsive */
 @media (max-width: 900px) {
   .lg-layout { gap:48px; padding:32px 36px; }
@@ -357,10 +442,86 @@ body.auth-page {
           <a href="<?php echo e(route('santri.login')); ?>" class="lg-santri-link">
             <i class="fas fa-user-graduate"></i> Login sebagai Santri / Wali
           </a>
+
+          
+          <button type="button" class="lg-demo-btn" id="lgDemoBtn">
+            <i class="fas fa-info-circle"></i> Lihat Akun Demo untuk Pengujian
+          </button>
+
         </form>
       </div>
     </div>
 
+  </div>
+</div>
+
+
+<div class="lg-modal-overlay" id="lgDemoOverlay">
+  <div class="lg-modal">
+    <button class="lg-modal-close" id="lgModalClose" aria-label="Tutup">
+      <i class="fas fa-times"></i>
+    </button>
+    <div class="lg-modal-ico"><i class="fas fa-users"></i></div>
+    <div class="lg-modal-title">Akun Demo</div>
+
+    <table class="lg-demo-table">
+      <thead>
+        <tr>
+          <th>Role</th>
+          <th>Email / Username</th>
+          <th>Password</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="lg-role-badge badge-super">Superadmin</span></td>
+          <td style="font-size:.72rem;">helga.faisa06@gmail.com</td>
+          <td style="font-size:.72rem;">Admin123_</td>
+          <td>
+            <button class="lg-copy-btn" onclick="lgCopy('helga.faisa06@gmail.com','Admin123_')" title="Isi otomatis">
+              <i class="fas fa-arrow-right"></i>
+            </button>
+          </td>
+        </tr>
+        <tr>
+          <td><span class="lg-role-badge badge-akademik">Akademik</span></td>
+          <td style="font-size:.72rem;">akademik@test.com</td>
+          <td style="font-size:.72rem;">password123</td>
+          <td>
+            <button class="lg-copy-btn" onclick="lgCopy('akademik@test.com','password123')" title="Isi otomatis">
+              <i class="fas fa-arrow-right"></i>
+            </button>
+          </td>
+        </tr>
+        <tr>
+          <td><span class="lg-role-badge badge-pamong">Pamong</span></td>
+          <td style="font-size:.72rem;">pamong@test.com</td>
+          <td style="font-size:.72rem;">password123</td>
+          <td>
+            <button class="lg-copy-btn" onclick="lgCopy('pamong@test.com','password123')" title="Isi otomatis">
+              <i class="fas fa-arrow-right"></i>
+            </button>
+          </td>
+        </tr>
+        <tr>
+          <td><span class="lg-role-badge badge-santri">Santri</span></td>
+          <td style="font-size:.72rem;">Helga Faisa</td>
+          <td style="font-size:.72rem;">s001</td>
+          <td>
+            <button class="lg-copy-btn" onclick="lgCopy('Helga Faisa','s001')" title="Isi otomatis">
+              <i class="fas fa-arrow-right"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="lg-modal-note">
+      <i class="fas fa-info-circle"></i>
+      Klik <i class="fas fa-arrow-right"></i> untuk mengisi form login otomatis.
+      Akun santri dapat digunakan di halaman login santri.
+    </div>
   </div>
 </div>
 
@@ -419,8 +580,34 @@ document.addEventListener('DOMContentLoaded', function() {
       if (e.key === 'Enter') { e.preventDefault(); p.focus(); }
     });
   }
+
+  // ── Demo Modal ──
+  const demoBtn     = document.getElementById('lgDemoBtn');
+  const overlay     = document.getElementById('lgDemoOverlay');
+  const modalClose  = document.getElementById('lgModalClose');
+
+  function openModal()  { overlay.classList.add('open'); }
+  function closeModal() { overlay.classList.remove('open'); }
+
+  if (demoBtn)    demoBtn.addEventListener('click', openModal);
+  if (modalClose) modalClose.addEventListener('click', closeModal);
+  if (overlay)    overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) closeModal();
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeModal();
+  });
 });
+
+// Auto-fill form dari modal
+function lgCopy(email, pass) {
+  const u = document.getElementById('username');
+  const p = document.getElementById('password');
+  if (u) u.value = email;
+  if (p) p.value = pass;
+  document.getElementById('lgDemoOverlay').classList.remove('open');
+  if (u) u.focus();
+}
 </script>
 <?php $__env->stopSection(); ?>
-
 <?php echo $__env->make('auth.auth_layout', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\TugasAkhir\sim-pkpps\resources\views/admin/auth/login.blade.php ENDPATH**/ ?>

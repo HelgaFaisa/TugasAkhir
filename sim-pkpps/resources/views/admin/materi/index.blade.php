@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
 <div class="page-header">
@@ -85,6 +85,7 @@
 {{-- Table Section --}}
 <div class="content-box">
     @if($materis->count() > 0)
+        <div class="table-wrapper">
         <table class="data-table">
             <thead>
                 <tr>
@@ -139,6 +140,7 @@
                 @endforeach
             </tbody>
         </table>
+        </div>
 
         {{-- Pagination --}}
         <div style="margin-top: 14px;">

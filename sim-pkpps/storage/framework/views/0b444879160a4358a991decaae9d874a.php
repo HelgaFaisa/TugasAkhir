@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $__env->yieldContent('title', 'SIM Santri'); ?></title>
+    <link rel="icon" type="image/png" href="<?php echo e(asset('images/favicon.png')); ?>">
     <!-- Link ke Font Awesome untuk ikon -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Font Cinzel untuk splash screen -->
@@ -36,11 +37,24 @@
         <!-- SIDEBAR -->
         <aside id="sidebar" class="sidebar">
             <div class="sidebar-header">
-                <h3>SIM Santri</h3>
-                <button id="sidebar-toggle-btn-mobile" class="sidebar-toggle-btn-mobile">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
+    <div class="sidebar-brand">
+        <div class="sidebar-brand-icon-wrapper">
+            <i class="fas fa-graduation-cap sidebar-brand-icon"></i>
+        </div>
+        <div class="sidebar-brand-text">
+            <span class="sidebar-brand-name">PKPPS</span>
+            <span class="sidebar-brand-sub">Riyadlul Jannah</span>
+        </div>
+        <div class="sidebar-brand-ornament">
+            <span class="ornament-line"></span>
+            <span class="ornament-dot"></span>
+            <span class="ornament-line"></span>
+        </div>
+    </div>
+    <button id="sidebar-toggle-btn-mobile" class="sidebar-toggle-btn-mobile">
+        <i class="fas fa-times"></i>
+    </button>
+</div>
             <ul class="sidebar-menu">
                 
                 <?php if(auth()->check()): ?>

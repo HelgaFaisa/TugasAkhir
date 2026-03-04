@@ -221,33 +221,6 @@ class SemesterReportPage extends StatelessWidget {
             ),
             const SizedBox(height: 15),
 
-            // ===== PEER COMPARISON =====
-            if (data.peerComparison.isNotEmpty)
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 12, offset: const Offset(0, 4))],
-                ),
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Row(
-                      children: [
-                        Icon(Icons.people_rounded, size: 15, color: _kPrimary),
-                        SizedBox(width: 7),
-                        Text('Perbandingan Kelas', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    ...data.peerComparison.map((p) => _peerRow(p)),
-                  ],
-                ),
-              ),
-            const SizedBox(height: 15),
-
             // ===== RANKING =====
             if (data.rank != null)
               Container(
